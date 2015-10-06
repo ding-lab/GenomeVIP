@@ -1,0 +1,3388 @@
+1129
+s3://1000genomes/phase1/data/HG00096/exome_alignment
+s3://1000genomes/phase1/data/HG00097/exome_alignment
+s3://1000genomes/phase1/data/HG00099/exome_alignment
+s3://1000genomes/phase1/data/HG00100/exome_alignment
+s3://1000genomes/phase1/data/HG00101/exome_alignment
+s3://1000genomes/phase1/data/HG00102/exome_alignment
+s3://1000genomes/phase1/data/HG00103/exome_alignment
+s3://1000genomes/phase1/data/HG00104/exome_alignment
+s3://1000genomes/phase1/data/HG00105/exome_alignment
+s3://1000genomes/phase1/data/HG00106/exome_alignment
+s3://1000genomes/phase1/data/HG00107/exome_alignment
+s3://1000genomes/phase1/data/HG00108/exome_alignment
+s3://1000genomes/phase1/data/HG00109/exome_alignment
+s3://1000genomes/phase1/data/HG00110/exome_alignment
+s3://1000genomes/phase1/data/HG00111/exome_alignment
+s3://1000genomes/phase1/data/HG00112/exome_alignment
+s3://1000genomes/phase1/data/HG00113/exome_alignment
+s3://1000genomes/phase1/data/HG00114/exome_alignment
+s3://1000genomes/phase1/data/HG00115/exome_alignment
+s3://1000genomes/phase1/data/HG00116/exome_alignment
+s3://1000genomes/phase1/data/HG00117/exome_alignment
+s3://1000genomes/phase1/data/HG00118/exome_alignment
+s3://1000genomes/phase1/data/HG00119/exome_alignment
+s3://1000genomes/phase1/data/HG00120/exome_alignment
+s3://1000genomes/phase1/data/HG00121/exome_alignment
+s3://1000genomes/phase1/data/HG00122/exome_alignment
+s3://1000genomes/phase1/data/HG00123/exome_alignment
+s3://1000genomes/phase1/data/HG00124/exome_alignment
+s3://1000genomes/phase1/data/HG00125/exome_alignment
+s3://1000genomes/phase1/data/HG00126/exome_alignment
+s3://1000genomes/phase1/data/HG00127/exome_alignment
+s3://1000genomes/phase1/data/HG00128/exome_alignment
+s3://1000genomes/phase1/data/HG00129/exome_alignment
+s3://1000genomes/phase1/data/HG00130/exome_alignment
+s3://1000genomes/phase1/data/HG00131/exome_alignment
+s3://1000genomes/phase1/data/HG00132/exome_alignment
+s3://1000genomes/phase1/data/HG00133/exome_alignment
+s3://1000genomes/phase1/data/HG00134/exome_alignment
+s3://1000genomes/phase1/data/HG00135/exome_alignment
+s3://1000genomes/phase1/data/HG00136/exome_alignment
+s3://1000genomes/phase1/data/HG00137/exome_alignment
+s3://1000genomes/phase1/data/HG00138/exome_alignment
+s3://1000genomes/phase1/data/HG00139/exome_alignment
+s3://1000genomes/phase1/data/HG00140/exome_alignment
+s3://1000genomes/phase1/data/HG00141/exome_alignment
+s3://1000genomes/phase1/data/HG00142/exome_alignment
+s3://1000genomes/phase1/data/HG00143/exome_alignment
+s3://1000genomes/phase1/data/HG00145/exome_alignment
+s3://1000genomes/phase1/data/HG00148/exome_alignment
+s3://1000genomes/phase1/data/HG00149/exome_alignment
+s3://1000genomes/phase1/data/HG00150/exome_alignment
+s3://1000genomes/phase1/data/HG00151/exome_alignment
+s3://1000genomes/phase1/data/HG00152/exome_alignment
+s3://1000genomes/phase1/data/HG00154/exome_alignment
+s3://1000genomes/phase1/data/HG00156/exome_alignment
+s3://1000genomes/phase1/data/HG00157/exome_alignment
+s3://1000genomes/phase1/data/HG00158/exome_alignment
+s3://1000genomes/phase1/data/HG00159/exome_alignment
+s3://1000genomes/phase1/data/HG00160/exome_alignment
+s3://1000genomes/phase1/data/HG00171/exome_alignment
+s3://1000genomes/phase1/data/HG00173/exome_alignment
+s3://1000genomes/phase1/data/HG00174/exome_alignment
+s3://1000genomes/phase1/data/HG00176/exome_alignment
+s3://1000genomes/phase1/data/HG00177/exome_alignment
+s3://1000genomes/phase1/data/HG00178/exome_alignment
+s3://1000genomes/phase1/data/HG00179/exome_alignment
+s3://1000genomes/phase1/data/HG00180/exome_alignment
+s3://1000genomes/phase1/data/HG00181/exome_alignment
+s3://1000genomes/phase1/data/HG00182/exome_alignment
+s3://1000genomes/phase1/data/HG00183/exome_alignment
+s3://1000genomes/phase1/data/HG00185/exome_alignment
+s3://1000genomes/phase1/data/HG00186/exome_alignment
+s3://1000genomes/phase1/data/HG00187/exome_alignment
+s3://1000genomes/phase1/data/HG00188/exome_alignment
+s3://1000genomes/phase1/data/HG00189/exome_alignment
+s3://1000genomes/phase1/data/HG00190/exome_alignment
+s3://1000genomes/phase1/data/HG00231/exome_alignment
+s3://1000genomes/phase1/data/HG00232/exome_alignment
+s3://1000genomes/phase1/data/HG00233/exome_alignment
+s3://1000genomes/phase1/data/HG00234/exome_alignment
+s3://1000genomes/phase1/data/HG00235/exome_alignment
+s3://1000genomes/phase1/data/HG00236/exome_alignment
+s3://1000genomes/phase1/data/HG00237/exome_alignment
+s3://1000genomes/phase1/data/HG00238/exome_alignment
+s3://1000genomes/phase1/data/HG00239/exome_alignment
+s3://1000genomes/phase1/data/HG00240/exome_alignment
+s3://1000genomes/phase1/data/HG00242/exome_alignment
+s3://1000genomes/phase1/data/HG00243/exome_alignment
+s3://1000genomes/phase1/data/HG00244/exome_alignment
+s3://1000genomes/phase1/data/HG00246/exome_alignment
+s3://1000genomes/phase1/data/HG00247/exome_alignment
+s3://1000genomes/phase1/data/HG00249/exome_alignment
+s3://1000genomes/phase1/data/HG00250/exome_alignment
+s3://1000genomes/phase1/data/HG00251/exome_alignment
+s3://1000genomes/phase1/data/HG00252/exome_alignment
+s3://1000genomes/phase1/data/HG00253/exome_alignment
+s3://1000genomes/phase1/data/HG00254/exome_alignment
+s3://1000genomes/phase1/data/HG00255/exome_alignment
+s3://1000genomes/phase1/data/HG00256/exome_alignment
+s3://1000genomes/phase1/data/HG00257/exome_alignment
+s3://1000genomes/phase1/data/HG00258/exome_alignment
+s3://1000genomes/phase1/data/HG00259/exome_alignment
+s3://1000genomes/phase1/data/HG00260/exome_alignment
+s3://1000genomes/phase1/data/HG00261/exome_alignment
+s3://1000genomes/phase1/data/HG00262/exome_alignment
+s3://1000genomes/phase1/data/HG00263/exome_alignment
+s3://1000genomes/phase1/data/HG00264/exome_alignment
+s3://1000genomes/phase1/data/HG00265/exome_alignment
+s3://1000genomes/phase1/data/HG00266/exome_alignment
+s3://1000genomes/phase1/data/HG00267/exome_alignment
+s3://1000genomes/phase1/data/HG00268/exome_alignment
+s3://1000genomes/phase1/data/HG00269/exome_alignment
+s3://1000genomes/phase1/data/HG00270/exome_alignment
+s3://1000genomes/phase1/data/HG00271/exome_alignment
+s3://1000genomes/phase1/data/HG00272/exome_alignment
+s3://1000genomes/phase1/data/HG00273/exome_alignment
+s3://1000genomes/phase1/data/HG00274/exome_alignment
+s3://1000genomes/phase1/data/HG00275/exome_alignment
+s3://1000genomes/phase1/data/HG00276/exome_alignment
+s3://1000genomes/phase1/data/HG00277/exome_alignment
+s3://1000genomes/phase1/data/HG00278/exome_alignment
+s3://1000genomes/phase1/data/HG00280/exome_alignment
+s3://1000genomes/phase1/data/HG00281/exome_alignment
+s3://1000genomes/phase1/data/HG00282/exome_alignment
+s3://1000genomes/phase1/data/HG00284/exome_alignment
+s3://1000genomes/phase1/data/HG00285/exome_alignment
+s3://1000genomes/phase1/data/HG00306/exome_alignment
+s3://1000genomes/phase1/data/HG00309/exome_alignment
+s3://1000genomes/phase1/data/HG00310/exome_alignment
+s3://1000genomes/phase1/data/HG00311/exome_alignment
+s3://1000genomes/phase1/data/HG00312/exome_alignment
+s3://1000genomes/phase1/data/HG00313/exome_alignment
+s3://1000genomes/phase1/data/HG00315/exome_alignment
+s3://1000genomes/phase1/data/HG00318/exome_alignment
+s3://1000genomes/phase1/data/HG00319/exome_alignment
+s3://1000genomes/phase1/data/HG00320/exome_alignment
+s3://1000genomes/phase1/data/HG00321/exome_alignment
+s3://1000genomes/phase1/data/HG00323/exome_alignment
+s3://1000genomes/phase1/data/HG00324/exome_alignment
+s3://1000genomes/phase1/data/HG00325/exome_alignment
+s3://1000genomes/phase1/data/HG00326/exome_alignment
+s3://1000genomes/phase1/data/HG00327/exome_alignment
+s3://1000genomes/phase1/data/HG00328/exome_alignment
+s3://1000genomes/phase1/data/HG00329/exome_alignment
+s3://1000genomes/phase1/data/HG00330/exome_alignment
+s3://1000genomes/phase1/data/HG00331/exome_alignment
+s3://1000genomes/phase1/data/HG00332/exome_alignment
+s3://1000genomes/phase1/data/HG00334/exome_alignment
+s3://1000genomes/phase1/data/HG00335/exome_alignment
+s3://1000genomes/phase1/data/HG00336/exome_alignment
+s3://1000genomes/phase1/data/HG00337/exome_alignment
+s3://1000genomes/phase1/data/HG00338/exome_alignment
+s3://1000genomes/phase1/data/HG00339/exome_alignment
+s3://1000genomes/phase1/data/HG00341/exome_alignment
+s3://1000genomes/phase1/data/HG00342/exome_alignment
+s3://1000genomes/phase1/data/HG00343/exome_alignment
+s3://1000genomes/phase1/data/HG00344/exome_alignment
+s3://1000genomes/phase1/data/HG00345/exome_alignment
+s3://1000genomes/phase1/data/HG00346/exome_alignment
+s3://1000genomes/phase1/data/HG00349/exome_alignment
+s3://1000genomes/phase1/data/HG00350/exome_alignment
+s3://1000genomes/phase1/data/HG00351/exome_alignment
+s3://1000genomes/phase1/data/HG00353/exome_alignment
+s3://1000genomes/phase1/data/HG00355/exome_alignment
+s3://1000genomes/phase1/data/HG00356/exome_alignment
+s3://1000genomes/phase1/data/HG00357/exome_alignment
+s3://1000genomes/phase1/data/HG00358/exome_alignment
+s3://1000genomes/phase1/data/HG00359/exome_alignment
+s3://1000genomes/phase1/data/HG00360/exome_alignment
+s3://1000genomes/phase1/data/HG00361/exome_alignment
+s3://1000genomes/phase1/data/HG00364/exome_alignment
+s3://1000genomes/phase1/data/HG00365/exome_alignment
+s3://1000genomes/phase1/data/HG00366/exome_alignment
+s3://1000genomes/phase1/data/HG00367/exome_alignment
+s3://1000genomes/phase1/data/HG00368/exome_alignment
+s3://1000genomes/phase1/data/HG00369/exome_alignment
+s3://1000genomes/phase1/data/HG00371/exome_alignment
+s3://1000genomes/phase1/data/HG00372/exome_alignment
+s3://1000genomes/phase1/data/HG00373/exome_alignment
+s3://1000genomes/phase1/data/HG00375/exome_alignment
+s3://1000genomes/phase1/data/HG00376/exome_alignment
+s3://1000genomes/phase1/data/HG00377/exome_alignment
+s3://1000genomes/phase1/data/HG00378/exome_alignment
+s3://1000genomes/phase1/data/HG00379/exome_alignment
+s3://1000genomes/phase1/data/HG00380/exome_alignment
+s3://1000genomes/phase1/data/HG00381/exome_alignment
+s3://1000genomes/phase1/data/HG00382/exome_alignment
+s3://1000genomes/phase1/data/HG00383/exome_alignment
+s3://1000genomes/phase1/data/HG00384/exome_alignment
+s3://1000genomes/phase1/data/HG00403/exome_alignment
+s3://1000genomes/phase1/data/HG00404/exome_alignment
+s3://1000genomes/phase1/data/HG00406/exome_alignment
+s3://1000genomes/phase1/data/HG00407/exome_alignment
+s3://1000genomes/phase1/data/HG00418/exome_alignment
+s3://1000genomes/phase1/data/HG00419/exome_alignment
+s3://1000genomes/phase1/data/HG00421/exome_alignment
+s3://1000genomes/phase1/data/HG00422/exome_alignment
+s3://1000genomes/phase1/data/HG00427/exome_alignment
+s3://1000genomes/phase1/data/HG00428/exome_alignment
+s3://1000genomes/phase1/data/HG00436/exome_alignment
+s3://1000genomes/phase1/data/HG00437/exome_alignment
+s3://1000genomes/phase1/data/HG00442/exome_alignment
+s3://1000genomes/phase1/data/HG00443/exome_alignment
+s3://1000genomes/phase1/data/HG00445/exome_alignment
+s3://1000genomes/phase1/data/HG00446/exome_alignment
+s3://1000genomes/phase1/data/HG00448/exome_alignment
+s3://1000genomes/phase1/data/HG00449/exome_alignment
+s3://1000genomes/phase1/data/HG00451/exome_alignment
+s3://1000genomes/phase1/data/HG00452/exome_alignment
+s3://1000genomes/phase1/data/HG00457/exome_alignment
+s3://1000genomes/phase1/data/HG00458/exome_alignment
+s3://1000genomes/phase1/data/HG00463/exome_alignment
+s3://1000genomes/phase1/data/HG00464/exome_alignment
+s3://1000genomes/phase1/data/HG00472/exome_alignment
+s3://1000genomes/phase1/data/HG00473/exome_alignment
+s3://1000genomes/phase1/data/HG00475/exome_alignment
+s3://1000genomes/phase1/data/HG00476/exome_alignment
+s3://1000genomes/phase1/data/HG00478/exome_alignment
+s3://1000genomes/phase1/data/HG00479/exome_alignment
+s3://1000genomes/phase1/data/HG00500/exome_alignment
+s3://1000genomes/phase1/data/HG00501/exome_alignment
+s3://1000genomes/phase1/data/HG00512/exome_alignment
+s3://1000genomes/phase1/data/HG00513/exome_alignment
+s3://1000genomes/phase1/data/HG00524/exome_alignment
+s3://1000genomes/phase1/data/HG00525/exome_alignment
+s3://1000genomes/phase1/data/HG00530/exome_alignment
+s3://1000genomes/phase1/data/HG00531/exome_alignment
+s3://1000genomes/phase1/data/HG00533/exome_alignment
+s3://1000genomes/phase1/data/HG00534/exome_alignment
+s3://1000genomes/phase1/data/HG00536/exome_alignment
+s3://1000genomes/phase1/data/HG00537/exome_alignment
+s3://1000genomes/phase1/data/HG00542/exome_alignment
+s3://1000genomes/phase1/data/HG00543/exome_alignment
+s3://1000genomes/phase1/data/HG00551/exome_alignment
+s3://1000genomes/phase1/data/HG00553/exome_alignment
+s3://1000genomes/phase1/data/HG00554/exome_alignment
+s3://1000genomes/phase1/data/HG00556/exome_alignment
+s3://1000genomes/phase1/data/HG00557/exome_alignment
+s3://1000genomes/phase1/data/HG00559/exome_alignment
+s3://1000genomes/phase1/data/HG00560/exome_alignment
+s3://1000genomes/phase1/data/HG00565/exome_alignment
+s3://1000genomes/phase1/data/HG00566/exome_alignment
+s3://1000genomes/phase1/data/HG00577/exome_alignment
+s3://1000genomes/phase1/data/HG00578/exome_alignment
+s3://1000genomes/phase1/data/HG00580/exome_alignment
+s3://1000genomes/phase1/data/HG00581/exome_alignment
+s3://1000genomes/phase1/data/HG00583/exome_alignment
+s3://1000genomes/phase1/data/HG00584/exome_alignment
+s3://1000genomes/phase1/data/HG00589/exome_alignment
+s3://1000genomes/phase1/data/HG00590/exome_alignment
+s3://1000genomes/phase1/data/HG00592/exome_alignment
+s3://1000genomes/phase1/data/HG00593/exome_alignment
+s3://1000genomes/phase1/data/HG00595/exome_alignment
+s3://1000genomes/phase1/data/HG00596/exome_alignment
+s3://1000genomes/phase1/data/HG00607/exome_alignment
+s3://1000genomes/phase1/data/HG00608/exome_alignment
+s3://1000genomes/phase1/data/HG00610/exome_alignment
+s3://1000genomes/phase1/data/HG00611/exome_alignment
+s3://1000genomes/phase1/data/HG00613/exome_alignment
+s3://1000genomes/phase1/data/HG00614/exome_alignment
+s3://1000genomes/phase1/data/HG00619/exome_alignment
+s3://1000genomes/phase1/data/HG00620/exome_alignment
+s3://1000genomes/phase1/data/HG00625/exome_alignment
+s3://1000genomes/phase1/data/HG00626/exome_alignment
+s3://1000genomes/phase1/data/HG00628/exome_alignment
+s3://1000genomes/phase1/data/HG00629/exome_alignment
+s3://1000genomes/phase1/data/HG00634/exome_alignment
+s3://1000genomes/phase1/data/HG00635/exome_alignment
+s3://1000genomes/phase1/data/HG00637/exome_alignment
+s3://1000genomes/phase1/data/HG00638/exome_alignment
+s3://1000genomes/phase1/data/HG00640/exome_alignment
+s3://1000genomes/phase1/data/HG00641/exome_alignment
+s3://1000genomes/phase1/data/HG00650/exome_alignment
+s3://1000genomes/phase1/data/HG00651/exome_alignment
+s3://1000genomes/phase1/data/HG00653/exome_alignment
+s3://1000genomes/phase1/data/HG00654/exome_alignment
+s3://1000genomes/phase1/data/HG00656/exome_alignment
+s3://1000genomes/phase1/data/HG00657/exome_alignment
+s3://1000genomes/phase1/data/HG00662/exome_alignment
+s3://1000genomes/phase1/data/HG00663/exome_alignment
+s3://1000genomes/phase1/data/HG00671/exome_alignment
+s3://1000genomes/phase1/data/HG00672/exome_alignment
+s3://1000genomes/phase1/data/HG00683/exome_alignment
+s3://1000genomes/phase1/data/HG00684/exome_alignment
+s3://1000genomes/phase1/data/HG00689/exome_alignment
+s3://1000genomes/phase1/data/HG00690/exome_alignment
+s3://1000genomes/phase1/data/HG00692/exome_alignment
+s3://1000genomes/phase1/data/HG00693/exome_alignment
+s3://1000genomes/phase1/data/HG00698/exome_alignment
+s3://1000genomes/phase1/data/HG00699/exome_alignment
+s3://1000genomes/phase1/data/HG00701/exome_alignment
+s3://1000genomes/phase1/data/HG00702/exome_alignment
+s3://1000genomes/phase1/data/HG00704/exome_alignment
+s3://1000genomes/phase1/data/HG00705/exome_alignment
+s3://1000genomes/phase1/data/HG00707/exome_alignment
+s3://1000genomes/phase1/data/HG00708/exome_alignment
+s3://1000genomes/phase1/data/HG00731/exome_alignment
+s3://1000genomes/phase1/data/HG00732/exome_alignment
+s3://1000genomes/phase1/data/HG00734/exome_alignment
+s3://1000genomes/phase1/data/HG00736/exome_alignment
+s3://1000genomes/phase1/data/HG00737/exome_alignment
+s3://1000genomes/phase1/data/HG00739/exome_alignment
+s3://1000genomes/phase1/data/HG00740/exome_alignment
+s3://1000genomes/phase1/data/HG01047/exome_alignment
+s3://1000genomes/phase1/data/HG01048/exome_alignment
+s3://1000genomes/phase1/data/HG01049/exome_alignment
+s3://1000genomes/phase1/data/HG01051/exome_alignment
+s3://1000genomes/phase1/data/HG01052/exome_alignment
+s3://1000genomes/phase1/data/HG01054/exome_alignment
+s3://1000genomes/phase1/data/HG01055/exome_alignment
+s3://1000genomes/phase1/data/HG01060/exome_alignment
+s3://1000genomes/phase1/data/HG01061/exome_alignment
+s3://1000genomes/phase1/data/HG01066/exome_alignment
+s3://1000genomes/phase1/data/HG01067/exome_alignment
+s3://1000genomes/phase1/data/HG01069/exome_alignment
+s3://1000genomes/phase1/data/HG01070/exome_alignment
+s3://1000genomes/phase1/data/HG01072/exome_alignment
+s3://1000genomes/phase1/data/HG01073/exome_alignment
+s3://1000genomes/phase1/data/HG01075/exome_alignment
+s3://1000genomes/phase1/data/HG01079/exome_alignment
+s3://1000genomes/phase1/data/HG01080/exome_alignment
+s3://1000genomes/phase1/data/HG01082/exome_alignment
+s3://1000genomes/phase1/data/HG01083/exome_alignment
+s3://1000genomes/phase1/data/HG01085/exome_alignment
+s3://1000genomes/phase1/data/HG01086/exome_alignment
+s3://1000genomes/phase1/data/HG01094/exome_alignment
+s3://1000genomes/phase1/data/HG01095/exome_alignment
+s3://1000genomes/phase1/data/HG01097/exome_alignment
+s3://1000genomes/phase1/data/HG01098/exome_alignment
+s3://1000genomes/phase1/data/HG01102/exome_alignment
+s3://1000genomes/phase1/data/HG01104/exome_alignment
+s3://1000genomes/phase1/data/HG01105/exome_alignment
+s3://1000genomes/phase1/data/HG01107/exome_alignment
+s3://1000genomes/phase1/data/HG01108/exome_alignment
+s3://1000genomes/phase1/data/HG01110/exome_alignment
+s3://1000genomes/phase1/data/HG01111/exome_alignment
+s3://1000genomes/phase1/data/HG01112/exome_alignment
+s3://1000genomes/phase1/data/HG01113/exome_alignment
+s3://1000genomes/phase1/data/HG01124/exome_alignment
+s3://1000genomes/phase1/data/HG01125/exome_alignment
+s3://1000genomes/phase1/data/HG01133/exome_alignment
+s3://1000genomes/phase1/data/HG01134/exome_alignment
+s3://1000genomes/phase1/data/HG01136/exome_alignment
+s3://1000genomes/phase1/data/HG01137/exome_alignment
+s3://1000genomes/phase1/data/HG01139/exome_alignment
+s3://1000genomes/phase1/data/HG01140/exome_alignment
+s3://1000genomes/phase1/data/HG01148/exome_alignment
+s3://1000genomes/phase1/data/HG01149/exome_alignment
+s3://1000genomes/phase1/data/HG01168/exome_alignment
+s3://1000genomes/phase1/data/HG01170/exome_alignment
+s3://1000genomes/phase1/data/HG01171/exome_alignment
+s3://1000genomes/phase1/data/HG01173/exome_alignment
+s3://1000genomes/phase1/data/HG01174/exome_alignment
+s3://1000genomes/phase1/data/HG01176/exome_alignment
+s3://1000genomes/phase1/data/HG01177/exome_alignment
+s3://1000genomes/phase1/data/HG01187/exome_alignment
+s3://1000genomes/phase1/data/HG01188/exome_alignment
+s3://1000genomes/phase1/data/HG01190/exome_alignment
+s3://1000genomes/phase1/data/HG01205/exome_alignment
+s3://1000genomes/phase1/data/HG01241/exome_alignment
+s3://1000genomes/phase1/data/HG01242/exome_alignment
+s3://1000genomes/phase1/data/HG01247/exome_alignment
+s3://1000genomes/phase1/data/HG01248/exome_alignment
+s3://1000genomes/phase1/data/HG01250/exome_alignment
+s3://1000genomes/phase1/data/HG01251/exome_alignment
+s3://1000genomes/phase1/data/HG01253/exome_alignment
+s3://1000genomes/phase1/data/HG01254/exome_alignment
+s3://1000genomes/phase1/data/HG01256/exome_alignment
+s3://1000genomes/phase1/data/HG01257/exome_alignment
+s3://1000genomes/phase1/data/HG01259/exome_alignment
+s3://1000genomes/phase1/data/HG01260/exome_alignment
+s3://1000genomes/phase1/data/HG01271/exome_alignment
+s3://1000genomes/phase1/data/HG01272/exome_alignment
+s3://1000genomes/phase1/data/HG01274/exome_alignment
+s3://1000genomes/phase1/data/HG01275/exome_alignment
+s3://1000genomes/phase1/data/HG01277/exome_alignment
+s3://1000genomes/phase1/data/HG01278/exome_alignment
+s3://1000genomes/phase1/data/HG01334/exome_alignment
+s3://1000genomes/phase1/data/HG01341/exome_alignment
+s3://1000genomes/phase1/data/HG01342/exome_alignment
+s3://1000genomes/phase1/data/HG01344/exome_alignment
+s3://1000genomes/phase1/data/HG01345/exome_alignment
+s3://1000genomes/phase1/data/HG01347/exome_alignment
+s3://1000genomes/phase1/data/HG01350/exome_alignment
+s3://1000genomes/phase1/data/HG01351/exome_alignment
+s3://1000genomes/phase1/data/HG01353/exome_alignment
+s3://1000genomes/phase1/data/HG01354/exome_alignment
+s3://1000genomes/phase1/data/HG01356/exome_alignment
+s3://1000genomes/phase1/data/HG01357/exome_alignment
+s3://1000genomes/phase1/data/HG01359/exome_alignment
+s3://1000genomes/phase1/data/HG01360/exome_alignment
+s3://1000genomes/phase1/data/HG01365/exome_alignment
+s3://1000genomes/phase1/data/HG01366/exome_alignment
+s3://1000genomes/phase1/data/HG01374/exome_alignment
+s3://1000genomes/phase1/data/HG01375/exome_alignment
+s3://1000genomes/phase1/data/HG01377/exome_alignment
+s3://1000genomes/phase1/data/HG01378/exome_alignment
+s3://1000genomes/phase1/data/HG01383/exome_alignment
+s3://1000genomes/phase1/data/HG01384/exome_alignment
+s3://1000genomes/phase1/data/HG01389/exome_alignment
+s3://1000genomes/phase1/data/HG01390/exome_alignment
+s3://1000genomes/phase1/data/HG01437/exome_alignment
+s3://1000genomes/phase1/data/HG01438/exome_alignment
+s3://1000genomes/phase1/data/HG01440/exome_alignment
+s3://1000genomes/phase1/data/HG01441/exome_alignment
+s3://1000genomes/phase1/data/HG01455/exome_alignment
+s3://1000genomes/phase1/data/HG01456/exome_alignment
+s3://1000genomes/phase1/data/HG01461/exome_alignment
+s3://1000genomes/phase1/data/HG01462/exome_alignment
+s3://1000genomes/phase1/data/HG01464/exome_alignment
+s3://1000genomes/phase1/data/HG01465/exome_alignment
+s3://1000genomes/phase1/data/HG01488/exome_alignment
+s3://1000genomes/phase1/data/HG01489/exome_alignment
+s3://1000genomes/phase1/data/HG01491/exome_alignment
+s3://1000genomes/phase1/data/HG01492/exome_alignment
+s3://1000genomes/phase1/data/HG01494/exome_alignment
+s3://1000genomes/phase1/data/HG01495/exome_alignment
+s3://1000genomes/phase1/data/HG01497/exome_alignment
+s3://1000genomes/phase1/data/HG01498/exome_alignment
+s3://1000genomes/phase1/data/HG01550/exome_alignment
+s3://1000genomes/phase1/data/HG01551/exome_alignment
+s3://1000genomes/phase1/data/NA06984/exome_alignment
+s3://1000genomes/phase1/data/NA06985/exome_alignment
+s3://1000genomes/phase1/data/NA06986/exome_alignment
+s3://1000genomes/phase1/data/NA06989/exome_alignment
+s3://1000genomes/phase1/data/NA06994/exome_alignment
+s3://1000genomes/phase1/data/NA07000/exome_alignment
+s3://1000genomes/phase1/data/NA07037/exome_alignment
+s3://1000genomes/phase1/data/NA07048/exome_alignment
+s3://1000genomes/phase1/data/NA07051/exome_alignment
+s3://1000genomes/phase1/data/NA07056/exome_alignment
+s3://1000genomes/phase1/data/NA07347/exome_alignment
+s3://1000genomes/phase1/data/NA07357/exome_alignment
+s3://1000genomes/phase1/data/NA10847/exome_alignment
+s3://1000genomes/phase1/data/NA10851/exome_alignment
+s3://1000genomes/phase1/data/NA11829/exome_alignment
+s3://1000genomes/phase1/data/NA11830/exome_alignment
+s3://1000genomes/phase1/data/NA11831/exome_alignment
+s3://1000genomes/phase1/data/NA11832/exome_alignment
+s3://1000genomes/phase1/data/NA11840/exome_alignment
+s3://1000genomes/phase1/data/NA11843/exome_alignment
+s3://1000genomes/phase1/data/NA11881/exome_alignment
+s3://1000genomes/phase1/data/NA11892/exome_alignment
+s3://1000genomes/phase1/data/NA11893/exome_alignment
+s3://1000genomes/phase1/data/NA11894/exome_alignment
+s3://1000genomes/phase1/data/NA11918/exome_alignment
+s3://1000genomes/phase1/data/NA11919/exome_alignment
+s3://1000genomes/phase1/data/NA11920/exome_alignment
+s3://1000genomes/phase1/data/NA11930/exome_alignment
+s3://1000genomes/phase1/data/NA11931/exome_alignment
+s3://1000genomes/phase1/data/NA11932/exome_alignment
+s3://1000genomes/phase1/data/NA11933/exome_alignment
+s3://1000genomes/phase1/data/NA11992/exome_alignment
+s3://1000genomes/phase1/data/NA11993/exome_alignment
+s3://1000genomes/phase1/data/NA11994/exome_alignment
+s3://1000genomes/phase1/data/NA11995/exome_alignment
+s3://1000genomes/phase1/data/NA12003/exome_alignment
+s3://1000genomes/phase1/data/NA12004/exome_alignment
+s3://1000genomes/phase1/data/NA12005/exome_alignment
+s3://1000genomes/phase1/data/NA12006/exome_alignment
+s3://1000genomes/phase1/data/NA12043/exome_alignment
+s3://1000genomes/phase1/data/NA12044/exome_alignment
+s3://1000genomes/phase1/data/NA12045/exome_alignment
+s3://1000genomes/phase1/data/NA12058/exome_alignment
+s3://1000genomes/phase1/data/NA12144/exome_alignment
+s3://1000genomes/phase1/data/NA12154/exome_alignment
+s3://1000genomes/phase1/data/NA12155/exome_alignment
+s3://1000genomes/phase1/data/NA12156/exome_alignment
+s3://1000genomes/phase1/data/NA12234/exome_alignment
+s3://1000genomes/phase1/data/NA12249/exome_alignment
+s3://1000genomes/phase1/data/NA12272/exome_alignment
+s3://1000genomes/phase1/data/NA12273/exome_alignment
+s3://1000genomes/phase1/data/NA12275/exome_alignment
+s3://1000genomes/phase1/data/NA12283/exome_alignment
+s3://1000genomes/phase1/data/NA12286/exome_alignment
+s3://1000genomes/phase1/data/NA12287/exome_alignment
+s3://1000genomes/phase1/data/NA12340/exome_alignment
+s3://1000genomes/phase1/data/NA12341/exome_alignment
+s3://1000genomes/phase1/data/NA12342/exome_alignment
+s3://1000genomes/phase1/data/NA12347/exome_alignment
+s3://1000genomes/phase1/data/NA12348/exome_alignment
+s3://1000genomes/phase1/data/NA12383/exome_alignment
+s3://1000genomes/phase1/data/NA12399/exome_alignment
+s3://1000genomes/phase1/data/NA12413/exome_alignment
+s3://1000genomes/phase1/data/NA12414/exome_alignment
+s3://1000genomes/phase1/data/NA12489/exome_alignment
+s3://1000genomes/phase1/data/NA12546/exome_alignment
+s3://1000genomes/phase1/data/NA12716/exome_alignment
+s3://1000genomes/phase1/data/NA12717/exome_alignment
+s3://1000genomes/phase1/data/NA12718/exome_alignment
+s3://1000genomes/phase1/data/NA12748/exome_alignment
+s3://1000genomes/phase1/data/NA12749/exome_alignment
+s3://1000genomes/phase1/data/NA12750/exome_alignment
+s3://1000genomes/phase1/data/NA12751/exome_alignment
+s3://1000genomes/phase1/data/NA12760/exome_alignment
+s3://1000genomes/phase1/data/NA12761/exome_alignment
+s3://1000genomes/phase1/data/NA12762/exome_alignment
+s3://1000genomes/phase1/data/NA12763/exome_alignment
+s3://1000genomes/phase1/data/NA12775/exome_alignment
+s3://1000genomes/phase1/data/NA12776/exome_alignment
+s3://1000genomes/phase1/data/NA12777/exome_alignment
+s3://1000genomes/phase1/data/NA12778/exome_alignment
+s3://1000genomes/phase1/data/NA12812/exome_alignment
+s3://1000genomes/phase1/data/NA12813/exome_alignment
+s3://1000genomes/phase1/data/NA12814/exome_alignment
+s3://1000genomes/phase1/data/NA12815/exome_alignment
+s3://1000genomes/phase1/data/NA12827/exome_alignment
+s3://1000genomes/phase1/data/NA12828/exome_alignment
+s3://1000genomes/phase1/data/NA12830/exome_alignment
+s3://1000genomes/phase1/data/NA12842/exome_alignment
+s3://1000genomes/phase1/data/NA12843/exome_alignment
+s3://1000genomes/phase1/data/NA12872/exome_alignment
+s3://1000genomes/phase1/data/NA12873/exome_alignment
+s3://1000genomes/phase1/data/NA12874/exome_alignment
+s3://1000genomes/phase1/data/NA12878/exome_alignment
+s3://1000genomes/phase1/data/NA12889/exome_alignment
+s3://1000genomes/phase1/data/NA12890/exome_alignment
+s3://1000genomes/phase1/data/NA12891/exome_alignment
+s3://1000genomes/phase1/data/NA12892/exome_alignment
+s3://1000genomes/phase1/data/NA18486/exome_alignment
+s3://1000genomes/phase1/data/NA18487/exome_alignment
+s3://1000genomes/phase1/data/NA18488/exome_alignment
+s3://1000genomes/phase1/data/NA18489/exome_alignment
+s3://1000genomes/phase1/data/NA18498/exome_alignment
+s3://1000genomes/phase1/data/NA18499/exome_alignment
+s3://1000genomes/phase1/data/NA18501/exome_alignment
+s3://1000genomes/phase1/data/NA18502/exome_alignment
+s3://1000genomes/phase1/data/NA18504/exome_alignment
+s3://1000genomes/phase1/data/NA18505/exome_alignment
+s3://1000genomes/phase1/data/NA18507/exome_alignment
+s3://1000genomes/phase1/data/NA18508/exome_alignment
+s3://1000genomes/phase1/data/NA18510/exome_alignment
+s3://1000genomes/phase1/data/NA18511/exome_alignment
+s3://1000genomes/phase1/data/NA18516/exome_alignment
+s3://1000genomes/phase1/data/NA18517/exome_alignment
+s3://1000genomes/phase1/data/NA18519/exome_alignment
+s3://1000genomes/phase1/data/NA18520/exome_alignment
+s3://1000genomes/phase1/data/NA18522/exome_alignment
+s3://1000genomes/phase1/data/NA18523/exome_alignment
+s3://1000genomes/phase1/data/NA18525/exome_alignment
+s3://1000genomes/phase1/data/NA18526/exome_alignment
+s3://1000genomes/phase1/data/NA18527/exome_alignment
+s3://1000genomes/phase1/data/NA18528/exome_alignment
+s3://1000genomes/phase1/data/NA18530/exome_alignment
+s3://1000genomes/phase1/data/NA18531/exome_alignment
+s3://1000genomes/phase1/data/NA18532/exome_alignment
+s3://1000genomes/phase1/data/NA18534/exome_alignment
+s3://1000genomes/phase1/data/NA18535/exome_alignment
+s3://1000genomes/phase1/data/NA18536/exome_alignment
+s3://1000genomes/phase1/data/NA18537/exome_alignment
+s3://1000genomes/phase1/data/NA18538/exome_alignment
+s3://1000genomes/phase1/data/NA18542/exome_alignment
+s3://1000genomes/phase1/data/NA18543/exome_alignment
+s3://1000genomes/phase1/data/NA18544/exome_alignment
+s3://1000genomes/phase1/data/NA18545/exome_alignment
+s3://1000genomes/phase1/data/NA18546/exome_alignment
+s3://1000genomes/phase1/data/NA18547/exome_alignment
+s3://1000genomes/phase1/data/NA18548/exome_alignment
+s3://1000genomes/phase1/data/NA18549/exome_alignment
+s3://1000genomes/phase1/data/NA18550/exome_alignment
+s3://1000genomes/phase1/data/NA18552/exome_alignment
+s3://1000genomes/phase1/data/NA18553/exome_alignment
+s3://1000genomes/phase1/data/NA18555/exome_alignment
+s3://1000genomes/phase1/data/NA18557/exome_alignment
+s3://1000genomes/phase1/data/NA18558/exome_alignment
+s3://1000genomes/phase1/data/NA18559/exome_alignment
+s3://1000genomes/phase1/data/NA18560/exome_alignment
+s3://1000genomes/phase1/data/NA18561/exome_alignment
+s3://1000genomes/phase1/data/NA18562/exome_alignment
+s3://1000genomes/phase1/data/NA18563/exome_alignment
+s3://1000genomes/phase1/data/NA18564/exome_alignment
+s3://1000genomes/phase1/data/NA18565/exome_alignment
+s3://1000genomes/phase1/data/NA18566/exome_alignment
+s3://1000genomes/phase1/data/NA18567/exome_alignment
+s3://1000genomes/phase1/data/NA18570/exome_alignment
+s3://1000genomes/phase1/data/NA18571/exome_alignment
+s3://1000genomes/phase1/data/NA18572/exome_alignment
+s3://1000genomes/phase1/data/NA18573/exome_alignment
+s3://1000genomes/phase1/data/NA18574/exome_alignment
+s3://1000genomes/phase1/data/NA18576/exome_alignment
+s3://1000genomes/phase1/data/NA18577/exome_alignment
+s3://1000genomes/phase1/data/NA18579/exome_alignment
+s3://1000genomes/phase1/data/NA18582/exome_alignment
+s3://1000genomes/phase1/data/NA18592/exome_alignment
+s3://1000genomes/phase1/data/NA18593/exome_alignment
+s3://1000genomes/phase1/data/NA18595/exome_alignment
+s3://1000genomes/phase1/data/NA18596/exome_alignment
+s3://1000genomes/phase1/data/NA18597/exome_alignment
+s3://1000genomes/phase1/data/NA18599/exome_alignment
+s3://1000genomes/phase1/data/NA18602/exome_alignment
+s3://1000genomes/phase1/data/NA18603/exome_alignment
+s3://1000genomes/phase1/data/NA18605/exome_alignment
+s3://1000genomes/phase1/data/NA18606/exome_alignment
+s3://1000genomes/phase1/data/NA18608/exome_alignment
+s3://1000genomes/phase1/data/NA18609/exome_alignment
+s3://1000genomes/phase1/data/NA18610/exome_alignment
+s3://1000genomes/phase1/data/NA18611/exome_alignment
+s3://1000genomes/phase1/data/NA18612/exome_alignment
+s3://1000genomes/phase1/data/NA18613/exome_alignment
+s3://1000genomes/phase1/data/NA18615/exome_alignment
+s3://1000genomes/phase1/data/NA18616/exome_alignment
+s3://1000genomes/phase1/data/NA18617/exome_alignment
+s3://1000genomes/phase1/data/NA18618/exome_alignment
+s3://1000genomes/phase1/data/NA18619/exome_alignment
+s3://1000genomes/phase1/data/NA18620/exome_alignment
+s3://1000genomes/phase1/data/NA18621/exome_alignment
+s3://1000genomes/phase1/data/NA18622/exome_alignment
+s3://1000genomes/phase1/data/NA18623/exome_alignment
+s3://1000genomes/phase1/data/NA18624/exome_alignment
+s3://1000genomes/phase1/data/NA18625/exome_alignment
+s3://1000genomes/phase1/data/NA18626/exome_alignment
+s3://1000genomes/phase1/data/NA18627/exome_alignment
+s3://1000genomes/phase1/data/NA18628/exome_alignment
+s3://1000genomes/phase1/data/NA18630/exome_alignment
+s3://1000genomes/phase1/data/NA18631/exome_alignment
+s3://1000genomes/phase1/data/NA18632/exome_alignment
+s3://1000genomes/phase1/data/NA18633/exome_alignment
+s3://1000genomes/phase1/data/NA18634/exome_alignment
+s3://1000genomes/phase1/data/NA18635/exome_alignment
+s3://1000genomes/phase1/data/NA18636/exome_alignment
+s3://1000genomes/phase1/data/NA18637/exome_alignment
+s3://1000genomes/phase1/data/NA18638/exome_alignment
+s3://1000genomes/phase1/data/NA18639/exome_alignment
+s3://1000genomes/phase1/data/NA18640/exome_alignment
+s3://1000genomes/phase1/data/NA18641/exome_alignment
+s3://1000genomes/phase1/data/NA18642/exome_alignment
+s3://1000genomes/phase1/data/NA18643/exome_alignment
+s3://1000genomes/phase1/data/NA18645/exome_alignment
+s3://1000genomes/phase1/data/NA18740/exome_alignment
+s3://1000genomes/phase1/data/NA18745/exome_alignment
+s3://1000genomes/phase1/data/NA18747/exome_alignment
+s3://1000genomes/phase1/data/NA18748/exome_alignment
+s3://1000genomes/phase1/data/NA18749/exome_alignment
+s3://1000genomes/phase1/data/NA18757/exome_alignment
+s3://1000genomes/phase1/data/NA18853/exome_alignment
+s3://1000genomes/phase1/data/NA18856/exome_alignment
+s3://1000genomes/phase1/data/NA18858/exome_alignment
+s3://1000genomes/phase1/data/NA18861/exome_alignment
+s3://1000genomes/phase1/data/NA18867/exome_alignment
+s3://1000genomes/phase1/data/NA18868/exome_alignment
+s3://1000genomes/phase1/data/NA18870/exome_alignment
+s3://1000genomes/phase1/data/NA18871/exome_alignment
+s3://1000genomes/phase1/data/NA18873/exome_alignment
+s3://1000genomes/phase1/data/NA18874/exome_alignment
+s3://1000genomes/phase1/data/NA18907/exome_alignment
+s3://1000genomes/phase1/data/NA18908/exome_alignment
+s3://1000genomes/phase1/data/NA18909/exome_alignment
+s3://1000genomes/phase1/data/NA18910/exome_alignment
+s3://1000genomes/phase1/data/NA18912/exome_alignment
+s3://1000genomes/phase1/data/NA18916/exome_alignment
+s3://1000genomes/phase1/data/NA18917/exome_alignment
+s3://1000genomes/phase1/data/NA18923/exome_alignment
+s3://1000genomes/phase1/data/NA18924/exome_alignment
+s3://1000genomes/phase1/data/NA18933/exome_alignment
+s3://1000genomes/phase1/data/NA18934/exome_alignment
+s3://1000genomes/phase1/data/NA18939/exome_alignment
+s3://1000genomes/phase1/data/NA18940/exome_alignment
+s3://1000genomes/phase1/data/NA18941/exome_alignment
+s3://1000genomes/phase1/data/NA18942/exome_alignment
+s3://1000genomes/phase1/data/NA18943/exome_alignment
+s3://1000genomes/phase1/data/NA18944/exome_alignment
+s3://1000genomes/phase1/data/NA18945/exome_alignment
+s3://1000genomes/phase1/data/NA18946/exome_alignment
+s3://1000genomes/phase1/data/NA18947/exome_alignment
+s3://1000genomes/phase1/data/NA18948/exome_alignment
+s3://1000genomes/phase1/data/NA18949/exome_alignment
+s3://1000genomes/phase1/data/NA18950/exome_alignment
+s3://1000genomes/phase1/data/NA18951/exome_alignment
+s3://1000genomes/phase1/data/NA18952/exome_alignment
+s3://1000genomes/phase1/data/NA18953/exome_alignment
+s3://1000genomes/phase1/data/NA18954/exome_alignment
+s3://1000genomes/phase1/data/NA18955/exome_alignment
+s3://1000genomes/phase1/data/NA18956/exome_alignment
+s3://1000genomes/phase1/data/NA18957/exome_alignment
+s3://1000genomes/phase1/data/NA18959/exome_alignment
+s3://1000genomes/phase1/data/NA18960/exome_alignment
+s3://1000genomes/phase1/data/NA18961/exome_alignment
+s3://1000genomes/phase1/data/NA18962/exome_alignment
+s3://1000genomes/phase1/data/NA18963/exome_alignment
+s3://1000genomes/phase1/data/NA18964/exome_alignment
+s3://1000genomes/phase1/data/NA18965/exome_alignment
+s3://1000genomes/phase1/data/NA18966/exome_alignment
+s3://1000genomes/phase1/data/NA18967/exome_alignment
+s3://1000genomes/phase1/data/NA18968/exome_alignment
+s3://1000genomes/phase1/data/NA18969/exome_alignment
+s3://1000genomes/phase1/data/NA18970/exome_alignment
+s3://1000genomes/phase1/data/NA18971/exome_alignment
+s3://1000genomes/phase1/data/NA18972/exome_alignment
+s3://1000genomes/phase1/data/NA18973/exome_alignment
+s3://1000genomes/phase1/data/NA18974/exome_alignment
+s3://1000genomes/phase1/data/NA18975/exome_alignment
+s3://1000genomes/phase1/data/NA18976/exome_alignment
+s3://1000genomes/phase1/data/NA18978/exome_alignment
+s3://1000genomes/phase1/data/NA18979/exome_alignment
+s3://1000genomes/phase1/data/NA18980/exome_alignment
+s3://1000genomes/phase1/data/NA18981/exome_alignment
+s3://1000genomes/phase1/data/NA18982/exome_alignment
+s3://1000genomes/phase1/data/NA18983/exome_alignment
+s3://1000genomes/phase1/data/NA18985/exome_alignment
+s3://1000genomes/phase1/data/NA18986/exome_alignment
+s3://1000genomes/phase1/data/NA18987/exome_alignment
+s3://1000genomes/phase1/data/NA18988/exome_alignment
+s3://1000genomes/phase1/data/NA18989/exome_alignment
+s3://1000genomes/phase1/data/NA18990/exome_alignment
+s3://1000genomes/phase1/data/NA18991/exome_alignment
+s3://1000genomes/phase1/data/NA18992/exome_alignment
+s3://1000genomes/phase1/data/NA18993/exome_alignment
+s3://1000genomes/phase1/data/NA18994/exome_alignment
+s3://1000genomes/phase1/data/NA18995/exome_alignment
+s3://1000genomes/phase1/data/NA18997/exome_alignment
+s3://1000genomes/phase1/data/NA18998/exome_alignment
+s3://1000genomes/phase1/data/NA18999/exome_alignment
+s3://1000genomes/phase1/data/NA19000/exome_alignment
+s3://1000genomes/phase1/data/NA19001/exome_alignment
+s3://1000genomes/phase1/data/NA19002/exome_alignment
+s3://1000genomes/phase1/data/NA19003/exome_alignment
+s3://1000genomes/phase1/data/NA19004/exome_alignment
+s3://1000genomes/phase1/data/NA19005/exome_alignment
+s3://1000genomes/phase1/data/NA19007/exome_alignment
+s3://1000genomes/phase1/data/NA19009/exome_alignment
+s3://1000genomes/phase1/data/NA19010/exome_alignment
+s3://1000genomes/phase1/data/NA19012/exome_alignment
+s3://1000genomes/phase1/data/NA19020/exome_alignment
+s3://1000genomes/phase1/data/NA19027/exome_alignment
+s3://1000genomes/phase1/data/NA19028/exome_alignment
+s3://1000genomes/phase1/data/NA19031/exome_alignment
+s3://1000genomes/phase1/data/NA19035/exome_alignment
+s3://1000genomes/phase1/data/NA19036/exome_alignment
+s3://1000genomes/phase1/data/NA19038/exome_alignment
+s3://1000genomes/phase1/data/NA19041/exome_alignment
+s3://1000genomes/phase1/data/NA19044/exome_alignment
+s3://1000genomes/phase1/data/NA19046/exome_alignment
+s3://1000genomes/phase1/data/NA19054/exome_alignment
+s3://1000genomes/phase1/data/NA19055/exome_alignment
+s3://1000genomes/phase1/data/NA19056/exome_alignment
+s3://1000genomes/phase1/data/NA19057/exome_alignment
+s3://1000genomes/phase1/data/NA19058/exome_alignment
+s3://1000genomes/phase1/data/NA19059/exome_alignment
+s3://1000genomes/phase1/data/NA19060/exome_alignment
+s3://1000genomes/phase1/data/NA19062/exome_alignment
+s3://1000genomes/phase1/data/NA19063/exome_alignment
+s3://1000genomes/phase1/data/NA19064/exome_alignment
+s3://1000genomes/phase1/data/NA19065/exome_alignment
+s3://1000genomes/phase1/data/NA19066/exome_alignment
+s3://1000genomes/phase1/data/NA19067/exome_alignment
+s3://1000genomes/phase1/data/NA19068/exome_alignment
+s3://1000genomes/phase1/data/NA19070/exome_alignment
+s3://1000genomes/phase1/data/NA19072/exome_alignment
+s3://1000genomes/phase1/data/NA19074/exome_alignment
+s3://1000genomes/phase1/data/NA19075/exome_alignment
+s3://1000genomes/phase1/data/NA19076/exome_alignment
+s3://1000genomes/phase1/data/NA19077/exome_alignment
+s3://1000genomes/phase1/data/NA19078/exome_alignment
+s3://1000genomes/phase1/data/NA19079/exome_alignment
+s3://1000genomes/phase1/data/NA19080/exome_alignment
+s3://1000genomes/phase1/data/NA19081/exome_alignment
+s3://1000genomes/phase1/data/NA19082/exome_alignment
+s3://1000genomes/phase1/data/NA19083/exome_alignment
+s3://1000genomes/phase1/data/NA19084/exome_alignment
+s3://1000genomes/phase1/data/NA19085/exome_alignment
+s3://1000genomes/phase1/data/NA19086/exome_alignment
+s3://1000genomes/phase1/data/NA19087/exome_alignment
+s3://1000genomes/phase1/data/NA19088/exome_alignment
+s3://1000genomes/phase1/data/NA19092/exome_alignment
+s3://1000genomes/phase1/data/NA19093/exome_alignment
+s3://1000genomes/phase1/data/NA19095/exome_alignment
+s3://1000genomes/phase1/data/NA19096/exome_alignment
+s3://1000genomes/phase1/data/NA19098/exome_alignment
+s3://1000genomes/phase1/data/NA19099/exome_alignment
+s3://1000genomes/phase1/data/NA19102/exome_alignment
+s3://1000genomes/phase1/data/NA19107/exome_alignment
+s3://1000genomes/phase1/data/NA19108/exome_alignment
+s3://1000genomes/phase1/data/NA19113/exome_alignment
+s3://1000genomes/phase1/data/NA19114/exome_alignment
+s3://1000genomes/phase1/data/NA19116/exome_alignment
+s3://1000genomes/phase1/data/NA19117/exome_alignment
+s3://1000genomes/phase1/data/NA19118/exome_alignment
+s3://1000genomes/phase1/data/NA19119/exome_alignment
+s3://1000genomes/phase1/data/NA19121/exome_alignment
+s3://1000genomes/phase1/data/NA19129/exome_alignment
+s3://1000genomes/phase1/data/NA19130/exome_alignment
+s3://1000genomes/phase1/data/NA19131/exome_alignment
+s3://1000genomes/phase1/data/NA19137/exome_alignment
+s3://1000genomes/phase1/data/NA19138/exome_alignment
+s3://1000genomes/phase1/data/NA19141/exome_alignment
+s3://1000genomes/phase1/data/NA19143/exome_alignment
+s3://1000genomes/phase1/data/NA19144/exome_alignment
+s3://1000genomes/phase1/data/NA19146/exome_alignment
+s3://1000genomes/phase1/data/NA19147/exome_alignment
+s3://1000genomes/phase1/data/NA19149/exome_alignment
+s3://1000genomes/phase1/data/NA19150/exome_alignment
+s3://1000genomes/phase1/data/NA19152/exome_alignment
+s3://1000genomes/phase1/data/NA19153/exome_alignment
+s3://1000genomes/phase1/data/NA19159/exome_alignment
+s3://1000genomes/phase1/data/NA19160/exome_alignment
+s3://1000genomes/phase1/data/NA19171/exome_alignment
+s3://1000genomes/phase1/data/NA19172/exome_alignment
+s3://1000genomes/phase1/data/NA19175/exome_alignment
+s3://1000genomes/phase1/data/NA19184/exome_alignment
+s3://1000genomes/phase1/data/NA19185/exome_alignment
+s3://1000genomes/phase1/data/NA19189/exome_alignment
+s3://1000genomes/phase1/data/NA19190/exome_alignment
+s3://1000genomes/phase1/data/NA19197/exome_alignment
+s3://1000genomes/phase1/data/NA19198/exome_alignment
+s3://1000genomes/phase1/data/NA19200/exome_alignment
+s3://1000genomes/phase1/data/NA19201/exome_alignment
+s3://1000genomes/phase1/data/NA19204/exome_alignment
+s3://1000genomes/phase1/data/NA19206/exome_alignment
+s3://1000genomes/phase1/data/NA19207/exome_alignment
+s3://1000genomes/phase1/data/NA19209/exome_alignment
+s3://1000genomes/phase1/data/NA19210/exome_alignment
+s3://1000genomes/phase1/data/NA19213/exome_alignment
+s3://1000genomes/phase1/data/NA19214/exome_alignment
+s3://1000genomes/phase1/data/NA19222/exome_alignment
+s3://1000genomes/phase1/data/NA19223/exome_alignment
+s3://1000genomes/phase1/data/NA19225/exome_alignment
+s3://1000genomes/phase1/data/NA19235/exome_alignment
+s3://1000genomes/phase1/data/NA19236/exome_alignment
+s3://1000genomes/phase1/data/NA19238/exome_alignment
+s3://1000genomes/phase1/data/NA19239/exome_alignment
+s3://1000genomes/phase1/data/NA19240/exome_alignment
+s3://1000genomes/phase1/data/NA19247/exome_alignment
+s3://1000genomes/phase1/data/NA19248/exome_alignment
+s3://1000genomes/phase1/data/NA19256/exome_alignment
+s3://1000genomes/phase1/data/NA19257/exome_alignment
+s3://1000genomes/phase1/data/NA19309/exome_alignment
+s3://1000genomes/phase1/data/NA19310/exome_alignment
+s3://1000genomes/phase1/data/NA19311/exome_alignment
+s3://1000genomes/phase1/data/NA19312/exome_alignment
+s3://1000genomes/phase1/data/NA19313/exome_alignment
+s3://1000genomes/phase1/data/NA19314/exome_alignment
+s3://1000genomes/phase1/data/NA19315/exome_alignment
+s3://1000genomes/phase1/data/NA19316/exome_alignment
+s3://1000genomes/phase1/data/NA19317/exome_alignment
+s3://1000genomes/phase1/data/NA19318/exome_alignment
+s3://1000genomes/phase1/data/NA19319/exome_alignment
+s3://1000genomes/phase1/data/NA19321/exome_alignment
+s3://1000genomes/phase1/data/NA19324/exome_alignment
+s3://1000genomes/phase1/data/NA19327/exome_alignment
+s3://1000genomes/phase1/data/NA19328/exome_alignment
+s3://1000genomes/phase1/data/NA19332/exome_alignment
+s3://1000genomes/phase1/data/NA19334/exome_alignment
+s3://1000genomes/phase1/data/NA19338/exome_alignment
+s3://1000genomes/phase1/data/NA19346/exome_alignment
+s3://1000genomes/phase1/data/NA19347/exome_alignment
+s3://1000genomes/phase1/data/NA19350/exome_alignment
+s3://1000genomes/phase1/data/NA19351/exome_alignment
+s3://1000genomes/phase1/data/NA19352/exome_alignment
+s3://1000genomes/phase1/data/NA19355/exome_alignment
+s3://1000genomes/phase1/data/NA19359/exome_alignment
+s3://1000genomes/phase1/data/NA19371/exome_alignment
+s3://1000genomes/phase1/data/NA19372/exome_alignment
+s3://1000genomes/phase1/data/NA19373/exome_alignment
+s3://1000genomes/phase1/data/NA19374/exome_alignment
+s3://1000genomes/phase1/data/NA19375/exome_alignment
+s3://1000genomes/phase1/data/NA19376/exome_alignment
+s3://1000genomes/phase1/data/NA19377/exome_alignment
+s3://1000genomes/phase1/data/NA19379/exome_alignment
+s3://1000genomes/phase1/data/NA19380/exome_alignment
+s3://1000genomes/phase1/data/NA19381/exome_alignment
+s3://1000genomes/phase1/data/NA19383/exome_alignment
+s3://1000genomes/phase1/data/NA19384/exome_alignment
+s3://1000genomes/phase1/data/NA19385/exome_alignment
+s3://1000genomes/phase1/data/NA19390/exome_alignment
+s3://1000genomes/phase1/data/NA19391/exome_alignment
+s3://1000genomes/phase1/data/NA19393/exome_alignment
+s3://1000genomes/phase1/data/NA19394/exome_alignment
+s3://1000genomes/phase1/data/NA19395/exome_alignment
+s3://1000genomes/phase1/data/NA19396/exome_alignment
+s3://1000genomes/phase1/data/NA19397/exome_alignment
+s3://1000genomes/phase1/data/NA19398/exome_alignment
+s3://1000genomes/phase1/data/NA19399/exome_alignment
+s3://1000genomes/phase1/data/NA19401/exome_alignment
+s3://1000genomes/phase1/data/NA19403/exome_alignment
+s3://1000genomes/phase1/data/NA19428/exome_alignment
+s3://1000genomes/phase1/data/NA19429/exome_alignment
+s3://1000genomes/phase1/data/NA19430/exome_alignment
+s3://1000genomes/phase1/data/NA19431/exome_alignment
+s3://1000genomes/phase1/data/NA19434/exome_alignment
+s3://1000genomes/phase1/data/NA19435/exome_alignment
+s3://1000genomes/phase1/data/NA19437/exome_alignment
+s3://1000genomes/phase1/data/NA19438/exome_alignment
+s3://1000genomes/phase1/data/NA19439/exome_alignment
+s3://1000genomes/phase1/data/NA19444/exome_alignment
+s3://1000genomes/phase1/data/NA19445/exome_alignment
+s3://1000genomes/phase1/data/NA19446/exome_alignment
+s3://1000genomes/phase1/data/NA19449/exome_alignment
+s3://1000genomes/phase1/data/NA19452/exome_alignment
+s3://1000genomes/phase1/data/NA19453/exome_alignment
+s3://1000genomes/phase1/data/NA19455/exome_alignment
+s3://1000genomes/phase1/data/NA19456/exome_alignment
+s3://1000genomes/phase1/data/NA19457/exome_alignment
+s3://1000genomes/phase1/data/NA19461/exome_alignment
+s3://1000genomes/phase1/data/NA19462/exome_alignment
+s3://1000genomes/phase1/data/NA19463/exome_alignment
+s3://1000genomes/phase1/data/NA19466/exome_alignment
+s3://1000genomes/phase1/data/NA19467/exome_alignment
+s3://1000genomes/phase1/data/NA19468/exome_alignment
+s3://1000genomes/phase1/data/NA19469/exome_alignment
+s3://1000genomes/phase1/data/NA19470/exome_alignment
+s3://1000genomes/phase1/data/NA19471/exome_alignment
+s3://1000genomes/phase1/data/NA19472/exome_alignment
+s3://1000genomes/phase1/data/NA19473/exome_alignment
+s3://1000genomes/phase1/data/NA19474/exome_alignment
+s3://1000genomes/phase1/data/NA19625/exome_alignment
+s3://1000genomes/phase1/data/NA19648/exome_alignment
+s3://1000genomes/phase1/data/NA19649/exome_alignment
+s3://1000genomes/phase1/data/NA19651/exome_alignment
+s3://1000genomes/phase1/data/NA19652/exome_alignment
+s3://1000genomes/phase1/data/NA19654/exome_alignment
+s3://1000genomes/phase1/data/NA19655/exome_alignment
+s3://1000genomes/phase1/data/NA19657/exome_alignment
+s3://1000genomes/phase1/data/NA19658/exome_alignment
+s3://1000genomes/phase1/data/NA19660/exome_alignment
+s3://1000genomes/phase1/data/NA19661/exome_alignment
+s3://1000genomes/phase1/data/NA19663/exome_alignment
+s3://1000genomes/phase1/data/NA19664/exome_alignment
+s3://1000genomes/phase1/data/NA19669/exome_alignment
+s3://1000genomes/phase1/data/NA19670/exome_alignment
+s3://1000genomes/phase1/data/NA19672/exome_alignment
+s3://1000genomes/phase1/data/NA19675/exome_alignment
+s3://1000genomes/phase1/data/NA19676/exome_alignment
+s3://1000genomes/phase1/data/NA19678/exome_alignment
+s3://1000genomes/phase1/data/NA19679/exome_alignment
+s3://1000genomes/phase1/data/NA19681/exome_alignment
+s3://1000genomes/phase1/data/NA19682/exome_alignment
+s3://1000genomes/phase1/data/NA19684/exome_alignment
+s3://1000genomes/phase1/data/NA19685/exome_alignment
+s3://1000genomes/phase1/data/NA19700/exome_alignment
+s3://1000genomes/phase1/data/NA19701/exome_alignment
+s3://1000genomes/phase1/data/NA19703/exome_alignment
+s3://1000genomes/phase1/data/NA19704/exome_alignment
+s3://1000genomes/phase1/data/NA19707/exome_alignment
+s3://1000genomes/phase1/data/NA19711/exome_alignment
+s3://1000genomes/phase1/data/NA19712/exome_alignment
+s3://1000genomes/phase1/data/NA19713/exome_alignment
+s3://1000genomes/phase1/data/NA19716/exome_alignment
+s3://1000genomes/phase1/data/NA19717/exome_alignment
+s3://1000genomes/phase1/data/NA19719/exome_alignment
+s3://1000genomes/phase1/data/NA19720/exome_alignment
+s3://1000genomes/phase1/data/NA19722/exome_alignment
+s3://1000genomes/phase1/data/NA19723/exome_alignment
+s3://1000genomes/phase1/data/NA19725/exome_alignment
+s3://1000genomes/phase1/data/NA19726/exome_alignment
+s3://1000genomes/phase1/data/NA19728/exome_alignment
+s3://1000genomes/phase1/data/NA19729/exome_alignment
+s3://1000genomes/phase1/data/NA19731/exome_alignment
+s3://1000genomes/phase1/data/NA19732/exome_alignment
+s3://1000genomes/phase1/data/NA19734/exome_alignment
+s3://1000genomes/phase1/data/NA19735/exome_alignment
+s3://1000genomes/phase1/data/NA19737/exome_alignment
+s3://1000genomes/phase1/data/NA19738/exome_alignment
+s3://1000genomes/phase1/data/NA19740/exome_alignment
+s3://1000genomes/phase1/data/NA19741/exome_alignment
+s3://1000genomes/phase1/data/NA19746/exome_alignment
+s3://1000genomes/phase1/data/NA19747/exome_alignment
+s3://1000genomes/phase1/data/NA19749/exome_alignment
+s3://1000genomes/phase1/data/NA19750/exome_alignment
+s3://1000genomes/phase1/data/NA19752/exome_alignment
+s3://1000genomes/phase1/data/NA19755/exome_alignment
+s3://1000genomes/phase1/data/NA19756/exome_alignment
+s3://1000genomes/phase1/data/NA19758/exome_alignment
+s3://1000genomes/phase1/data/NA19759/exome_alignment
+s3://1000genomes/phase1/data/NA19761/exome_alignment
+s3://1000genomes/phase1/data/NA19762/exome_alignment
+s3://1000genomes/phase1/data/NA19764/exome_alignment
+s3://1000genomes/phase1/data/NA19770/exome_alignment
+s3://1000genomes/phase1/data/NA19771/exome_alignment
+s3://1000genomes/phase1/data/NA19773/exome_alignment
+s3://1000genomes/phase1/data/NA19774/exome_alignment
+s3://1000genomes/phase1/data/NA19776/exome_alignment
+s3://1000genomes/phase1/data/NA19777/exome_alignment
+s3://1000genomes/phase1/data/NA19779/exome_alignment
+s3://1000genomes/phase1/data/NA19780/exome_alignment
+s3://1000genomes/phase1/data/NA19782/exome_alignment
+s3://1000genomes/phase1/data/NA19783/exome_alignment
+s3://1000genomes/phase1/data/NA19785/exome_alignment
+s3://1000genomes/phase1/data/NA19786/exome_alignment
+s3://1000genomes/phase1/data/NA19788/exome_alignment
+s3://1000genomes/phase1/data/NA19789/exome_alignment
+s3://1000genomes/phase1/data/NA19794/exome_alignment
+s3://1000genomes/phase1/data/NA19795/exome_alignment
+s3://1000genomes/phase1/data/NA19818/exome_alignment
+s3://1000genomes/phase1/data/NA19819/exome_alignment
+s3://1000genomes/phase1/data/NA19834/exome_alignment
+s3://1000genomes/phase1/data/NA19835/exome_alignment
+s3://1000genomes/phase1/data/NA19901/exome_alignment
+s3://1000genomes/phase1/data/NA19904/exome_alignment
+s3://1000genomes/phase1/data/NA19908/exome_alignment
+s3://1000genomes/phase1/data/NA19909/exome_alignment
+s3://1000genomes/phase1/data/NA19914/exome_alignment
+s3://1000genomes/phase1/data/NA19916/exome_alignment
+s3://1000genomes/phase1/data/NA19917/exome_alignment
+s3://1000genomes/phase1/data/NA19920/exome_alignment
+s3://1000genomes/phase1/data/NA19921/exome_alignment
+s3://1000genomes/phase1/data/NA19923/exome_alignment
+s3://1000genomes/phase1/data/NA19982/exome_alignment
+s3://1000genomes/phase1/data/NA19984/exome_alignment
+s3://1000genomes/phase1/data/NA19985/exome_alignment
+s3://1000genomes/phase1/data/NA20126/exome_alignment
+s3://1000genomes/phase1/data/NA20127/exome_alignment
+s3://1000genomes/phase1/data/NA20276/exome_alignment
+s3://1000genomes/phase1/data/NA20278/exome_alignment
+s3://1000genomes/phase1/data/NA20281/exome_alignment
+s3://1000genomes/phase1/data/NA20282/exome_alignment
+s3://1000genomes/phase1/data/NA20287/exome_alignment
+s3://1000genomes/phase1/data/NA20289/exome_alignment
+s3://1000genomes/phase1/data/NA20291/exome_alignment
+s3://1000genomes/phase1/data/NA20294/exome_alignment
+s3://1000genomes/phase1/data/NA20296/exome_alignment
+s3://1000genomes/phase1/data/NA20298/exome_alignment
+s3://1000genomes/phase1/data/NA20299/exome_alignment
+s3://1000genomes/phase1/data/NA20314/exome_alignment
+s3://1000genomes/phase1/data/NA20317/exome_alignment
+s3://1000genomes/phase1/data/NA20322/exome_alignment
+s3://1000genomes/phase1/data/NA20332/exome_alignment
+s3://1000genomes/phase1/data/NA20334/exome_alignment
+s3://1000genomes/phase1/data/NA20336/exome_alignment
+s3://1000genomes/phase1/data/NA20339/exome_alignment
+s3://1000genomes/phase1/data/NA20340/exome_alignment
+s3://1000genomes/phase1/data/NA20341/exome_alignment
+s3://1000genomes/phase1/data/NA20342/exome_alignment
+s3://1000genomes/phase1/data/NA20344/exome_alignment
+s3://1000genomes/phase1/data/NA20346/exome_alignment
+s3://1000genomes/phase1/data/NA20348/exome_alignment
+s3://1000genomes/phase1/data/NA20351/exome_alignment
+s3://1000genomes/phase1/data/NA20356/exome_alignment
+s3://1000genomes/phase1/data/NA20359/exome_alignment
+s3://1000genomes/phase1/data/NA20363/exome_alignment
+s3://1000genomes/phase1/data/NA20412/exome_alignment
+s3://1000genomes/phase1/data/NA20414/exome_alignment
+s3://1000genomes/phase1/data/NA20502/exome_alignment
+s3://1000genomes/phase1/data/NA20503/exome_alignment
+s3://1000genomes/phase1/data/NA20504/exome_alignment
+s3://1000genomes/phase1/data/NA20505/exome_alignment
+s3://1000genomes/phase1/data/NA20506/exome_alignment
+s3://1000genomes/phase1/data/NA20507/exome_alignment
+s3://1000genomes/phase1/data/NA20508/exome_alignment
+s3://1000genomes/phase1/data/NA20509/exome_alignment
+s3://1000genomes/phase1/data/NA20510/exome_alignment
+s3://1000genomes/phase1/data/NA20512/exome_alignment
+s3://1000genomes/phase1/data/NA20513/exome_alignment
+s3://1000genomes/phase1/data/NA20514/exome_alignment
+s3://1000genomes/phase1/data/NA20515/exome_alignment
+s3://1000genomes/phase1/data/NA20516/exome_alignment
+s3://1000genomes/phase1/data/NA20517/exome_alignment
+s3://1000genomes/phase1/data/NA20518/exome_alignment
+s3://1000genomes/phase1/data/NA20519/exome_alignment
+s3://1000genomes/phase1/data/NA20520/exome_alignment
+s3://1000genomes/phase1/data/NA20521/exome_alignment
+s3://1000genomes/phase1/data/NA20522/exome_alignment
+s3://1000genomes/phase1/data/NA20524/exome_alignment
+s3://1000genomes/phase1/data/NA20525/exome_alignment
+s3://1000genomes/phase1/data/NA20526/exome_alignment
+s3://1000genomes/phase1/data/NA20527/exome_alignment
+s3://1000genomes/phase1/data/NA20528/exome_alignment
+s3://1000genomes/phase1/data/NA20529/exome_alignment
+s3://1000genomes/phase1/data/NA20530/exome_alignment
+s3://1000genomes/phase1/data/NA20531/exome_alignment
+s3://1000genomes/phase1/data/NA20533/exome_alignment
+s3://1000genomes/phase1/data/NA20534/exome_alignment
+s3://1000genomes/phase1/data/NA20535/exome_alignment
+s3://1000genomes/phase1/data/NA20536/exome_alignment
+s3://1000genomes/phase1/data/NA20537/exome_alignment
+s3://1000genomes/phase1/data/NA20538/exome_alignment
+s3://1000genomes/phase1/data/NA20539/exome_alignment
+s3://1000genomes/phase1/data/NA20540/exome_alignment
+s3://1000genomes/phase1/data/NA20541/exome_alignment
+s3://1000genomes/phase1/data/NA20542/exome_alignment
+s3://1000genomes/phase1/data/NA20543/exome_alignment
+s3://1000genomes/phase1/data/NA20544/exome_alignment
+s3://1000genomes/phase1/data/NA20581/exome_alignment
+s3://1000genomes/phase1/data/NA20582/exome_alignment
+s3://1000genomes/phase1/data/NA20585/exome_alignment
+s3://1000genomes/phase1/data/NA20586/exome_alignment
+s3://1000genomes/phase1/data/NA20588/exome_alignment
+s3://1000genomes/phase1/data/NA20589/exome_alignment
+s3://1000genomes/phase1/data/NA20752/exome_alignment
+s3://1000genomes/phase1/data/NA20753/exome_alignment
+s3://1000genomes/phase1/data/NA20754/exome_alignment
+s3://1000genomes/phase1/data/NA20755/exome_alignment
+s3://1000genomes/phase1/data/NA20756/exome_alignment
+s3://1000genomes/phase1/data/NA20757/exome_alignment
+s3://1000genomes/phase1/data/NA20758/exome_alignment
+s3://1000genomes/phase1/data/NA20759/exome_alignment
+s3://1000genomes/phase1/data/NA20760/exome_alignment
+s3://1000genomes/phase1/data/NA20761/exome_alignment
+s3://1000genomes/phase1/data/NA20765/exome_alignment
+s3://1000genomes/phase1/data/NA20766/exome_alignment
+s3://1000genomes/phase1/data/NA20768/exome_alignment
+s3://1000genomes/phase1/data/NA20769/exome_alignment
+s3://1000genomes/phase1/data/NA20770/exome_alignment
+s3://1000genomes/phase1/data/NA20771/exome_alignment
+s3://1000genomes/phase1/data/NA20772/exome_alignment
+s3://1000genomes/phase1/data/NA20773/exome_alignment
+s3://1000genomes/phase1/data/NA20774/exome_alignment
+s3://1000genomes/phase1/data/NA20775/exome_alignment
+s3://1000genomes/phase1/data/NA20778/exome_alignment
+s3://1000genomes/phase1/data/NA20783/exome_alignment
+s3://1000genomes/phase1/data/NA20785/exome_alignment
+s3://1000genomes/phase1/data/NA20786/exome_alignment
+s3://1000genomes/phase1/data/NA20787/exome_alignment
+s3://1000genomes/phase1/data/NA20790/exome_alignment
+s3://1000genomes/phase1/data/NA20792/exome_alignment
+s3://1000genomes/phase1/data/NA20795/exome_alignment
+s3://1000genomes/phase1/data/NA20796/exome_alignment
+s3://1000genomes/phase1/data/NA20798/exome_alignment
+s3://1000genomes/phase1/data/NA20799/exome_alignment
+s3://1000genomes/phase1/data/NA20800/exome_alignment
+s3://1000genomes/phase1/data/NA20801/exome_alignment
+s3://1000genomes/phase1/data/NA20802/exome_alignment
+s3://1000genomes/phase1/data/NA20803/exome_alignment
+s3://1000genomes/phase1/data/NA20804/exome_alignment
+s3://1000genomes/phase1/data/NA20805/exome_alignment
+s3://1000genomes/phase1/data/NA20806/exome_alignment
+s3://1000genomes/phase1/data/NA20807/exome_alignment
+s3://1000genomes/phase1/data/NA20808/exome_alignment
+s3://1000genomes/phase1/data/NA20809/exome_alignment
+s3://1000genomes/phase1/data/NA20810/exome_alignment
+s3://1000genomes/phase1/data/NA20811/exome_alignment
+s3://1000genomes/phase1/data/NA20812/exome_alignment
+s3://1000genomes/phase1/data/NA20813/exome_alignment
+s3://1000genomes/phase1/data/NA20814/exome_alignment
+s3://1000genomes/phase1/data/NA20815/exome_alignment
+s3://1000genomes/phase1/data/NA20818/exome_alignment
+s3://1000genomes/phase1/data/NA20819/exome_alignment
+s3://1000genomes/phase1/data/NA20826/exome_alignment
+s3://1000genomes/phase1/data/NA20828/exome_alignment
+s3://1000genomes/technical/reference
+0	HG00096.mapped.illumina.mosaik.GBR.exome.20110411.bam
+0	HG00096.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+1	HG00097.mapped.SOLID.bfast.GBR.exome.20110411.bam
+1	HG00097.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+2	HG00099.mapped.SOLID.bfast.GBR.exome.20110411.bam
+2	HG00099.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+3	HG00100.mapped.illumina.mosaik.GBR.exome.20110411.bam
+3	HG00100.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+4	HG00101.mapped.illumina.mosaik.GBR.exome.20110411.bam
+4	HG00101.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+5	HG00102.mapped.illumina.mosaik.GBR.exome.20110411.bam
+5	HG00102.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+6	HG00103.mapped.illumina.mosaik.GBR.exome.20110411.bam
+6	HG00103.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+7	HG00104.mapped.SOLID.bfast.GBR.exome.20110521.bam
+7	HG00104.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+8	HG00105.mapped.SOLID.bfast.GBR.exome.20110411.bam
+8	HG00105.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+9	HG00106.mapped.SOLID.bfast.GBR.exome.20110411.bam
+9	HG00106.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+10	HG00107.mapped.illumina.mosaik.GBR.exome.20110411.bam
+10	HG00107.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+11	HG00108.mapped.illumina.mosaik.GBR.exome.20110521.bam
+11	HG00108.mapped.illumina.mosaik.GBR.exome.20110521.bam.bai
+12	HG00109.mapped.illumina.mosaik.GBR.exome.20110521.bam
+12	HG00109.mapped.illumina.mosaik.GBR.exome.20110521.bam.bai
+13	HG00110.mapped.illumina.mosaik.GBR.exome.20110521.bam
+13	HG00110.mapped.illumina.mosaik.GBR.exome.20110521.bam.bai
+14	HG00111.mapped.illumina.mosaik.GBR.exome.20110411.bam
+14	HG00111.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+15	HG00112.mapped.SOLID.bfast.GBR.exome.20110521.bam
+15	HG00112.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+16	HG00113.mapped.illumina.mosaik.GBR.exome.20110411.bam
+16	HG00113.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+17	HG00114.mapped.illumina.mosaik.GBR.exome.20110411.bam
+17	HG00114.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+18	HG00115.mapped.SOLID.bfast.GBR.exome.20110411.bam
+18	HG00115.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+19	HG00116.mapped.illumina.mosaik.GBR.exome.20110411.bam
+19	HG00116.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+20	HG00117.mapped.illumina.mosaik.GBR.exome.20110411.bam
+20	HG00117.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+21	HG00118.mapped.SOLID.bfast.GBR.exome.20110411.bam
+21	HG00118.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+22	HG00119.mapped.illumina.mosaik.GBR.exome.20110411.bam
+22	HG00119.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+23	HG00120.mapped.illumina.mosaik.GBR.exome.20110411.bam
+23	HG00120.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+24	HG00121.mapped.illumina.mosaik.GBR.exome.20110411.bam
+24	HG00121.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+25	HG00122.mapped.SOLID.bfast.GBR.exome.20110411.bam
+25	HG00122.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+26	HG00123.mapped.illumina.mosaik.GBR.exome.20110411.bam
+26	HG00123.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+27	HG00124.mapped.illumina.mosaik.GBR.exome.20110411.bam
+27	HG00124.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+28	HG00125.mapped.illumina.mosaik.GBR.exome.20110411.bam
+28	HG00125.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+29	HG00126.mapped.SOLID.bfast.GBR.exome.20110411.bam
+29	HG00126.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+30	HG00127.mapped.illumina.mosaik.GBR.exome.20110411.bam
+30	HG00127.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+31	HG00128.mapped.SOLID.bfast.GBR.exome.20110521.bam
+31	HG00128.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+32	HG00129.mapped.SOLID.bfast.GBR.exome.20110411.bam
+32	HG00129.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+33	HG00130.mapped.SOLID.bfast.GBR.exome.20110411.bam
+33	HG00130.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+34	HG00131.mapped.illumina.mosaik.GBR.exome.20110521.bam
+34	HG00131.mapped.illumina.mosaik.GBR.exome.20110521.bam.bai
+35	HG00132.mapped.SOLID.bfast.GBR.exome.20110521.bam
+35	HG00132.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+36	HG00133.mapped.illumina.mosaik.GBR.exome.20110411.bam
+36	HG00133.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+37	HG00134.mapped.SOLID.bfast.GBR.exome.20110521.bam
+37	HG00134.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+38	HG00135.mapped.SOLID.bfast.GBR.exome.20110521.bam
+38	HG00135.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+39	HG00136.mapped.illumina.mosaik.GBR.exome.20110411.bam
+39	HG00136.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+40	HG00137.mapped.illumina.mosaik.GBR.exome.20110411.bam
+40	HG00137.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+41	HG00138.mapped.illumina.mosaik.GBR.exome.20110411.bam
+41	HG00138.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+42	HG00139.mapped.illumina.mosaik.GBR.exome.20110411.bam
+42	HG00139.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+43	HG00140.mapped.illumina.mosaik.GBR.exome.20110411.bam
+43	HG00140.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+44	HG00141.mapped.SOLID.bfast.GBR.exome.20110521.bam
+44	HG00141.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+45	HG00142.mapped.SOLID.bfast.GBR.exome.20110521.bam
+45	HG00142.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+46	HG00143.mapped.SOLID.bfast.GBR.exome.20110521.bam
+46	HG00143.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+47	HG00145.mapped.illumina.mosaik.GBR.exome.20110411.bam
+47	HG00145.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+48	HG00148.mapped.SOLID.bfast.GBR.exome.20110411.bam
+48	HG00148.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+49	HG00149.mapped.SOLID.bfast.GBR.exome.20110521.bam
+49	HG00149.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+50	HG00150.mapped.SOLID.bfast.GBR.exome.20110411.bam
+50	HG00150.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+51	HG00151.mapped.SOLID.bfast.GBR.exome.20110521.bam
+51	HG00151.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+52	HG00152.mapped.SOLID.bfast.GBR.exome.20110411.bam
+52	HG00152.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+53	HG00154.mapped.illumina.mosaik.GBR.exome.20110411.bam
+53	HG00154.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+54	HG00156.mapped.SOLID.bfast.GBR.exome.20110411.bam
+54	HG00156.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+55	HG00157.mapped.illumina.mosaik.GBR.exome.20110411.bam
+55	HG00157.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+56	HG00158.mapped.illumina.mosaik.GBR.exome.20110411.bam
+56	HG00158.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+57	HG00159.mapped.illumina.mosaik.GBR.exome.20110411.bam
+57	HG00159.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+58	HG00160.mapped.illumina.mosaik.GBR.exome.20110411.bam
+58	HG00160.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+59	HG00171.mapped.illumina.mosaik.FIN.exome.20110521.bam
+59	HG00171.mapped.illumina.mosaik.FIN.exome.20110521.bam.bai
+60	HG00173.mapped.SOLID.bfast.FIN.exome.20110411.bam
+60	HG00173.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+61	HG00174.mapped.illumina.mosaik.FIN.exome.20110521.bam
+61	HG00174.mapped.illumina.mosaik.FIN.exome.20110521.bam.bai
+62	HG00176.mapped.illumina.mosaik.FIN.exome.20110411.bam
+62	HG00176.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+63	HG00177.mapped.SOLID.bfast.FIN.exome.20110521.bam
+63	HG00177.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+64	HG00178.mapped.illumina.mosaik.FIN.exome.20110411.bam
+64	HG00178.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+65	HG00179.mapped.SOLID.bfast.FIN.exome.20110521.bam
+65	HG00179.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+66	HG00180.mapped.SOLID.bfast.FIN.exome.20110411.bam
+66	HG00180.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+67	HG00181.mapped.illumina.mosaik.FIN.exome.20110521.bam
+67	HG00181.mapped.illumina.mosaik.FIN.exome.20110521.bam.bai
+68	HG00182.mapped.illumina.mosaik.FIN.exome.20110411.bam
+68	HG00182.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+69	HG00183.mapped.illumina.mosaik.FIN.exome.20110411.bam
+69	HG00183.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+70	HG00185.mapped.illumina.mosaik.FIN.exome.20110411.bam
+70	HG00185.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+71	HG00186.mapped.illumina.mosaik.FIN.exome.20110411.bam
+71	HG00186.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+72	HG00187.mapped.illumina.mosaik.FIN.exome.20110411.bam
+72	HG00187.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+73	HG00188.mapped.illumina.mosaik.FIN.exome.20110411.bam
+73	HG00188.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+74	HG00189.mapped.illumina.mosaik.FIN.exome.20110411.bam
+74	HG00189.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+75	HG00190.mapped.illumina.mosaik.FIN.exome.20110411.bam
+75	HG00190.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+76	HG00231.mapped.SOLID.bfast.GBR.exome.20110411.bam
+76	HG00231.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+77	HG00232.mapped.illumina.mosaik.GBR.exome.20110411.bam
+77	HG00232.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+78	HG00233.mapped.illumina.mosaik.GBR.exome.20110411.bam
+78	HG00233.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+79	HG00234.mapped.SOLID.bfast.GBR.exome.20110411.bam
+79	HG00234.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+80	HG00235.mapped.SOLID.bfast.GBR.exome.20110411.bam
+80	HG00235.mapped.SOLID.bfast.GBR.exome.20110411.bam.bai
+81	HG00236.mapped.illumina.mosaik.GBR.exome.20110411.bam
+81	HG00236.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+82	HG00237.mapped.illumina.mosaik.GBR.exome.20110411.bam
+82	HG00237.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+83	HG00238.mapped.illumina.mosaik.GBR.exome.20110411.bam
+83	HG00238.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+84	HG00239.mapped.illumina.mosaik.GBR.exome.20110411.bam
+84	HG00239.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+85	HG00240.mapped.illumina.mosaik.GBR.exome.20110411.bam
+85	HG00240.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+86	HG00242.mapped.illumina.mosaik.GBR.exome.20110411.bam
+86	HG00242.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+87	HG00243.mapped.illumina.mosaik.GBR.exome.20110411.bam
+87	HG00243.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+88	HG00244.mapped.illumina.mosaik.GBR.exome.20110521.bam
+88	HG00244.mapped.illumina.mosaik.GBR.exome.20110521.bam.bai
+89	HG00246.mapped.illumina.mosaik.GBR.exome.20110411.bam
+89	HG00246.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+90	HG00247.mapped.SOLID.bfast.GBR.exome.20110521.bam
+90	HG00247.mapped.SOLID.bfast.GBR.exome.20110521.bam.bai
+91	HG00249.mapped.illumina.mosaik.GBR.exome.20110411.bam
+91	HG00249.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+92	HG00250.mapped.illumina.mosaik.GBR.exome.20110411.bam
+92	HG00250.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+93	HG00251.mapped.illumina.mosaik.GBR.exome.20110411.bam
+93	HG00251.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+94	HG00252.mapped.illumina.mosaik.GBR.exome.20110411.bam
+94	HG00252.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+95	HG00253.mapped.illumina.mosaik.GBR.exome.20110411.bam
+95	HG00253.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+96	HG00254.mapped.illumina.mosaik.GBR.exome.20110411.bam
+96	HG00254.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+97	HG00255.mapped.illumina.mosaik.GBR.exome.20110411.bam
+97	HG00255.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+98	HG00256.mapped.illumina.mosaik.GBR.exome.20110411.bam
+98	HG00256.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+99	HG00257.mapped.illumina.mosaik.GBR.exome.20110411.bam
+99	HG00257.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+100	HG00258.mapped.illumina.mosaik.GBR.exome.20110411.bam
+100	HG00258.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+101	HG00259.mapped.illumina.mosaik.GBR.exome.20110411.bam
+101	HG00259.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+102	HG00260.mapped.illumina.mosaik.GBR.exome.20110411.bam
+102	HG00260.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+103	HG00261.mapped.illumina.mosaik.GBR.exome.20110411.bam
+103	HG00261.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+104	HG00262.mapped.illumina.mosaik.GBR.exome.20110411.bam
+104	HG00262.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+105	HG00263.mapped.illumina.mosaik.GBR.exome.20110411.bam
+105	HG00263.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+106	HG00264.mapped.illumina.mosaik.GBR.exome.20110411.bam
+106	HG00264.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+107	HG00265.mapped.illumina.mosaik.GBR.exome.20110411.bam
+107	HG00265.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+108	HG00266.mapped.SOLID.bfast.FIN.exome.20110521.bam
+108	HG00266.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+109	HG00267.mapped.SOLID.bfast.FIN.exome.20110411.bam
+109	HG00267.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+110	HG00268.mapped.illumina.mosaik.FIN.exome.20110411.bam
+110	HG00268.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+111	HG00269.mapped.SOLID.bfast.FIN.exome.20110521.bam
+111	HG00269.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+112	HG00270.mapped.SOLID.bfast.FIN.exome.20110411.bam
+112	HG00270.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+113	HG00271.mapped.illumina.mosaik.FIN.exome.20110411.bam
+113	HG00271.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+114	HG00272.mapped.illumina.mosaik.FIN.exome.20110411.bam
+114	HG00272.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+115	HG00273.mapped.illumina.mosaik.FIN.exome.20110411.bam
+115	HG00273.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+116	HG00274.mapped.illumina.mosaik.FIN.exome.20110411.bam
+116	HG00274.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+117	HG00275.mapped.illumina.mosaik.FIN.exome.20110411.bam
+117	HG00275.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+118	HG00276.mapped.illumina.mosaik.FIN.exome.20110411.bam
+118	HG00276.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+119	HG00277.mapped.illumina.mosaik.FIN.exome.20110411.bam
+119	HG00277.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+120	HG00278.mapped.illumina.mosaik.FIN.exome.20110411.bam
+120	HG00278.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+121	HG00280.mapped.illumina.mosaik.FIN.exome.20110411.bam
+121	HG00280.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+122	HG00281.mapped.illumina.mosaik.FIN.exome.20110411.bam
+122	HG00281.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+123	HG00282.mapped.illumina.mosaik.FIN.exome.20110411.bam
+123	HG00282.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+124	HG00284.mapped.illumina.mosaik.FIN.exome.20110411.bam
+124	HG00284.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+125	HG00285.mapped.illumina.mosaik.FIN.exome.20110411.bam
+125	HG00285.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+126	HG00306.mapped.illumina.mosaik.FIN.exome.20110411.bam
+126	HG00306.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+127	HG00309.mapped.illumina.mosaik.FIN.exome.20110411.bam
+127	HG00309.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+128	HG00310.mapped.illumina.mosaik.FIN.exome.20110411.bam
+128	HG00310.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+129	HG00311.mapped.illumina.mosaik.FIN.exome.20110411.bam
+129	HG00311.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+130	HG00312.mapped.illumina.mosaik.FIN.exome.20110411.bam
+130	HG00312.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+131	HG00313.mapped.illumina.mosaik.FIN.exome.20110411.bam
+131	HG00313.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+132	HG00315.mapped.illumina.mosaik.FIN.exome.20110411.bam
+132	HG00315.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+133	HG00318.mapped.illumina.mosaik.FIN.exome.20110411.bam
+133	HG00318.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+134	HG00319.mapped.illumina.mosaik.FIN.exome.20110411.bam
+134	HG00319.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+135	HG00320.mapped.illumina.mosaik.FIN.exome.20110411.bam
+135	HG00320.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+136	HG00321.mapped.illumina.mosaik.FIN.exome.20110411.bam
+136	HG00321.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+137	HG00323.mapped.illumina.mosaik.FIN.exome.20110411.bam
+137	HG00323.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+138	HG00324.mapped.illumina.mosaik.FIN.exome.20110411.bam
+138	HG00324.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+139	HG00325.mapped.illumina.mosaik.FIN.exome.20110411.bam
+139	HG00325.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+140	HG00326.mapped.illumina.mosaik.FIN.exome.20110411.bam
+140	HG00326.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+141	HG00327.mapped.illumina.mosaik.FIN.exome.20110411.bam
+141	HG00327.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+142	HG00328.mapped.illumina.mosaik.FIN.exome.20110411.bam
+142	HG00328.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+143	HG00329.mapped.illumina.mosaik.FIN.exome.20110411.bam
+143	HG00329.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+144	HG00330.mapped.illumina.mosaik.FIN.exome.20110521.bam
+144	HG00330.mapped.illumina.mosaik.FIN.exome.20110521.bam.bai
+145	HG00331.mapped.illumina.mosaik.FIN.exome.20110411.bam
+145	HG00331.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+146	HG00332.mapped.illumina.mosaik.FIN.exome.20110521.bam
+146	HG00332.mapped.illumina.mosaik.FIN.exome.20110521.bam.bai
+147	HG00334.mapped.illumina.mosaik.FIN.exome.20110411.bam
+147	HG00334.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+148	HG00335.mapped.illumina.mosaik.FIN.exome.20110411.bam
+148	HG00335.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+149	HG00336.mapped.illumina.mosaik.FIN.exome.20110411.bam
+149	HG00336.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+150	HG00337.mapped.illumina.mosaik.FIN.exome.20110411.bam
+150	HG00337.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+151	HG00338.mapped.illumina.mosaik.FIN.exome.20110411.bam
+151	HG00338.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+152	HG00339.mapped.illumina.mosaik.FIN.exome.20110411.bam
+152	HG00339.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+153	HG00341.mapped.illumina.mosaik.FIN.exome.20110411.bam
+153	HG00341.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+154	HG00342.mapped.illumina.mosaik.FIN.exome.20110411.bam
+154	HG00342.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+155	HG00343.mapped.illumina.mosaik.FIN.exome.20110411.bam
+155	HG00343.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+156	HG00344.mapped.illumina.mosaik.FIN.exome.20110411.bam
+156	HG00344.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+157	HG00345.mapped.illumina.mosaik.FIN.exome.20110411.bam
+157	HG00345.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+158	HG00346.mapped.illumina.mosaik.FIN.exome.20110411.bam
+158	HG00346.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+159	HG00349.mapped.SOLID.bfast.FIN.exome.20110411.bam
+159	HG00349.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+160	HG00350.mapped.SOLID.bfast.FIN.exome.20110411.bam
+160	HG00350.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+161	HG00351.mapped.SOLID.bfast.FIN.exome.20110521.bam
+161	HG00351.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+162	HG00353.mapped.illumina.mosaik.FIN.exome.20110411.bam
+162	HG00353.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+163	HG00355.mapped.SOLID.bfast.FIN.exome.20110411.bam
+163	HG00355.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+164	HG00356.mapped.SOLID.bfast.FIN.exome.20110411.bam
+164	HG00356.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+165	HG00357.mapped.illumina.mosaik.FIN.exome.20110411.bam
+165	HG00357.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+166	HG00358.mapped.SOLID.bfast.FIN.exome.20110411.bam
+166	HG00358.mapped.SOLID.bfast.FIN.exome.20110411.bam.bai
+167	HG00359.mapped.SOLID.bfast.FIN.exome.20110521.bam
+167	HG00359.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+168	HG00360.mapped.SOLID.bfast.FIN.exome.20110521.bam
+168	HG00360.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+169	HG00361.mapped.illumina.mosaik.FIN.exome.20110411.bam
+169	HG00361.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+170	HG00364.mapped.SOLID.bfast.FIN.exome.20110521.bam
+170	HG00364.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+171	HG00365.mapped.SOLID.bfast.FIN.exome.20110521.bam
+171	HG00365.mapped.SOLID.bfast.FIN.exome.20110521.bam.bai
+172	HG00366.mapped.illumina.mosaik.FIN.exome.20110411.bam
+172	HG00366.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+173	HG00367.mapped.illumina.mosaik.FIN.exome.20110411.bam
+173	HG00367.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+174	HG00368.mapped.illumina.mosaik.FIN.exome.20110411.bam
+174	HG00368.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+175	HG00369.mapped.illumina.mosaik.FIN.exome.20110411.bam
+175	HG00369.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+176	HG00371.mapped.illumina.mosaik.FIN.exome.20110411.bam
+176	HG00371.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+177	HG00372.mapped.illumina.mosaik.FIN.exome.20110411.bam
+177	HG00372.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+178	HG00373.mapped.illumina.mosaik.FIN.exome.20110411.bam
+178	HG00373.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+179	HG00375.mapped.illumina.mosaik.FIN.exome.20110411.bam
+179	HG00375.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+180	HG00376.mapped.illumina.mosaik.FIN.exome.20110411.bam
+180	HG00376.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+181	HG00377.mapped.illumina.mosaik.FIN.exome.20110411.bam
+181	HG00377.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+182	HG00378.mapped.illumina.mosaik.FIN.exome.20110411.bam
+182	HG00378.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+183	HG00379.mapped.illumina.mosaik.FIN.exome.20110411.bam
+183	HG00379.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+184	HG00380.mapped.illumina.mosaik.FIN.exome.20110411.bam
+184	HG00380.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+185	HG00381.mapped.illumina.mosaik.FIN.exome.20110411.bam
+185	HG00381.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+186	HG00382.mapped.illumina.mosaik.FIN.exome.20110411.bam
+186	HG00382.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+187	HG00383.mapped.illumina.mosaik.FIN.exome.20110411.bam
+187	HG00383.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+188	HG00384.mapped.illumina.mosaik.FIN.exome.20110411.bam
+188	HG00384.mapped.illumina.mosaik.FIN.exome.20110411.bam.bai
+189	HG00403.mapped.illumina.mosaik.CHS.exome.20110411.bam
+189	HG00403.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+190	HG00404.mapped.illumina.mosaik.CHS.exome.20110411.bam
+190	HG00404.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+191	HG00406.mapped.illumina.mosaik.CHS.exome.20110521.bam
+191	HG00406.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+192	HG00407.mapped.illumina.mosaik.CHS.exome.20110411.bam
+192	HG00407.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+193	HG00418.mapped.illumina.mosaik.CHS.exome.20110521.bam
+193	HG00418.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+194	HG00419.mapped.illumina.mosaik.CHS.exome.20110411.bam
+194	HG00419.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+195	HG00421.mapped.illumina.mosaik.CHS.exome.20110411.bam
+195	HG00421.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+196	HG00422.mapped.illumina.mosaik.CHS.exome.20110521.bam
+196	HG00422.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+197	HG00427.mapped.illumina.mosaik.CHS.exome.20110521.bam
+197	HG00427.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+198	HG00428.mapped.illumina.mosaik.CHS.exome.20110521.bam
+198	HG00428.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+199	HG00436.mapped.illumina.mosaik.CHS.exome.20110521.bam
+199	HG00436.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+200	HG00437.mapped.illumina.mosaik.CHS.exome.20110521.bam
+200	HG00437.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+201	HG00442.mapped.illumina.mosaik.CHS.exome.20110411.bam
+201	HG00442.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+202	HG00443.mapped.illumina.mosaik.CHS.exome.20110411.bam
+202	HG00443.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+203	HG00445.mapped.illumina.mosaik.CHS.exome.20110411.bam
+203	HG00445.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+204	HG00446.mapped.illumina.mosaik.CHS.exome.20110411.bam
+204	HG00446.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+205	HG00448.mapped.illumina.mosaik.CHS.exome.20110411.bam
+205	HG00448.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+206	HG00449.mapped.illumina.mosaik.CHS.exome.20110521.bam
+206	HG00449.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+207	HG00451.mapped.illumina.mosaik.CHS.exome.20110411.bam
+207	HG00451.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+208	HG00452.mapped.illumina.mosaik.CHS.exome.20110411.bam
+208	HG00452.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+209	HG00457.mapped.illumina.mosaik.CHS.exome.20110411.bam
+209	HG00457.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+210	HG00458.mapped.illumina.mosaik.CHS.exome.20110411.bam
+210	HG00458.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+211	HG00463.mapped.illumina.mosaik.CHS.exome.20110411.bam
+211	HG00463.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+212	HG00464.mapped.illumina.mosaik.CHS.exome.20110411.bam
+212	HG00464.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+213	HG00472.mapped.illumina.mosaik.CHS.exome.20110411.bam
+213	HG00472.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+214	HG00473.mapped.illumina.mosaik.CHS.exome.20110411.bam
+214	HG00473.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+215	HG00475.mapped.illumina.mosaik.CHS.exome.20110411.bam
+215	HG00475.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+216	HG00476.mapped.illumina.mosaik.CHS.exome.20110411.bam
+216	HG00476.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+217	HG00478.mapped.illumina.mosaik.CHS.exome.20110411.bam
+217	HG00478.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+218	HG00479.mapped.illumina.mosaik.CHS.exome.20110521.bam
+218	HG00479.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+219	HG00500.mapped.illumina.mosaik.CHS.exome.20110411.bam
+219	HG00500.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+220	HG00501.mapped.illumina.mosaik.CHS.exome.20110411.bam
+220	HG00501.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+221	HG00512.mapped.illumina.mosaik.CHS.exome.20110521.bam
+221	HG00512.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+222	HG00513.mapped.illumina.mosaik.CHS.exome.20110521.bam
+222	HG00513.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+223	HG00524.mapped.illumina.mosaik.CHS.exome.20110411.bam
+223	HG00524.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+224	HG00525.mapped.illumina.mosaik.CHS.exome.20110411.bam
+224	HG00525.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+225	HG00530.mapped.illumina.mosaik.CHS.exome.20110521.bam
+225	HG00530.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+226	HG00531.mapped.illumina.mosaik.CHS.exome.20110521.bam
+226	HG00531.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+227	HG00533.mapped.illumina.mosaik.CHS.exome.20110411.bam
+227	HG00533.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+228	HG00534.mapped.illumina.mosaik.CHS.exome.20110411.bam
+228	HG00534.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+229	HG00536.mapped.illumina.mosaik.CHS.exome.20110521.bam
+229	HG00536.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+230	HG00537.mapped.illumina.mosaik.CHS.exome.20110411.bam
+230	HG00537.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+231	HG00542.mapped.illumina.mosaik.CHS.exome.20110521.bam
+231	HG00542.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+232	HG00543.mapped.illumina.mosaik.CHS.exome.20110521.bam
+232	HG00543.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+233	HG00551.mapped.illumina.mosaik.PUR.exome.20110411.bam
+233	HG00551.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+234	HG00553.mapped.illumina.mosaik.PUR.exome.20110411.bam
+234	HG00553.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+235	HG00554.mapped.illumina.mosaik.PUR.exome.20110411.bam
+235	HG00554.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+236	HG00556.mapped.illumina.mosaik.CHS.exome.20110411.bam
+236	HG00556.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+237	HG00557.mapped.illumina.mosaik.CHS.exome.20110411.bam
+237	HG00557.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+238	HG00559.mapped.SOLID.bfast.CHS.exome.20110521.bam
+238	HG00559.mapped.SOLID.bfast.CHS.exome.20110521.bam.bai
+239	HG00560.mapped.SOLID.bfast.CHS.exome.20110521.bam
+239	HG00560.mapped.SOLID.bfast.CHS.exome.20110521.bam.bai
+240	HG00565.mapped.SOLID.bfast.CHS.exome.20110521.bam
+240	HG00565.mapped.SOLID.bfast.CHS.exome.20110521.bam.bai
+241	HG00566.mapped.SOLID.bfast.CHS.exome.20110521.bam
+241	HG00566.mapped.SOLID.bfast.CHS.exome.20110521.bam.bai
+242	HG00577.mapped.SOLID.bfast.CHS.exome.20110411.bam
+242	HG00577.mapped.SOLID.bfast.CHS.exome.20110411.bam.bai
+243	HG00578.mapped.SOLID.bfast.CHS.exome.20110411.bam
+243	HG00578.mapped.SOLID.bfast.CHS.exome.20110411.bam.bai
+244	HG00580.mapped.illumina.mosaik.CHS.exome.20110411.bam
+244	HG00580.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+245	HG00581.mapped.illumina.mosaik.CHS.exome.20110521.bam
+245	HG00581.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+246	HG00583.mapped.illumina.mosaik.CHS.exome.20110521.bam
+246	HG00583.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+247	HG00584.mapped.illumina.mosaik.CHS.exome.20110411.bam
+247	HG00584.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+248	HG00589.mapped.illumina.mosaik.CHS.exome.20110411.bam
+248	HG00589.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+249	HG00590.mapped.illumina.mosaik.CHS.exome.20110411.bam
+249	HG00590.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+250	HG00592.mapped.SOLID.bfast.CHS.exome.20110411.bam
+250	HG00592.mapped.SOLID.bfast.CHS.exome.20110411.bam.bai
+251	HG00593.mapped.SOLID.bfast.CHS.exome.20110411.bam
+251	HG00593.mapped.SOLID.bfast.CHS.exome.20110411.bam.bai
+252	HG00595.mapped.SOLID.bfast.CHS.exome.20110521.bam
+252	HG00595.mapped.SOLID.bfast.CHS.exome.20110521.bam.bai
+253	HG00596.mapped.SOLID.bfast.CHS.exome.20110411.bam
+253	HG00596.mapped.SOLID.bfast.CHS.exome.20110411.bam.bai
+254	HG00607.mapped.illumina.mosaik.CHS.exome.20110411.bam
+254	HG00607.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+255	HG00608.mapped.illumina.mosaik.CHS.exome.20110411.bam
+255	HG00608.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+256	HG00610.mapped.illumina.mosaik.CHS.exome.20110411.bam
+256	HG00610.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+257	HG00611.mapped.illumina.mosaik.CHS.exome.20110411.bam
+257	HG00611.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+258	HG00613.mapped.illumina.mosaik.CHS.exome.20110411.bam
+258	HG00613.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+259	HG00614.mapped.illumina.mosaik.CHS.exome.20110411.bam
+259	HG00614.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+260	HG00619.mapped.illumina.mosaik.CHS.exome.20110521.bam
+260	HG00619.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+261	HG00620.mapped.illumina.mosaik.CHS.exome.20110411.bam
+261	HG00620.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+262	HG00625.mapped.illumina.mosaik.CHS.exome.20110411.bam
+262	HG00625.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+263	HG00626.mapped.illumina.mosaik.CHS.exome.20110411.bam
+263	HG00626.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+264	HG00628.mapped.illumina.mosaik.CHS.exome.20110411.bam
+264	HG00628.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+265	HG00629.mapped.illumina.mosaik.CHS.exome.20110411.bam
+265	HG00629.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+266	HG00634.mapped.illumina.mosaik.CHS.exome.20110411.bam
+266	HG00634.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+267	HG00635.mapped.illumina.mosaik.CHS.exome.20110411.bam
+267	HG00635.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+268	HG00637.mapped.illumina.mosaik.PUR.exome.20110411.bam
+268	HG00637.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+269	HG00638.mapped.illumina.mosaik.PUR.exome.20110411.bam
+269	HG00638.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+270	HG00640.mapped.illumina.mosaik.PUR.exome.20110411.bam
+270	HG00640.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+271	HG00641.mapped.illumina.mosaik.PUR.exome.20110411.bam
+271	HG00641.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+272	HG00650.mapped.illumina.mosaik.CHS.exome.20110411.bam
+272	HG00650.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+273	HG00651.mapped.illumina.mosaik.CHS.exome.20110411.bam
+273	HG00651.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+274	HG00653.mapped.illumina.mosaik.CHS.exome.20110411.bam
+274	HG00653.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+275	HG00654.mapped.illumina.mosaik.CHS.exome.20110411.bam
+275	HG00654.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+276	HG00656.mapped.illumina.mosaik.CHS.exome.20110411.bam
+276	HG00656.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+277	HG00657.mapped.illumina.mosaik.CHS.exome.20110521.bam
+277	HG00657.mapped.illumina.mosaik.CHS.exome.20110521.bam.bai
+278	HG00662.mapped.illumina.mosaik.CHS.exome.20110411.bam
+278	HG00662.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+279	HG00663.mapped.illumina.mosaik.CHS.exome.20110411.bam
+279	HG00663.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+280	HG00671.mapped.illumina.mosaik.CHS.exome.20110411.bam
+280	HG00671.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+281	HG00672.mapped.illumina.mosaik.CHS.exome.20110411.bam
+281	HG00672.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+282	HG00683.mapped.illumina.mosaik.CHS.exome.20110411.bam
+282	HG00683.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+283	HG00684.mapped.illumina.mosaik.CHS.exome.20110411.bam
+283	HG00684.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+284	HG00689.mapped.illumina.mosaik.CHS.exome.20110411.bam
+284	HG00689.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+285	HG00690.mapped.illumina.mosaik.CHS.exome.20110411.bam
+285	HG00690.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+286	HG00692.mapped.illumina.mosaik.CHS.exome.20110411.bam
+286	HG00692.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+287	HG00693.mapped.illumina.mosaik.CHS.exome.20110411.bam
+287	HG00693.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+288	HG00698.mapped.illumina.mosaik.CHS.exome.20110411.bam
+288	HG00698.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+289	HG00699.mapped.illumina.mosaik.CHS.exome.20110411.bam
+289	HG00699.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+290	HG00701.mapped.illumina.mosaik.CHS.exome.20110411.bam
+290	HG00701.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+291	HG00702.mapped.illumina.mosaik.CHS.exome.20110411.bam
+291	HG00702.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+292	HG00704.mapped.illumina.mosaik.CHS.exome.20110411.bam
+292	HG00704.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+293	HG00705.mapped.illumina.mosaik.CHS.exome.20110411.bam
+293	HG00705.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+294	HG00707.mapped.illumina.mosaik.CHS.exome.20110411.bam
+294	HG00707.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+295	HG00708.mapped.illumina.mosaik.CHS.exome.20110411.bam
+295	HG00708.mapped.illumina.mosaik.CHS.exome.20110411.bam.bai
+296	HG00731.mapped.illumina.mosaik.PUR.exome.20110411.bam
+296	HG00731.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+297	HG00732.mapped.illumina.mosaik.PUR.exome.20110411.bam
+297	HG00732.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+298	HG00734.mapped.illumina.mosaik.PUR.exome.20110411.bam
+298	HG00734.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+299	HG00736.mapped.illumina.mosaik.PUR.exome.20110411.bam
+299	HG00736.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+300	HG00737.mapped.illumina.mosaik.PUR.exome.20110411.bam
+300	HG00737.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+301	HG00739.mapped.illumina.mosaik.PUR.exome.20110411.bam
+301	HG00739.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+302	HG00740.mapped.illumina.mosaik.PUR.exome.20110411.bam
+302	HG00740.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+303	HG01047.mapped.illumina.mosaik.PUR.exome.20110411.bam
+303	HG01047.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+304	HG01048.mapped.illumina.mosaik.PUR.exome.20110411.bam
+304	HG01048.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+305	HG01049.mapped.illumina.mosaik.PUR.exome.20110411.bam
+305	HG01049.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+306	HG01051.mapped.illumina.mosaik.PUR.exome.20110521.bam
+306	HG01051.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+307	HG01052.mapped.illumina.mosaik.PUR.exome.20110521.bam
+307	HG01052.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+308	HG01054.mapped.illumina.mosaik.PUR.exome.20110411.bam
+308	HG01054.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+309	HG01055.mapped.illumina.mosaik.PUR.exome.20110411.bam
+309	HG01055.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+310	HG01060.mapped.illumina.mosaik.PUR.exome.20110521.bam
+310	HG01060.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+311	HG01061.mapped.illumina.mosaik.PUR.exome.20110521.bam
+311	HG01061.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+312	HG01066.mapped.illumina.mosaik.PUR.exome.20110411.bam
+312	HG01066.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+313	HG01067.mapped.illumina.mosaik.PUR.exome.20110411.bam
+313	HG01067.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+314	HG01069.mapped.illumina.mosaik.PUR.exome.20110521.bam
+314	HG01069.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+315	HG01070.mapped.illumina.mosaik.PUR.exome.20110411.bam
+315	HG01070.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+316	HG01072.mapped.illumina.mosaik.PUR.exome.20110521.bam
+316	HG01072.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+317	HG01073.mapped.illumina.mosaik.PUR.exome.20110411.bam
+317	HG01073.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+318	HG01075.mapped.illumina.mosaik.PUR.exome.20110411.bam
+318	HG01075.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+319	HG01079.mapped.illumina.mosaik.PUR.exome.20110411.bam
+319	HG01079.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+320	HG01080.mapped.illumina.mosaik.PUR.exome.20110411.bam
+320	HG01080.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+321	HG01082.mapped.illumina.mosaik.PUR.exome.20110521.bam
+321	HG01082.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+322	HG01083.mapped.illumina.mosaik.PUR.exome.20110521.bam
+322	HG01083.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+323	HG01085.mapped.illumina.mosaik.PUR.exome.20110521.bam
+323	HG01085.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+324	HG01086.mapped.illumina.mosaik.PUR.exome.20110521.bam
+324	HG01086.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+325	HG01094.mapped.illumina.mosaik.PUR.exome.20110411.bam
+325	HG01094.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+326	HG01095.mapped.illumina.mosaik.PUR.exome.20110411.bam
+326	HG01095.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+327	HG01097.mapped.illumina.mosaik.PUR.exome.20110411.bam
+327	HG01097.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+328	HG01098.mapped.illumina.mosaik.PUR.exome.20110411.bam
+328	HG01098.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+329	HG01102.mapped.illumina.mosaik.PUR.exome.20110411.bam
+329	HG01102.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+330	HG01104.mapped.illumina.mosaik.PUR.exome.20110521.bam
+330	HG01104.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+331	HG01105.mapped.illumina.mosaik.PUR.exome.20110521.bam
+331	HG01105.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+332	HG01107.mapped.illumina.mosaik.PUR.exome.20110521.bam
+332	HG01107.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+333	HG01108.mapped.illumina.mosaik.PUR.exome.20110521.bam
+333	HG01108.mapped.illumina.mosaik.PUR.exome.20110521.bam.bai
+334	HG01110.mapped.illumina.mosaik.PUR.exome.20110411.bam
+334	HG01110.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+335	HG01111.mapped.illumina.mosaik.PUR.exome.20110411.bam
+335	HG01111.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+336	HG01112.mapped.illumina.mosaik.CLM.exome.20110411.bam
+336	HG01112.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+337	HG01113.mapped.illumina.mosaik.CLM.exome.20110411.bam
+337	HG01113.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+338	HG01124.mapped.SOLID.bfast.CLM.exome.20110411.bam
+338	HG01124.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+339	HG01125.mapped.SOLID.bfast.CLM.exome.20110521.bam
+339	HG01125.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+340	HG01133.mapped.SOLID.bfast.CLM.exome.20110411.bam
+340	HG01133.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+341	HG01134.mapped.SOLID.bfast.CLM.exome.20110411.bam
+341	HG01134.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+342	HG01136.mapped.SOLID.bfast.CLM.exome.20110521.bam
+342	HG01136.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+343	HG01137.mapped.SOLID.bfast.CLM.exome.20110411.bam
+343	HG01137.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+344	HG01139.mapped.SOLID.bfast.CLM.exome.20110521.bam
+344	HG01139.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+345	HG01140.mapped.SOLID.bfast.CLM.exome.20110411.bam
+345	HG01140.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+346	HG01148.mapped.SOLID.bfast.CLM.exome.20110411.bam
+346	HG01148.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+347	HG01149.mapped.SOLID.bfast.CLM.exome.20110411.bam
+347	HG01149.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+348	HG01168.mapped.illumina.mosaik.PUR.exome.20110411.bam
+348	HG01168.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+349	HG01170.mapped.illumina.mosaik.PUR.exome.20110411.bam
+349	HG01170.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+350	HG01171.mapped.illumina.mosaik.PUR.exome.20110411.bam
+350	HG01171.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+351	HG01173.mapped.illumina.mosaik.PUR.exome.20110411.bam
+351	HG01173.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+352	HG01174.mapped.illumina.mosaik.PUR.exome.20110411.bam
+352	HG01174.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+353	HG01176.mapped.illumina.mosaik.PUR.exome.20110411.bam
+353	HG01176.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+354	HG01177.mapped.illumina.mosaik.PUR.exome.20110411.bam
+354	HG01177.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+355	HG01187.mapped.illumina.mosaik.PUR.exome.20110411.bam
+355	HG01187.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+356	HG01188.mapped.illumina.mosaik.PUR.exome.20110411.bam
+356	HG01188.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+357	HG01190.mapped.illumina.mosaik.PUR.exome.20110411.bam
+357	HG01190.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+358	HG01205.mapped.illumina.mosaik.PUR.exome.20110411.bam
+358	HG01205.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+359	HG01241.mapped.illumina.mosaik.PUR.exome.20110411.bam
+359	HG01241.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+360	HG01242.mapped.illumina.mosaik.PUR.exome.20110411.bam
+360	HG01242.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+361	HG01247.mapped.illumina.mosaik.PUR.exome.20110411.bam
+361	HG01247.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+362	HG01248.mapped.illumina.mosaik.PUR.exome.20110411.bam
+362	HG01248.mapped.illumina.mosaik.PUR.exome.20110411.bam.bai
+363	HG01250.mapped.illumina.mosaik.CLM.exome.20110411.bam
+363	HG01250.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+364	HG01251.mapped.illumina.mosaik.CLM.exome.20110411.bam
+364	HG01251.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+365	HG01253.mapped.illumina.mosaik.CLM.exome.20110411.bam
+365	HG01253.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+366	HG01254.mapped.illumina.mosaik.CLM.exome.20110411.bam
+366	HG01254.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+367	HG01256.mapped.illumina.mosaik.CLM.exome.20110411.bam
+367	HG01256.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+368	HG01257.mapped.illumina.mosaik.CLM.exome.20110411.bam
+368	HG01257.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+369	HG01259.mapped.illumina.mosaik.CLM.exome.20110411.bam
+369	HG01259.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+370	HG01260.mapped.illumina.mosaik.CLM.exome.20110411.bam
+370	HG01260.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+371	HG01271.mapped.SOLID.bfast.CLM.exome.20110411.bam
+371	HG01271.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+372	HG01272.mapped.SOLID.bfast.CLM.exome.20110521.bam
+372	HG01272.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+373	HG01274.mapped.SOLID.bfast.CLM.exome.20110411.bam
+373	HG01274.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+374	HG01275.mapped.SOLID.bfast.CLM.exome.20110411.bam
+374	HG01275.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+375	HG01277.mapped.SOLID.bfast.CLM.exome.20110521.bam
+375	HG01277.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+376	HG01278.mapped.SOLID.bfast.CLM.exome.20110411.bam
+376	HG01278.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+377	HG01334.mapped.illumina.mosaik.GBR.exome.20110411.bam
+377	HG01334.mapped.illumina.mosaik.GBR.exome.20110411.bam.bai
+378	HG01341.mapped.illumina.mosaik.CLM.exome.20110411.bam
+378	HG01341.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+379	HG01342.mapped.illumina.mosaik.CLM.exome.20110411.bam
+379	HG01342.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+380	HG01344.mapped.SOLID.bfast.CLM.exome.20110411.bam
+380	HG01344.mapped.SOLID.bfast.CLM.exome.20110411.bam.bai
+381	HG01345.mapped.SOLID.bfast.CLM.exome.20110521.bam
+381	HG01345.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+382	HG01347.mapped.SOLID.bfast.IBS.exome.20110521.bam
+382	HG01347.mapped.SOLID.bfast.IBS.exome.20110521.bam.bai
+383	HG01350.mapped.illumina.mosaik.CLM.exome.20110411.bam
+383	HG01350.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+384	HG01351.mapped.illumina.mosaik.CLM.exome.20110411.bam
+384	HG01351.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+385	HG01353.mapped.illumina.mosaik.CLM.exome.20110411.bam
+385	HG01353.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+386	HG01354.mapped.illumina.mosaik.CLM.exome.20110411.bam
+386	HG01354.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+387	HG01356.mapped.SOLID.bfast.CLM.exome.20110521.bam
+387	HG01356.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+388	HG01357.mapped.SOLID.bfast.CLM.exome.20110521.bam
+388	HG01357.mapped.SOLID.bfast.CLM.exome.20110521.bam.bai
+389	HG01359.mapped.illumina.mosaik.CLM.exome.20110411.bam
+389	HG01359.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+390	HG01360.mapped.illumina.mosaik.CLM.exome.20110411.bam
+390	HG01360.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+391	HG01365.mapped.illumina.mosaik.CLM.exome.20110411.bam
+391	HG01365.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+392	HG01366.mapped.illumina.mosaik.CLM.exome.20110411.bam
+392	HG01366.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+393	HG01374.mapped.illumina.mosaik.CLM.exome.20110411.bam
+393	HG01374.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+394	HG01375.mapped.illumina.mosaik.CLM.exome.20110411.bam
+394	HG01375.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+395	HG01377.mapped.illumina.mosaik.CLM.exome.20110411.bam
+395	HG01377.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+396	HG01378.mapped.illumina.mosaik.CLM.exome.20110411.bam
+396	HG01378.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+397	HG01383.mapped.illumina.mosaik.CLM.exome.20110411.bam
+397	HG01383.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+398	HG01384.mapped.illumina.mosaik.CLM.exome.20110411.bam
+398	HG01384.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+399	HG01389.mapped.illumina.mosaik.CLM.exome.20110411.bam
+399	HG01389.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+400	HG01390.mapped.illumina.mosaik.CLM.exome.20110411.bam
+400	HG01390.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+401	HG01437.mapped.illumina.mosaik.CLM.exome.20110411.bam
+401	HG01437.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+402	HG01438.mapped.illumina.mosaik.CLM.exome.20110411.bam
+402	HG01438.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+403	HG01440.mapped.illumina.mosaik.CLM.exome.20110411.bam
+403	HG01440.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+404	HG01441.mapped.illumina.mosaik.CLM.exome.20110411.bam
+404	HG01441.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+405	HG01455.mapped.illumina.mosaik.CLM.exome.20110411.bam
+405	HG01455.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+406	HG01456.mapped.illumina.mosaik.CLM.exome.20110411.bam
+406	HG01456.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+407	HG01461.mapped.illumina.mosaik.CLM.exome.20110411.bam
+407	HG01461.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+408	HG01462.mapped.illumina.mosaik.CLM.exome.20110411.bam
+408	HG01462.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+409	HG01464.mapped.illumina.mosaik.CLM.exome.20110411.bam
+409	HG01464.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+410	HG01465.mapped.illumina.mosaik.CLM.exome.20110411.bam
+410	HG01465.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+411	HG01488.mapped.illumina.mosaik.CLM.exome.20110411.bam
+411	HG01488.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+412	HG01489.mapped.illumina.mosaik.CLM.exome.20110411.bam
+412	HG01489.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+413	HG01491.mapped.illumina.mosaik.CLM.exome.20110411.bam
+413	HG01491.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+414	HG01492.mapped.illumina.mosaik.CLM.exome.20110411.bam
+414	HG01492.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+415	HG01494.mapped.illumina.mosaik.CLM.exome.20110411.bam
+415	HG01494.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+416	HG01495.mapped.illumina.mosaik.CLM.exome.20110411.bam
+416	HG01495.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+417	HG01497.mapped.illumina.mosaik.CLM.exome.20110411.bam
+417	HG01497.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+418	HG01498.mapped.illumina.mosaik.CLM.exome.20110411.bam
+418	HG01498.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+419	HG01550.mapped.illumina.mosaik.CLM.exome.20110411.bam
+419	HG01550.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+420	HG01551.mapped.illumina.mosaik.CLM.exome.20110411.bam
+420	HG01551.mapped.illumina.mosaik.CLM.exome.20110411.bam.bai
+421	NA06984.mapped.illumina.mosaik.CEU.exome.20110521.bam
+421	NA06984.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+422	NA06985.mapped.SOLID.bfast.CEU.exome.20110521.bam
+422	NA06985.mapped.SOLID.bfast.CEU.exome.20110521.bam.bai
+423	NA06986.mapped.illumina.mosaik.CEU.exome.20110411.bam
+423	NA06986.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+424	NA06989.mapped.illumina.mosaik.CEU.exome.20110411.bam
+424	NA06989.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+425	NA06994.mapped.illumina.mosaik.CEU.exome.20110411.bam
+425	NA06994.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+426	NA07000.mapped.SOLID.bfast.CEU.exome.20110521.bam
+426	NA07000.mapped.SOLID.bfast.CEU.exome.20110521.bam.bai
+427	NA07037.mapped.illumina.mosaik.CEU.exome.20110521.bam
+427	NA07037.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+428	NA07048.mapped.illumina.mosaik.CEU.exome.20110411.bam
+428	NA07048.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+429	NA07051.mapped.illumina.mosaik.CEU.exome.20110411.bam
+429	NA07051.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+430	NA07056.mapped.SOLID.bfast.CEU.exome.20110411.bam
+430	NA07056.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+431	NA07347.mapped.illumina.mosaik.CEU.exome.20110411.bam
+431	NA07347.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+432	NA07357.mapped.SOLID.bfast.CEU.exome.20110411.bam
+432	NA07357.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+433	NA10847.mapped.illumina.mosaik.CEU.exome.20110411.bam
+433	NA10847.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+434	NA10851.mapped.SOLID.bfast.CEU.exome.20110411.bam
+434	NA10851.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+435	NA11829.mapped.SOLID.bfast.CEU.exome.20110411.bam
+435	NA11829.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+436	NA11830.mapped.SOLID.bfast.CEU.exome.20110521.bam
+436	NA11830.mapped.SOLID.bfast.CEU.exome.20110521.bam.bai
+437	NA11831.mapped.SOLID.bfast.CEU.exome.20110411.bam
+437	NA11831.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+438	NA11832.mapped.SOLID.bfast.CEU.exome.20110521.bam
+438	NA11832.mapped.SOLID.bfast.CEU.exome.20110521.bam.bai
+439	NA11840.mapped.illumina.mosaik.CEU.exome.20110411.bam
+439	NA11840.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+440	NA11843.mapped.illumina.mosaik.CEU.exome.20110521.bam
+440	NA11843.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+441	NA11881.mapped.SOLID.bfast.CEU.exome.20110411.bam
+441	NA11881.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+442	NA11892.mapped.illumina.mosaik.CEU.exome.20110521.bam
+442	NA11892.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+443	NA11893.mapped.illumina.mosaik.CEU.exome.20110521.bam
+443	NA11893.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+444	NA11894.mapped.illumina.mosaik.CEU.exome.20110521.bam
+444	NA11894.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+445	NA11918.mapped.illumina.mosaik.CEU.exome.20110411.bam
+445	NA11918.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+446	NA11919.mapped.illumina.mosaik.CEU.exome.20110411.bam
+446	NA11919.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+447	NA11920.mapped.illumina.mosaik.CEU.exome.20110411.bam
+447	NA11920.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+448	NA11930.mapped.illumina.mosaik.CEU.exome.20110411.bam
+448	NA11930.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+449	NA11931.mapped.illumina.mosaik.CEU.exome.20110521.bam
+449	NA11931.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+450	NA11932.mapped.illumina.mosaik.CEU.exome.20110521.bam
+450	NA11932.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+451	NA11933.mapped.illumina.mosaik.CEU.exome.20110521.bam
+451	NA11933.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+452	NA11992.mapped.SOLID.bfast.CEU.exome.20110411.bam
+452	NA11992.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+453	NA11993.mapped.SOLID.bfast.CEU.exome.20110411.bam
+453	NA11993.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+454	NA11994.mapped.SOLID.bfast.CEU.exome.20110521.bam
+454	NA11994.mapped.SOLID.bfast.CEU.exome.20110521.bam.bai
+455	NA11995.mapped.SOLID.bfast.CEU.exome.20110411.bam
+455	NA11995.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+456	NA12003.mapped.SOLID.bfast.CEU.exome.20110411.bam
+456	NA12003.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+457	NA12004.mapped.SOLID.bfast.CEU.exome.20110411.bam
+457	NA12004.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+458	NA12005.mapped.SOLID.bfast.CEU.exome.20110521.bam
+458	NA12005.mapped.SOLID.bfast.CEU.exome.20110521.bam.bai
+459	NA12006.mapped.SOLID.bfast.CEU.exome.20110411.bam
+459	NA12006.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+460	NA12043.mapped.SOLID.bfast.CEU.exome.20110411.bam
+460	NA12043.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+461	NA12044.mapped.SOLID.bfast.CEU.exome.20110411.bam
+461	NA12044.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+462	NA12045.mapped.illumina.mosaik.CEU.exome.20110411.bam
+462	NA12045.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+463	NA12058.mapped.illumina.mosaik.CEU.exome.20110411.bam
+463	NA12058.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+464	NA12144.mapped.SOLID.bfast.CEU.exome.20110411.bam
+464	NA12144.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+465	NA12154.mapped.SOLID.bfast.CEU.exome.20110411.bam
+465	NA12154.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+466	NA12155.mapped.SOLID.bfast.CEU.exome.20110411.bam
+466	NA12155.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+467	NA12156.mapped.SOLID.bfast.CEU.exome.20110411.bam
+467	NA12156.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+468	NA12234.mapped.SOLID.bfast.CEU.exome.20110411.bam
+468	NA12234.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+469	NA12249.mapped.illumina.mosaik.CEU.exome.20110411.bam
+469	NA12249.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+470	NA12272.mapped.illumina.mosaik.CEU.exome.20110411.bam
+470	NA12272.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+471	NA12273.mapped.illumina.mosaik.CEU.exome.20110411.bam
+471	NA12273.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+472	NA12275.mapped.illumina.mosaik.CEU.exome.20110521.bam
+472	NA12275.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+473	NA12283.mapped.illumina.mosaik.CEU.exome.20110411.bam
+473	NA12283.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+474	NA12286.mapped.illumina.mosaik.CEU.exome.20110411.bam
+474	NA12286.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+475	NA12287.mapped.illumina.mosaik.CEU.exome.20110521.bam
+475	NA12287.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+476	NA12340.mapped.illumina.mosaik.CEU.exome.20110521.bam
+476	NA12340.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+477	NA12341.mapped.illumina.mosaik.CEU.exome.20110411.bam
+477	NA12341.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+478	NA12342.mapped.illumina.mosaik.CEU.exome.20110411.bam
+478	NA12342.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+479	NA12347.mapped.illumina.mosaik.CEU.exome.20110521.bam
+479	NA12347.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+480	NA12348.mapped.illumina.mosaik.CEU.exome.20110521.bam
+480	NA12348.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+481	NA12383.mapped.illumina.mosaik.CEU.exome.20110521.bam
+481	NA12383.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+482	NA12399.mapped.illumina.mosaik.CEU.exome.20110411.bam
+482	NA12399.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+483	NA12413.mapped.illumina.mosaik.CEU.exome.20110521.bam
+483	NA12413.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+484	NA12414.mapped.SOLID.bfast.CEU.exome.20110411.bam
+484	NA12414.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+485	NA12489.mapped.SOLID.bfast.CEU.exome.20110411.bam
+485	NA12489.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+486	NA12546.mapped.illumina.mosaik.CEU.exome.20110521.bam
+486	NA12546.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+487	NA12716.mapped.illumina.mosaik.CEU.exome.20110411.bam
+487	NA12716.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+488	NA12717.mapped.illumina.mosaik.CEU.exome.20110411.bam
+488	NA12717.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+489	NA12718.mapped.illumina.mosaik.CEU.exome.20110411.bam
+489	NA12718.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+490	NA12748.mapped.illumina.mosaik.CEU.exome.20110411.bam
+490	NA12748.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+491	NA12749.mapped.illumina.mosaik.CEU.exome.20110521.bam
+491	NA12749.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+492	NA12750.mapped.illumina.mosaik.CEU.exome.20110411.bam
+492	NA12750.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+493	NA12751.mapped.illumina.mosaik.CEU.exome.20110411.bam
+493	NA12751.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+494	NA12760.mapped.illumina.mosaik.CEU.exome.20110411.bam
+494	NA12760.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+495	NA12761.mapped.illumina.mosaik.CEU.exome.20110411.bam
+495	NA12761.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+496	NA12762.mapped.SOLID.bfast.CEU.exome.20110411.bam
+496	NA12762.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+497	NA12763.mapped.illumina.mosaik.CEU.exome.20110411.bam
+497	NA12763.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+498	NA12775.mapped.illumina.mosaik.CEU.exome.20110521.bam
+498	NA12775.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+499	NA12776.mapped.illumina.mosaik.CEU.exome.20110521.bam
+499	NA12776.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+500	NA12777.mapped.illumina.mosaik.CEU.exome.20110521.bam
+500	NA12777.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+501	NA12778.mapped.illumina.mosaik.CEU.exome.20110521.bam
+501	NA12778.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+502	NA12812.mapped.SOLID.bfast.CEU.exome.20110411.bam
+502	NA12812.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+503	NA12813.mapped.SOLID.bfast.CEU.exome.20110411.bam
+503	NA12813.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+504	NA12814.mapped.SOLID.bfast.CEU.exome.20110521.bam
+504	NA12814.mapped.SOLID.bfast.CEU.exome.20110521.bam.bai
+505	NA12815.mapped.SOLID.bfast.CEU.exome.20110411.bam
+505	NA12815.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+506	NA12827.mapped.illumina.mosaik.CEU.exome.20110521.bam
+506	NA12827.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+507	NA12828.mapped.illumina.mosaik.CEU.exome.20110521.bam
+507	NA12828.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+508	NA12830.mapped.illumina.mosaik.CEU.exome.20110411.bam
+508	NA12830.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+509	NA12842.mapped.illumina.mosaik.CEU.exome.20110411.bam
+509	NA12842.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+510	NA12843.mapped.illumina.mosaik.CEU.exome.20110411.bam
+510	NA12843.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+511	NA12872.mapped.SOLID.bfast.CEU.exome.20110411.bam
+511	NA12872.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+512	NA12873.mapped.SOLID.bfast.CEU.exome.20110411.bam
+512	NA12873.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+513	NA12874.mapped.SOLID.bfast.CEU.exome.20110411.bam
+513	NA12874.mapped.SOLID.bfast.CEU.exome.20110411.bam.bai
+514	NA12878.mapped.illumina.mosaik.CEU.exome.20110411.bam
+514	NA12878.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+515	NA12889.mapped.illumina.mosaik.CEU.exome.20110411.bam
+515	NA12889.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+516	NA12890.mapped.illumina.mosaik.CEU.exome.20110521.bam
+516	NA12890.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+517	NA12891.mapped.illumina.mosaik.CEU.exome.20110411.bam
+517	NA12891.mapped.illumina.mosaik.CEU.exome.20110411.bam.bai
+518	NA12892.mapped.illumina.mosaik.CEU.exome.20110521.bam
+518	NA12892.mapped.illumina.mosaik.CEU.exome.20110521.bam.bai
+519	NA18486.mapped.illumina.mosaik.YRI.exome.20110411.bam
+519	NA18486.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+520	NA18487.mapped.illumina.mosaik.YRI.exome.20110411.bam
+520	NA18487.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+521	NA18488.mapped.illumina.mosaik.YRI.exome.20110411.bam
+521	NA18488.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+522	NA18489.mapped.illumina.mosaik.YRI.exome.20110411.bam
+522	NA18489.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+523	NA18498.mapped.illumina.mosaik.YRI.exome.20110411.bam
+523	NA18498.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+524	NA18499.mapped.illumina.mosaik.YRI.exome.20110411.bam
+524	NA18499.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+525	NA18501.mapped.illumina.mosaik.YRI.exome.20110411.bam
+525	NA18501.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+526	NA18502.mapped.SOLID.bfast.YRI.exome.20110411.bam
+526	NA18502.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+527	NA18504.mapped.illumina.mosaik.YRI.exome.20110411.bam
+527	NA18504.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+528	NA18505.mapped.SOLID.bfast.YRI.exome.20110411.bam
+528	NA18505.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+529	NA18507.mapped.SOLID.bfast.YRI.exome.20110411.bam
+529	NA18507.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+530	NA18508.mapped.SOLID.bfast.YRI.exome.20110521.bam
+530	NA18508.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+531	NA18510.mapped.illumina.mosaik.YRI.exome.20110411.bam
+531	NA18510.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+532	NA18511.mapped.illumina.mosaik.YRI.exome.20110521.bam
+532	NA18511.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+533	NA18516.mapped.illumina.mosaik.YRI.exome.20110411.bam
+533	NA18516.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+534	NA18517.mapped.illumina.mosaik.YRI.exome.20110521.bam
+534	NA18517.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+535	NA18519.mapped.illumina.mosaik.YRI.exome.20110411.bam
+535	NA18519.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+536	NA18520.mapped.illumina.mosaik.YRI.exome.20110411.bam
+536	NA18520.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+537	NA18522.mapped.illumina.mosaik.YRI.exome.20110411.bam
+537	NA18522.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+538	NA18523.mapped.illumina.mosaik.YRI.exome.20110521.bam
+538	NA18523.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+539	NA18525.mapped.SOLID.bfast.CHB.exome.20110411.bam
+539	NA18525.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+540	NA18526.mapped.illumina.mosaik.CHB.exome.20110521.bam
+540	NA18526.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+541	NA18527.mapped.SOLID.bfast.CHB.exome.20110411.bam
+541	NA18527.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+542	NA18528.mapped.SOLID.bfast.CHB.exome.20110521.bam
+542	NA18528.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+543	NA18530.mapped.illumina.mosaik.CHB.exome.20110521.bam
+543	NA18530.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+544	NA18531.mapped.SOLID.bfast.CHB.exome.20110411.bam
+544	NA18531.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+545	NA18532.mapped.illumina.mosaik.CHB.exome.20110411.bam
+545	NA18532.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+546	NA18534.mapped.illumina.mosaik.CHB.exome.20110521.bam
+546	NA18534.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+547	NA18535.mapped.illumina.mosaik.CHB.exome.20110411.bam
+547	NA18535.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+548	NA18536.mapped.illumina.mosaik.CHB.exome.20110521.bam
+548	NA18536.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+549	NA18537.mapped.illumina.mosaik.CHB.exome.20110411.bam
+549	NA18537.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+550	NA18538.mapped.illumina.mosaik.CHB.exome.20110411.bam
+550	NA18538.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+551	NA18542.mapped.illumina.mosaik.CHB.exome.20110411.bam
+551	NA18542.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+552	NA18543.mapped.illumina.mosaik.CHB.exome.20110521.bam
+552	NA18543.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+553	NA18544.mapped.illumina.mosaik.CHB.exome.20110521.bam
+553	NA18544.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+554	NA18545.mapped.illumina.mosaik.CHB.exome.20110411.bam
+554	NA18545.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+555	NA18546.mapped.illumina.mosaik.CHB.exome.20110521.bam
+555	NA18546.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+556	NA18547.mapped.illumina.mosaik.CHB.exome.20110411.bam
+556	NA18547.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+557	NA18548.mapped.illumina.mosaik.CHB.exome.20110521.bam
+557	NA18548.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+558	NA18549.mapped.illumina.mosaik.CHB.exome.20110521.bam
+558	NA18549.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+559	NA18550.mapped.illumina.mosaik.CHB.exome.20110411.bam
+559	NA18550.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+560	NA18552.mapped.illumina.mosaik.CHB.exome.20110411.bam
+560	NA18552.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+561	NA18553.mapped.illumina.mosaik.CHB.exome.20110411.bam
+561	NA18553.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+562	NA18555.mapped.illumina.mosaik.CHB.exome.20110411.bam
+562	NA18555.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+563	NA18557.mapped.illumina.mosaik.CHB.exome.20110521.bam
+563	NA18557.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+564	NA18558.mapped.illumina.mosaik.CHB.exome.20110411.bam
+564	NA18558.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+565	NA18559.mapped.illumina.mosaik.CHB.exome.20110521.bam
+565	NA18559.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+566	NA18560.mapped.illumina.mosaik.CHB.exome.20110411.bam
+566	NA18560.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+567	NA18561.mapped.illumina.mosaik.CHB.exome.20110411.bam
+567	NA18561.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+568	NA18562.mapped.illumina.mosaik.CHB.exome.20110411.bam
+568	NA18562.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+569	NA18563.mapped.illumina.mosaik.CHB.exome.20110411.bam
+569	NA18563.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+570	NA18564.mapped.illumina.mosaik.CHB.exome.20110411.bam
+570	NA18564.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+571	NA18565.mapped.illumina.mosaik.CHB.exome.20110411.bam
+571	NA18565.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+572	NA18566.mapped.illumina.mosaik.CHB.exome.20110411.bam
+572	NA18566.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+573	NA18567.mapped.illumina.mosaik.CHB.exome.20110411.bam
+573	NA18567.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+574	NA18570.mapped.illumina.mosaik.CHB.exome.20110411.bam
+574	NA18570.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+575	NA18571.mapped.illumina.mosaik.CHB.exome.20110411.bam
+575	NA18571.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+576	NA18572.mapped.illumina.mosaik.CHB.exome.20110411.bam
+576	NA18572.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+577	NA18573.mapped.illumina.mosaik.CHB.exome.20110411.bam
+577	NA18573.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+578	NA18574.mapped.illumina.mosaik.CHB.exome.20110411.bam
+578	NA18574.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+579	NA18576.mapped.illumina.mosaik.CHB.exome.20110411.bam
+579	NA18576.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+580	NA18577.mapped.illumina.mosaik.CHB.exome.20110411.bam
+580	NA18577.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+581	NA18579.mapped.illumina.mosaik.CHB.exome.20110411.bam
+581	NA18579.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+582	NA18582.mapped.illumina.mosaik.CHB.exome.20110411.bam
+582	NA18582.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+583	NA18592.mapped.illumina.mosaik.CHB.exome.20110411.bam
+583	NA18592.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+584	NA18593.mapped.illumina.mosaik.CHB.exome.20110521.bam
+584	NA18593.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+585	NA18595.mapped.illumina.mosaik.CHB.exome.20110521.bam
+585	NA18595.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+586	NA18596.mapped.illumina.mosaik.CHB.exome.20110521.bam
+586	NA18596.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+587	NA18597.mapped.illumina.mosaik.CHB.exome.20110521.bam
+587	NA18597.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+588	NA18599.mapped.illumina.mosaik.CHB.exome.20110521.bam
+588	NA18599.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+589	NA18602.mapped.illumina.mosaik.CHB.exome.20110521.bam
+589	NA18602.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+590	NA18603.mapped.illumina.mosaik.CHB.exome.20110521.bam
+590	NA18603.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+591	NA18605.mapped.illumina.mosaik.CHB.exome.20110411.bam
+591	NA18605.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+592	NA18606.mapped.illumina.mosaik.CHB.exome.20110521.bam
+592	NA18606.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+593	NA18608.mapped.illumina.mosaik.CHB.exome.20110411.bam
+593	NA18608.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+594	NA18609.mapped.illumina.mosaik.CHB.exome.20110411.bam
+594	NA18609.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+595	NA18610.mapped.illumina.mosaik.CHB.exome.20110521.bam
+595	NA18610.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+596	NA18611.mapped.illumina.mosaik.CHB.exome.20110411.bam
+596	NA18611.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+597	NA18612.mapped.illumina.mosaik.CHB.exome.20110521.bam
+597	NA18612.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+598	NA18613.mapped.illumina.mosaik.CHB.exome.20110521.bam
+598	NA18613.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+599	NA18615.mapped.SOLID.bfast.CHB.exome.20110411.bam
+599	NA18615.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+600	NA18616.mapped.illumina.mosaik.CHB.exome.20110411.bam
+600	NA18616.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+601	NA18617.mapped.SOLID.bfast.CHB.exome.20110521.bam
+601	NA18617.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+602	NA18618.mapped.SOLID.bfast.CHB.exome.20110521.bam
+602	NA18618.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+603	NA18619.mapped.SOLID.bfast.CHB.exome.20110411.bam
+603	NA18619.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+604	NA18620.mapped.illumina.mosaik.CHB.exome.20110411.bam
+604	NA18620.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+605	NA18621.mapped.illumina.mosaik.CHB.exome.20110521.bam
+605	NA18621.mapped.illumina.mosaik.CHB.exome.20110521.bam.bai
+606	NA18622.mapped.illumina.mosaik.CHB.exome.20110411.bam
+606	NA18622.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+607	NA18623.mapped.illumina.mosaik.CHB.exome.20110411.bam
+607	NA18623.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+608	NA18624.mapped.illumina.mosaik.CHB.exome.20110411.bam
+608	NA18624.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+609	NA18625.mapped.SOLID.bfast.CHB.exome.20110411.bam
+609	NA18625.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+610	NA18626.mapped.SOLID.bfast.CHB.exome.20110411.bam
+610	NA18626.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+611	NA18627.mapped.SOLID.bfast.CHB.exome.20110521.bam
+611	NA18627.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+612	NA18628.mapped.SOLID.bfast.CHB.exome.20110521.bam
+612	NA18628.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+613	NA18630.mapped.SOLID.bfast.CHB.exome.20110411.bam
+613	NA18630.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+614	NA18631.mapped.illumina.mosaik.CHB.exome.20110411.bam
+614	NA18631.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+615	NA18632.mapped.illumina.mosaik.CHB.exome.20110411.bam
+615	NA18632.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+616	NA18633.mapped.illumina.mosaik.CHB.exome.20110411.bam
+616	NA18633.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+617	NA18634.mapped.illumina.mosaik.CHB.exome.20110411.bam
+617	NA18634.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+618	NA18635.mapped.illumina.mosaik.CHB.exome.20110411.bam
+618	NA18635.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+619	NA18636.mapped.illumina.mosaik.CHB.exome.20110411.bam
+619	NA18636.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+620	NA18637.mapped.illumina.mosaik.CHB.exome.20110411.bam
+620	NA18637.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+621	NA18638.mapped.illumina.mosaik.CHB.exome.20110411.bam
+621	NA18638.mapped.illumina.mosaik.CHB.exome.20110411.bam.bai
+622	NA18639.mapped.SOLID.bfast.CHB.exome.20110521.bam
+622	NA18639.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+623	NA18640.mapped.SOLID.bfast.CHB.exome.20110411.bam
+623	NA18640.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+624	NA18641.mapped.SOLID.bfast.CHB.exome.20110411.bam
+624	NA18641.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+625	NA18642.mapped.SOLID.bfast.CHB.exome.20110411.bam
+625	NA18642.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+626	NA18643.mapped.SOLID.bfast.CHB.exome.20110521.bam
+626	NA18643.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+627	NA18645.mapped.SOLID.bfast.CHB.exome.20110411.bam
+627	NA18645.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+628	NA18740.mapped.SOLID.bfast.CHB.exome.20110411.bam
+628	NA18740.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+629	NA18745.mapped.SOLID.bfast.CHB.exome.20110411.bam
+629	NA18745.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+630	NA18747.mapped.SOLID.bfast.CHB.exome.20110411.bam
+630	NA18747.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+631	NA18748.mapped.SOLID.bfast.CHB.exome.20110411.bam
+631	NA18748.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+632	NA18749.mapped.SOLID.bfast.CHB.exome.20110411.bam
+632	NA18749.mapped.SOLID.bfast.CHB.exome.20110411.bam.bai
+633	NA18757.mapped.SOLID.bfast.CHB.exome.20110521.bam
+633	NA18757.mapped.SOLID.bfast.CHB.exome.20110521.bam.bai
+634	NA18853.mapped.illumina.mosaik.YRI.exome.20110411.bam
+634	NA18853.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+635	NA18856.mapped.illumina.mosaik.YRI.exome.20110411.bam
+635	NA18856.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+636	NA18858.mapped.illumina.mosaik.YRI.exome.20110521.bam
+636	NA18858.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+637	NA18861.mapped.illumina.mosaik.YRI.exome.20110521.bam
+637	NA18861.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+638	NA18867.mapped.illumina.mosaik.YRI.exome.20110411.bam
+638	NA18867.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+639	NA18868.mapped.illumina.mosaik.YRI.exome.20110411.bam
+639	NA18868.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+640	NA18870.mapped.illumina.mosaik.YRI.exome.20110411.bam
+640	NA18870.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+641	NA18871.mapped.illumina.mosaik.YRI.exome.20110411.bam
+641	NA18871.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+642	NA18873.mapped.illumina.mosaik.YRI.exome.20110411.bam
+642	NA18873.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+643	NA18874.mapped.illumina.mosaik.YRI.exome.20110411.bam
+643	NA18874.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+644	NA18907.mapped.illumina.mosaik.YRI.exome.20110521.bam
+644	NA18907.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+645	NA18908.mapped.illumina.mosaik.YRI.exome.20110411.bam
+645	NA18908.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+646	NA18909.mapped.illumina.mosaik.YRI.exome.20110521.bam
+646	NA18909.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+647	NA18910.mapped.illumina.mosaik.YRI.exome.20110411.bam
+647	NA18910.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+648	NA18912.mapped.illumina.mosaik.YRI.exome.20110411.bam
+648	NA18912.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+649	NA18916.mapped.illumina.mosaik.YRI.exome.20110521.bam
+649	NA18916.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+650	NA18917.mapped.illumina.mosaik.YRI.exome.20110411.bam
+650	NA18917.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+651	NA18923.mapped.illumina.mosaik.YRI.exome.20110411.bam
+651	NA18923.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+652	NA18924.mapped.illumina.mosaik.YRI.exome.20110411.bam
+652	NA18924.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+653	NA18933.mapped.illumina.mosaik.YRI.exome.20110411.bam
+653	NA18933.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+654	NA18934.mapped.illumina.mosaik.YRI.exome.20110411.bam
+654	NA18934.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+655	NA18939.mapped.SOLID.bfast.JPT.exome.20110521.bam
+655	NA18939.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+656	NA18940.mapped.illumina.mosaik.JPT.exome.20110521.bam
+656	NA18940.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+657	NA18941.mapped.SOLID.bfast.JPT.exome.20110411.bam
+657	NA18941.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+658	NA18942.mapped.illumina.mosaik.JPT.exome.20110521.bam
+658	NA18942.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+659	NA18943.mapped.illumina.mosaik.JPT.exome.20110521.bam
+659	NA18943.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+660	NA18944.mapped.illumina.mosaik.JPT.exome.20110521.bam
+660	NA18944.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+661	NA18945.mapped.illumina.mosaik.JPT.exome.20110521.bam
+661	NA18945.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+662	NA18946.mapped.SOLID.bfast.JPT.exome.20110411.bam
+662	NA18946.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+663	NA18947.mapped.illumina.mosaik.JPT.exome.20110521.bam
+663	NA18947.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+664	NA18948.mapped.illumina.mosaik.JPT.exome.20110521.bam
+664	NA18948.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+665	NA18949.mapped.illumina.mosaik.JPT.exome.20110521.bam
+665	NA18949.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+666	NA18950.mapped.illumina.mosaik.JPT.exome.20110411.bam
+666	NA18950.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+667	NA18951.mapped.illumina.mosaik.JPT.exome.20110521.bam
+667	NA18951.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+668	NA18952.mapped.illumina.mosaik.JPT.exome.20110521.bam
+668	NA18952.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+669	NA18953.mapped.illumina.mosaik.JPT.exome.20110411.bam
+669	NA18953.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+670	NA18954.mapped.SOLID.bfast.JPT.exome.20110521.bam
+670	NA18954.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+671	NA18955.mapped.SOLID.bfast.JPT.exome.20110521.bam
+671	NA18955.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+672	NA18956.mapped.SOLID.bfast.JPT.exome.20110411.bam
+672	NA18956.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+673	NA18957.mapped.SOLID.bfast.JPT.exome.20110411.bam
+673	NA18957.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+674	NA18959.mapped.illumina.mosaik.JPT.exome.20110411.bam
+674	NA18959.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+675	NA18960.mapped.illumina.mosaik.JPT.exome.20110411.bam
+675	NA18960.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+676	NA18961.mapped.illumina.mosaik.JPT.exome.20110411.bam
+676	NA18961.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+677	NA18962.mapped.SOLID.bfast.JPT.exome.20110521.bam
+677	NA18962.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+678	NA18963.mapped.SOLID.bfast.JPT.exome.20110521.bam
+678	NA18963.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+679	NA18964.mapped.illumina.mosaik.JPT.exome.20110411.bam
+679	NA18964.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+680	NA18965.mapped.SOLID.bfast.JPT.exome.20110411.bam
+680	NA18965.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+681	NA18966.mapped.illumina.mosaik.JPT.exome.20110411.bam
+681	NA18966.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+682	NA18967.mapped.illumina.mosaik.JPT.exome.20110411.bam
+682	NA18967.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+683	NA18968.mapped.illumina.mosaik.JPT.exome.20110411.bam
+683	NA18968.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+684	NA18969.mapped.illumina.mosaik.JPT.exome.20110411.bam
+684	NA18969.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+685	NA18970.mapped.illumina.mosaik.JPT.exome.20110411.bam
+685	NA18970.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+686	NA18971.mapped.illumina.mosaik.JPT.exome.20110411.bam
+686	NA18971.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+687	NA18972.mapped.illumina.mosaik.JPT.exome.20110411.bam
+687	NA18972.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+688	NA18973.mapped.illumina.mosaik.JPT.exome.20110411.bam
+688	NA18973.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+689	NA18974.mapped.illumina.mosaik.JPT.exome.20110411.bam
+689	NA18974.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+690	NA18975.mapped.illumina.mosaik.JPT.exome.20110411.bam
+690	NA18975.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+691	NA18976.mapped.illumina.mosaik.JPT.exome.20110411.bam
+691	NA18976.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+692	NA18978.mapped.SOLID.bfast.JPT.exome.20110411.bam
+692	NA18978.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+693	NA18979.mapped.SOLID.bfast.JPT.exome.20110521.bam
+693	NA18979.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+694	NA18980.mapped.SOLID.bfast.JPT.exome.20110411.bam
+694	NA18980.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+695	NA18981.mapped.illumina.mosaik.JPT.exome.20110411.bam
+695	NA18981.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+696	NA18982.mapped.illumina.mosaik.JPT.exome.20110411.bam
+696	NA18982.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+697	NA18983.mapped.illumina.mosaik.JPT.exome.20110411.bam
+697	NA18983.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+698	NA18985.mapped.illumina.mosaik.JPT.exome.20110521.bam
+698	NA18985.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+699	NA18986.mapped.illumina.mosaik.JPT.exome.20110411.bam
+699	NA18986.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+700	NA18987.mapped.illumina.mosaik.JPT.exome.20110411.bam
+700	NA18987.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+701	NA18988.mapped.illumina.mosaik.JPT.exome.20110411.bam
+701	NA18988.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+702	NA18989.mapped.illumina.mosaik.JPT.exome.20110411.bam
+702	NA18989.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+703	NA18990.mapped.illumina.mosaik.JPT.exome.20110411.bam
+703	NA18990.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+704	NA18991.mapped.illumina.mosaik.JPT.exome.20110411.bam
+704	NA18991.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+705	NA18992.mapped.SOLID.bfast.JPT.exome.20110411.bam
+705	NA18992.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+706	NA18993.mapped.SOLID.bfast.JPT.exome.20110411.bam
+706	NA18993.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+707	NA18994.mapped.SOLID.bfast.JPT.exome.20110411.bam
+707	NA18994.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+708	NA18995.mapped.SOLID.bfast.JPT.exome.20110411.bam
+708	NA18995.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+709	NA18997.mapped.SOLID.bfast.JPT.exome.20110521.bam
+709	NA18997.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+710	NA18998.mapped.SOLID.bfast.JPT.exome.20110521.bam
+710	NA18998.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+711	NA18999.mapped.illumina.mosaik.JPT.exome.20110411.bam
+711	NA18999.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+712	NA19000.mapped.illumina.mosaik.JPT.exome.20110411.bam
+712	NA19000.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+713	NA19001.mapped.SOLID.bfast.JPT.exome.20110411.bam
+713	NA19001.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+714	NA19002.mapped.SOLID.bfast.JPT.exome.20110521.bam
+714	NA19002.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+715	NA19003.mapped.illumina.mosaik.JPT.exome.20110411.bam
+715	NA19003.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+716	NA19004.mapped.illumina.mosaik.JPT.exome.20110411.bam
+716	NA19004.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+717	NA19005.mapped.SOLID.bfast.JPT.exome.20110521.bam
+717	NA19005.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+718	NA19007.mapped.illumina.mosaik.JPT.exome.20110411.bam
+718	NA19007.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+719	NA19009.mapped.SOLID.bfast.JPT.exome.20110411.bam
+719	NA19009.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+720	NA19010.mapped.SOLID.bfast.JPT.exome.20110411.bam
+720	NA19010.mapped.SOLID.bfast.JPT.exome.20110411.bam.bai
+721	NA19012.mapped.illumina.mosaik.JPT.exome.20110411.bam
+721	NA19012.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+722	NA19020.mapped.SOLID.bfast.LWK.exome.20110521.bam
+722	NA19020.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+723	NA19027.mapped.SOLID.bfast.LWK.exome.20110521.bam
+723	NA19027.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+724	NA19028.mapped.SOLID.bfast.LWK.exome.20110521.bam
+724	NA19028.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+725	NA19031.mapped.SOLID.bfast.LWK.exome.20110521.bam
+725	NA19031.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+726	NA19035.mapped.SOLID.bfast.LWK.exome.20110411.bam
+726	NA19035.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+727	NA19036.mapped.SOLID.bfast.LWK.exome.20110411.bam
+727	NA19036.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+728	NA19038.mapped.SOLID.bfast.LWK.exome.20110521.bam
+728	NA19038.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+729	NA19041.mapped.SOLID.bfast.LWK.exome.20110521.bam
+729	NA19041.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+730	NA19044.mapped.SOLID.bfast.LWK.exome.20110411.bam
+730	NA19044.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+731	NA19046.mapped.SOLID.bfast.LWK.exome.20110521.bam
+731	NA19046.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+732	NA19054.mapped.illumina.mosaik.JPT.exome.20110411.bam
+732	NA19054.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+733	NA19055.mapped.illumina.mosaik.JPT.exome.20110411.bam
+733	NA19055.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+734	NA19056.mapped.illumina.mosaik.JPT.exome.20110411.bam
+734	NA19056.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+735	NA19057.mapped.illumina.mosaik.JPT.exome.20110411.bam
+735	NA19057.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+736	NA19058.mapped.illumina.mosaik.JPT.exome.20110411.bam
+736	NA19058.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+737	NA19059.mapped.illumina.mosaik.JPT.exome.20110411.bam
+737	NA19059.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+738	NA19060.mapped.illumina.mosaik.JPT.exome.20110411.bam
+738	NA19060.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+739	NA19062.mapped.illumina.mosaik.JPT.exome.20110411.bam
+739	NA19062.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+740	NA19063.mapped.illumina.mosaik.JPT.exome.20110411.bam
+740	NA19063.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+741	NA19064.mapped.illumina.mosaik.JPT.exome.20110411.bam
+741	NA19064.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+742	NA19065.mapped.illumina.mosaik.JPT.exome.20110411.bam
+742	NA19065.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+743	NA19066.mapped.illumina.mosaik.JPT.exome.20110411.bam
+743	NA19066.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+744	NA19067.mapped.illumina.mosaik.JPT.exome.20110411.bam
+744	NA19067.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+745	NA19068.mapped.illumina.mosaik.JPT.exome.20110411.bam
+745	NA19068.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+746	NA19070.mapped.illumina.mosaik.JPT.exome.20110411.bam
+746	NA19070.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+747	NA19072.mapped.illumina.mosaik.JPT.exome.20110411.bam
+747	NA19072.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+748	NA19074.mapped.illumina.mosaik.JPT.exome.20110411.bam
+748	NA19074.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+749	NA19075.mapped.illumina.mosaik.JPT.exome.20110411.bam
+749	NA19075.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+750	NA19076.mapped.illumina.mosaik.JPT.exome.20110411.bam
+750	NA19076.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+751	NA19077.mapped.illumina.mosaik.JPT.exome.20110411.bam
+751	NA19077.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+752	NA19078.mapped.illumina.mosaik.JPT.exome.20110411.bam
+752	NA19078.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+753	NA19079.mapped.illumina.mosaik.JPT.exome.20110411.bam
+753	NA19079.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+754	NA19080.mapped.illumina.mosaik.JPT.exome.20110411.bam
+754	NA19080.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+755	NA19081.mapped.illumina.mosaik.JPT.exome.20110411.bam
+755	NA19081.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+756	NA19082.mapped.illumina.mosaik.JPT.exome.20110411.bam
+756	NA19082.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+757	NA19083.mapped.illumina.mosaik.JPT.exome.20110411.bam
+757	NA19083.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+758	NA19084.mapped.illumina.mosaik.JPT.exome.20110411.bam
+758	NA19084.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+759	NA19085.mapped.illumina.mosaik.JPT.exome.20110411.bam
+759	NA19085.mapped.illumina.mosaik.JPT.exome.20110411.bam.bai
+760	NA19086.mapped.SOLID.bfast.JPT.exome.20110521.bam
+760	NA19086.mapped.SOLID.bfast.JPT.exome.20110521.bam.bai
+761	NA19087.mapped.illumina.mosaik.JPT.exome.20110521.bam
+761	NA19087.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+762	NA19088.mapped.illumina.mosaik.JPT.exome.20110521.bam
+762	NA19088.mapped.illumina.mosaik.JPT.exome.20110521.bam.bai
+763	NA19092.mapped.illumina.mosaik.YRI.exome.20110411.bam
+763	NA19092.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+764	NA19093.mapped.illumina.mosaik.YRI.exome.20110411.bam
+764	NA19093.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+765	NA19095.mapped.SOLID.bfast.YRI.exome.20110521.bam
+765	NA19095.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+766	NA19096.mapped.SOLID.bfast.YRI.exome.20110411.bam
+766	NA19096.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+767	NA19098.mapped.illumina.mosaik.YRI.exome.20110411.bam
+767	NA19098.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+768	NA19099.mapped.SOLID.bfast.YRI.exome.20110521.bam
+768	NA19099.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+769	NA19102.mapped.illumina.mosaik.YRI.exome.20110411.bam
+769	NA19102.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+770	NA19107.mapped.illumina.mosaik.YRI.exome.20110521.bam
+770	NA19107.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+771	NA19108.mapped.illumina.mosaik.YRI.exome.20110521.bam
+771	NA19108.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+772	NA19113.mapped.SOLID.bfast.YRI.exome.20110411.bam
+772	NA19113.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+773	NA19114.mapped.illumina.mosaik.YRI.exome.20110521.bam
+773	NA19114.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+774	NA19116.mapped.illumina.mosaik.YRI.exome.20110411.bam
+774	NA19116.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+775	NA19117.mapped.SOLID.bfast.YRI.exome.20110411.bam
+775	NA19117.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+776	NA19118.mapped.SOLID.bfast.YRI.exome.20110521.bam
+776	NA19118.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+777	NA19119.mapped.illumina.mosaik.YRI.exome.20110411.bam
+777	NA19119.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+778	NA19121.mapped.SOLID.bfast.YRI.exome.20110521.bam
+778	NA19121.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+779	NA19129.mapped.illumina.mosaik.YRI.exome.20110521.bam
+779	NA19129.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+780	NA19130.mapped.illumina.mosaik.YRI.exome.20110411.bam
+780	NA19130.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+781	NA19131.mapped.illumina.mosaik.YRI.exome.20110411.bam
+781	NA19131.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+782	NA19137.mapped.illumina.mosaik.YRI.exome.20110411.bam
+782	NA19137.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+783	NA19138.mapped.illumina.mosaik.YRI.exome.20110411.bam
+783	NA19138.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+784	NA19141.mapped.illumina.mosaik.YRI.exome.20110411.bam
+784	NA19141.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+785	NA19143.mapped.illumina.mosaik.YRI.exome.20110411.bam
+785	NA19143.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+786	NA19144.mapped.illumina.mosaik.YRI.exome.20110411.bam
+786	NA19144.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+787	NA19146.mapped.SOLID.bfast.YRI.exome.20110411.bam
+787	NA19146.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+788	NA19147.mapped.illumina.mosaik.YRI.exome.20110521.bam
+788	NA19147.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+789	NA19149.mapped.SOLID.bfast.YRI.exome.20110411.bam
+789	NA19149.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+790	NA19150.mapped.SOLID.bfast.YRI.exome.20110521.bam
+790	NA19150.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+791	NA19152.mapped.illumina.mosaik.YRI.exome.20110411.bam
+791	NA19152.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+792	NA19153.mapped.illumina.mosaik.YRI.exome.20110411.bam
+792	NA19153.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+793	NA19159.mapped.illumina.mosaik.YRI.exome.20110411.bam
+793	NA19159.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+794	NA19160.mapped.illumina.mosaik.YRI.exome.20110411.bam
+794	NA19160.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+795	NA19171.mapped.illumina.mosaik.YRI.exome.20110411.bam
+795	NA19171.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+796	NA19172.mapped.illumina.mosaik.YRI.exome.20110411.bam
+796	NA19172.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+797	NA19175.mapped.SOLID.bfast.YRI.exome.20110521.bam
+797	NA19175.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+798	NA19184.mapped.SOLID.bfast.YRI.exome.20110411.bam
+798	NA19184.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+799	NA19185.mapped.SOLID.bfast.YRI.exome.20110521.bam
+799	NA19185.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+800	NA19189.mapped.illumina.mosaik.YRI.exome.20110521.bam
+800	NA19189.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+801	NA19190.mapped.illumina.mosaik.YRI.exome.20110521.bam
+801	NA19190.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+802	NA19197.mapped.illumina.mosaik.YRI.exome.20110411.bam
+802	NA19197.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+803	NA19198.mapped.illumina.mosaik.YRI.exome.20110411.bam
+803	NA19198.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+804	NA19200.mapped.illumina.mosaik.YRI.exome.20110411.bam
+804	NA19200.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+805	NA19201.mapped.illumina.mosaik.YRI.exome.20110411.bam
+805	NA19201.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+806	NA19204.mapped.illumina.mosaik.YRI.exome.20110411.bam
+806	NA19204.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+807	NA19206.mapped.illumina.mosaik.YRI.exome.20110411.bam
+807	NA19206.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+808	NA19207.mapped.illumina.mosaik.YRI.exome.20110411.bam
+808	NA19207.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+809	NA19209.mapped.illumina.mosaik.YRI.exome.20110411.bam
+809	NA19209.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+810	NA19210.mapped.illumina.mosaik.YRI.exome.20110411.bam
+810	NA19210.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+811	NA19213.mapped.illumina.mosaik.YRI.exome.20110411.bam
+811	NA19213.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+812	NA19214.mapped.SOLID.bfast.YRI.exome.20110411.bam
+812	NA19214.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+813	NA19222.mapped.SOLID.bfast.YRI.exome.20110521.bam
+813	NA19222.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+814	NA19223.mapped.illumina.mosaik.YRI.exome.20110411.bam
+814	NA19223.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+815	NA19225.mapped.illumina.mosaik.YRI.exome.20110521.bam
+815	NA19225.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+816	NA19235.mapped.illumina.mosaik.YRI.exome.20110411.bam
+816	NA19235.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+817	NA19236.mapped.illumina.mosaik.YRI.exome.20110411.bam
+817	NA19236.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+818	NA19238.mapped.illumina.mosaik.YRI.exome.20110411.bam
+818	NA19238.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+819	NA19239.mapped.SOLID.bfast.YRI.exome.20110411.bam
+819	NA19239.mapped.SOLID.bfast.YRI.exome.20110411.bam.bai
+820	NA19240.mapped.SOLID.bfast.YRI.exome.20110521.bam
+820	NA19240.mapped.SOLID.bfast.YRI.exome.20110521.bam.bai
+821	NA19247.mapped.illumina.mosaik.YRI.exome.20110411.bam
+821	NA19247.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+822	NA19248.mapped.illumina.mosaik.YRI.exome.20110411.bam
+822	NA19248.mapped.illumina.mosaik.YRI.exome.20110411.bam.bai
+823	NA19256.mapped.illumina.mosaik.YRI.exome.20110521.bam
+823	NA19256.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+824	NA19257.mapped.illumina.mosaik.YRI.exome.20110521.bam
+824	NA19257.mapped.illumina.mosaik.YRI.exome.20110521.bam.bai
+825	NA19309.mapped.SOLID.bfast.LWK.exome.20110521.bam
+825	NA19309.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+826	NA19310.mapped.SOLID.bfast.LWK.exome.20110411.bam
+826	NA19310.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+827	NA19311.mapped.illumina.mosaik.LWK.exome.20110411.bam
+827	NA19311.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+828	NA19312.mapped.SOLID.bfast.LWK.exome.20110411.bam
+828	NA19312.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+829	NA19313.mapped.illumina.mosaik.LWK.exome.20110411.bam
+829	NA19313.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+830	NA19314.mapped.SOLID.bfast.LWK.exome.20110411.bam
+830	NA19314.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+831	NA19315.mapped.illumina.mosaik.LWK.exome.20110411.bam
+831	NA19315.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+832	NA19316.mapped.illumina.mosaik.LWK.exome.20110411.bam
+832	NA19316.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+833	NA19317.mapped.illumina.mosaik.LWK.exome.20110411.bam
+833	NA19317.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+834	NA19318.mapped.illumina.mosaik.LWK.exome.20110411.bam
+834	NA19318.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+835	NA19319.mapped.illumina.mosaik.LWK.exome.20110411.bam
+835	NA19319.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+836	NA19321.mapped.illumina.mosaik.LWK.exome.20110411.bam
+836	NA19321.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+837	NA19324.mapped.illumina.mosaik.LWK.exome.20110411.bam
+837	NA19324.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+838	NA19327.mapped.illumina.mosaik.LWK.exome.20110411.bam
+838	NA19327.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+839	NA19328.mapped.illumina.mosaik.LWK.exome.20110411.bam
+839	NA19328.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+840	NA19332.mapped.illumina.mosaik.LWK.exome.20110411.bam
+840	NA19332.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+841	NA19334.mapped.illumina.mosaik.LWK.exome.20110411.bam
+841	NA19334.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+842	NA19338.mapped.illumina.mosaik.LWK.exome.20110411.bam
+842	NA19338.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+843	NA19346.mapped.illumina.mosaik.LWK.exome.20110411.bam
+843	NA19346.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+844	NA19347.mapped.illumina.mosaik.LWK.exome.20110411.bam
+844	NA19347.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+845	NA19350.mapped.illumina.mosaik.LWK.exome.20110411.bam
+845	NA19350.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+846	NA19351.mapped.SOLID.bfast.LWK.exome.20110411.bam
+846	NA19351.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+847	NA19352.mapped.SOLID.bfast.LWK.exome.20110411.bam
+847	NA19352.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+848	NA19355.mapped.SOLID.bfast.LWK.exome.20110411.bam
+848	NA19355.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+849	NA19359.mapped.SOLID.bfast.LWK.exome.20110411.bam
+849	NA19359.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+850	NA19371.mapped.SOLID.bfast.LWK.exome.20110411.bam
+850	NA19371.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+851	NA19372.mapped.SOLID.bfast.LWK.exome.20110411.bam
+851	NA19372.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+852	NA19373.mapped.SOLID.bfast.LWK.exome.20110521.bam
+852	NA19373.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+853	NA19374.mapped.SOLID.bfast.LWK.exome.20110521.bam
+853	NA19374.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+854	NA19375.mapped.SOLID.bfast.LWK.exome.20110521.bam
+854	NA19375.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+855	NA19376.mapped.SOLID.bfast.LWK.exome.20110521.bam
+855	NA19376.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+856	NA19377.mapped.SOLID.bfast.LWK.exome.20110411.bam
+856	NA19377.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+857	NA19379.mapped.SOLID.bfast.LWK.exome.20110411.bam
+857	NA19379.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+858	NA19380.mapped.illumina.mosaik.LWK.exome.20110411.bam
+858	NA19380.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+859	NA19381.mapped.SOLID.bfast.LWK.exome.20110411.bam
+859	NA19381.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+860	NA19383.mapped.SOLID.bfast.LWK.exome.20110521.bam
+860	NA19383.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+861	NA19384.mapped.SOLID.bfast.LWK.exome.20110411.bam
+861	NA19384.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+862	NA19385.mapped.illumina.mosaik.LWK.exome.20110411.bam
+862	NA19385.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+863	NA19390.mapped.SOLID.bfast.LWK.exome.20110411.bam
+863	NA19390.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+864	NA19391.mapped.SOLID.bfast.LWK.exome.20110411.bam
+864	NA19391.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+865	NA19393.mapped.SOLID.bfast.LWK.exome.20110411.bam
+865	NA19393.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+866	NA19394.mapped.SOLID.bfast.LWK.exome.20110411.bam
+866	NA19394.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+867	NA19395.mapped.SOLID.bfast.LWK.exome.20110521.bam
+867	NA19395.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+868	NA19396.mapped.SOLID.bfast.LWK.exome.20110411.bam
+868	NA19396.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+869	NA19397.mapped.SOLID.bfast.LWK.exome.20110521.bam
+869	NA19397.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+870	NA19398.mapped.SOLID.bfast.LWK.exome.20110411.bam
+870	NA19398.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+871	NA19399.mapped.SOLID.bfast.LWK.exome.20110521.bam
+871	NA19399.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+872	NA19401.mapped.SOLID.bfast.LWK.exome.20110521.bam
+872	NA19401.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+873	NA19403.mapped.SOLID.bfast.LWK.exome.20110521.bam
+873	NA19403.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+874	NA19428.mapped.SOLID.bfast.LWK.exome.20110521.bam
+874	NA19428.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+875	NA19429.mapped.SOLID.bfast.LWK.exome.20110521.bam
+875	NA19429.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+876	NA19430.mapped.SOLID.bfast.LWK.exome.20110411.bam
+876	NA19430.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+877	NA19431.mapped.SOLID.bfast.LWK.exome.20110521.bam
+877	NA19431.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+878	NA19434.mapped.SOLID.bfast.LWK.exome.20110521.bam
+878	NA19434.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+879	NA19435.mapped.SOLID.bfast.LWK.exome.20110521.bam
+879	NA19435.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+880	NA19437.mapped.SOLID.bfast.LWK.exome.20110411.bam
+880	NA19437.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+881	NA19438.mapped.SOLID.bfast.LWK.exome.20110411.bam
+881	NA19438.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+882	NA19439.mapped.SOLID.bfast.LWK.exome.20110521.bam
+882	NA19439.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+883	NA19444.mapped.SOLID.bfast.LWK.exome.20110411.bam
+883	NA19444.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+884	NA19445.mapped.SOLID.bfast.LWK.exome.20110411.bam
+884	NA19445.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+885	NA19446.mapped.SOLID.bfast.LWK.exome.20110411.bam
+885	NA19446.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+886	NA19449.mapped.SOLID.bfast.LWK.exome.20110411.bam
+886	NA19449.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+887	NA19452.mapped.SOLID.bfast.LWK.exome.20110411.bam
+887	NA19452.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+888	NA19453.mapped.SOLID.bfast.LWK.exome.20110411.bam
+888	NA19453.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+889	NA19455.mapped.SOLID.bfast.LWK.exome.20110521.bam
+889	NA19455.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+890	NA19456.mapped.SOLID.bfast.LWK.exome.20110521.bam
+890	NA19456.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+891	NA19457.mapped.illumina.mosaik.LWK.exome.20110411.bam
+891	NA19457.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+892	NA19461.mapped.SOLID.bfast.LWK.exome.20110521.bam
+892	NA19461.mapped.SOLID.bfast.LWK.exome.20110521.bam.bai
+893	NA19462.mapped.SOLID.bfast.LWK.exome.20110411.bam
+893	NA19462.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+894	NA19463.mapped.SOLID.bfast.LWK.exome.20110411.bam
+894	NA19463.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+895	NA19466.mapped.SOLID.bfast.LWK.exome.20110411.bam
+895	NA19466.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+896	NA19467.mapped.SOLID.bfast.LWK.exome.20110411.bam
+896	NA19467.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+897	NA19468.mapped.SOLID.bfast.LWK.exome.20110411.bam
+897	NA19468.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+898	NA19469.mapped.SOLID.bfast.LWK.exome.20110411.bam
+898	NA19469.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+899	NA19470.mapped.SOLID.bfast.LWK.exome.20110411.bam
+899	NA19470.mapped.SOLID.bfast.LWK.exome.20110411.bam.bai
+900	NA19471.mapped.illumina.mosaik.LWK.exome.20110411.bam
+900	NA19471.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+901	NA19472.mapped.illumina.mosaik.LWK.exome.20110411.bam
+901	NA19472.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+902	NA19473.mapped.illumina.mosaik.LWK.exome.20110411.bam
+902	NA19473.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+903	NA19474.mapped.illumina.mosaik.LWK.exome.20110411.bam
+903	NA19474.mapped.illumina.mosaik.LWK.exome.20110411.bam.bai
+904	NA19625.mapped.illumina.mosaik.ASW.exome.20110411.bam
+904	NA19625.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+905	NA19648.mapped.illumina.mosaik.MXL.exome.20110411.bam
+905	NA19648.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+906	NA19649.mapped.illumina.mosaik.MXL.exome.20110411.bam
+906	NA19649.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+907	NA19651.mapped.illumina.mosaik.MXL.exome.20110411.bam
+907	NA19651.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+908	NA19652.mapped.illumina.mosaik.MXL.exome.20110411.bam
+908	NA19652.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+909	NA19654.mapped.illumina.mosaik.MXL.exome.20110411.bam
+909	NA19654.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+910	NA19655.mapped.illumina.mosaik.MXL.exome.20110411.bam
+910	NA19655.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+911	NA19657.mapped.illumina.mosaik.MXL.exome.20110411.bam
+911	NA19657.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+912	NA19658.mapped.illumina.mosaik.MXL.exome.20110411.bam
+912	NA19658.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+913	NA19660.mapped.illumina.mosaik.MXL.exome.20110411.bam
+913	NA19660.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+914	NA19661.mapped.illumina.mosaik.MXL.exome.20110411.bam
+914	NA19661.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+915	NA19663.mapped.illumina.mosaik.MXL.exome.20110411.bam
+915	NA19663.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+916	NA19664.mapped.illumina.mosaik.MXL.exome.20110411.bam
+916	NA19664.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+917	NA19669.mapped.illumina.mosaik.MXL.exome.20110411.bam
+917	NA19669.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+918	NA19670.mapped.illumina.mosaik.MXL.exome.20110411.bam
+918	NA19670.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+919	NA19672.mapped.SOLID.bfast.MXL.exome.20110411.bam
+919	NA19672.mapped.SOLID.bfast.MXL.exome.20110411.bam.bai
+920	NA19675.mapped.illumina.mosaik.MXL.exome.20110521.bam
+920	NA19675.mapped.illumina.mosaik.MXL.exome.20110521.bam.bai
+921	NA19676.mapped.illumina.mosaik.MXL.exome.20110411.bam
+921	NA19676.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+922	NA19678.mapped.illumina.mosaik.MXL.exome.20110411.bam
+922	NA19678.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+923	NA19679.mapped.illumina.mosaik.MXL.exome.20110411.bam
+923	NA19679.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+924	NA19681.mapped.illumina.mosaik.MXL.exome.20110411.bam
+924	NA19681.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+925	NA19682.mapped.illumina.mosaik.MXL.exome.20110411.bam
+925	NA19682.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+926	NA19684.mapped.illumina.mosaik.MXL.exome.20110411.bam
+926	NA19684.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+927	NA19685.mapped.illumina.mosaik.MXL.exome.20110411.bam
+927	NA19685.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+928	NA19700.mapped.illumina.mosaik.ASW.exome.20110411.bam
+928	NA19700.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+929	NA19701.mapped.illumina.mosaik.ASW.exome.20110411.bam
+929	NA19701.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+930	NA19703.mapped.illumina.mosaik.ASW.exome.20110411.bam
+930	NA19703.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+931	NA19704.mapped.illumina.mosaik.ASW.exome.20110411.bam
+931	NA19704.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+932	NA19707.mapped.illumina.mosaik.ASW.exome.20110411.bam
+932	NA19707.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+933	NA19711.mapped.illumina.mosaik.ASW.exome.20110411.bam
+933	NA19711.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+934	NA19712.mapped.illumina.mosaik.ASW.exome.20110411.bam
+934	NA19712.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+935	NA19713.mapped.illumina.mosaik.ASW.exome.20110411.bam
+935	NA19713.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+936	NA19716.mapped.illumina.mosaik.MXL.exome.20110411.bam
+936	NA19716.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+937	NA19717.mapped.illumina.mosaik.MXL.exome.20110411.bam
+937	NA19717.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+938	NA19719.mapped.illumina.mosaik.MXL.exome.20110411.bam
+938	NA19719.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+939	NA19720.mapped.illumina.mosaik.MXL.exome.20110411.bam
+939	NA19720.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+940	NA19722.mapped.illumina.mosaik.MXL.exome.20110411.bam
+940	NA19722.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+941	NA19723.mapped.illumina.mosaik.MXL.exome.20110411.bam
+941	NA19723.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+942	NA19725.mapped.illumina.mosaik.MXL.exome.20110411.bam
+942	NA19725.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+943	NA19726.mapped.illumina.mosaik.MXL.exome.20110411.bam
+943	NA19726.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+944	NA19728.mapped.illumina.mosaik.MXL.exome.20110411.bam
+944	NA19728.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+945	NA19729.mapped.illumina.mosaik.MXL.exome.20110411.bam
+945	NA19729.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+946	NA19731.mapped.illumina.mosaik.MXL.exome.20110411.bam
+946	NA19731.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+947	NA19732.mapped.illumina.mosaik.MXL.exome.20110411.bam
+947	NA19732.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+948	NA19734.mapped.SOLID.bfast.MXL.exome.20110521.bam
+948	NA19734.mapped.SOLID.bfast.MXL.exome.20110521.bam.bai
+949	NA19735.mapped.SOLID.bfast.MXL.exome.20110521.bam
+949	NA19735.mapped.SOLID.bfast.MXL.exome.20110521.bam.bai
+950	NA19737.mapped.SOLID.bfast.MXL.exome.20110521.bam
+950	NA19737.mapped.SOLID.bfast.MXL.exome.20110521.bam.bai
+951	NA19738.mapped.SOLID.bfast.MXL.exome.20110411.bam
+951	NA19738.mapped.SOLID.bfast.MXL.exome.20110411.bam.bai
+952	NA19740.mapped.SOLID.bfast.MXL.exome.20110521.bam
+952	NA19740.mapped.SOLID.bfast.MXL.exome.20110521.bam.bai
+953	NA19741.mapped.SOLID.bfast.MXL.exome.20110411.bam
+953	NA19741.mapped.SOLID.bfast.MXL.exome.20110411.bam.bai
+954	NA19746.mapped.illumina.mosaik.MXL.exome.20110411.bam
+954	NA19746.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+955	NA19747.mapped.illumina.mosaik.MXL.exome.20110411.bam
+955	NA19747.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+956	NA19749.mapped.illumina.mosaik.MXL.exome.20110411.bam
+956	NA19749.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+957	NA19750.mapped.illumina.mosaik.MXL.exome.20110411.bam
+957	NA19750.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+958	NA19752.mapped.SOLID.bfast.MXL.exome.20110521.bam
+958	NA19752.mapped.SOLID.bfast.MXL.exome.20110521.bam.bai
+959	NA19755.mapped.illumina.mosaik.MXL.exome.20110411.bam
+959	NA19755.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+960	NA19756.mapped.illumina.mosaik.MXL.exome.20110411.bam
+960	NA19756.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+961	NA19758.mapped.illumina.mosaik.MXL.exome.20110411.bam
+961	NA19758.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+962	NA19759.mapped.illumina.mosaik.MXL.exome.20110411.bam
+962	NA19759.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+963	NA19761.mapped.illumina.mosaik.MXL.exome.20110411.bam
+963	NA19761.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+964	NA19762.mapped.illumina.mosaik.MXL.exome.20110411.bam
+964	NA19762.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+965	NA19764.mapped.SOLID.bfast.MXL.exome.20110411.bam
+965	NA19764.mapped.SOLID.bfast.MXL.exome.20110411.bam.bai
+966	NA19770.mapped.illumina.mosaik.MXL.exome.20110411.bam
+966	NA19770.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+967	NA19771.mapped.illumina.mosaik.MXL.exome.20110411.bam
+967	NA19771.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+968	NA19773.mapped.illumina.mosaik.MXL.exome.20110411.bam
+968	NA19773.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+969	NA19774.mapped.illumina.mosaik.MXL.exome.20110411.bam
+969	NA19774.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+970	NA19776.mapped.illumina.mosaik.MXL.exome.20110411.bam
+970	NA19776.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+971	NA19777.mapped.illumina.mosaik.MXL.exome.20110411.bam
+971	NA19777.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+972	NA19779.mapped.illumina.mosaik.MXL.exome.20110411.bam
+972	NA19779.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+973	NA19780.mapped.illumina.mosaik.MXL.exome.20110411.bam
+973	NA19780.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+974	NA19782.mapped.illumina.mosaik.MXL.exome.20110411.bam
+974	NA19782.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+975	NA19783.mapped.illumina.mosaik.MXL.exome.20110411.bam
+975	NA19783.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+976	NA19785.mapped.illumina.mosaik.MXL.exome.20110411.bam
+976	NA19785.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+977	NA19786.mapped.illumina.mosaik.MXL.exome.20110411.bam
+977	NA19786.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+978	NA19788.mapped.illumina.mosaik.MXL.exome.20110411.bam
+978	NA19788.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+979	NA19789.mapped.illumina.mosaik.MXL.exome.20110411.bam
+979	NA19789.mapped.illumina.mosaik.MXL.exome.20110411.bam.bai
+980	NA19794.mapped.SOLID.bfast.MXL.exome.20110411.bam
+980	NA19794.mapped.SOLID.bfast.MXL.exome.20110411.bam.bai
+981	NA19795.mapped.SOLID.bfast.MXL.exome.20110521.bam
+981	NA19795.mapped.SOLID.bfast.MXL.exome.20110521.bam.bai
+982	NA19818.mapped.illumina.mosaik.ASW.exome.20110411.bam
+982	NA19818.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+983	NA19819.mapped.illumina.mosaik.ASW.exome.20110411.bam
+983	NA19819.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+984	NA19834.mapped.illumina.mosaik.ASW.exome.20110411.bam
+984	NA19834.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+985	NA19835.mapped.illumina.mosaik.ASW.exome.20110411.bam
+985	NA19835.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+986	NA19901.mapped.illumina.mosaik.ASW.exome.20110411.bam
+986	NA19901.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+987	NA19904.mapped.illumina.mosaik.ASW.exome.20110411.bam
+987	NA19904.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+988	NA19908.mapped.illumina.mosaik.ASW.exome.20110411.bam
+988	NA19908.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+989	NA19909.mapped.illumina.mosaik.ASW.exome.20110411.bam
+989	NA19909.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+990	NA19914.mapped.illumina.mosaik.ASW.exome.20110411.bam
+990	NA19914.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+991	NA19916.mapped.illumina.mosaik.ASW.exome.20110411.bam
+991	NA19916.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+992	NA19917.mapped.illumina.mosaik.ASW.exome.20110411.bam
+992	NA19917.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+993	NA19920.mapped.illumina.mosaik.ASW.exome.20110411.bam
+993	NA19920.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+994	NA19921.mapped.illumina.mosaik.ASW.exome.20110411.bam
+994	NA19921.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+995	NA19923.mapped.SOLID.bfast.ASW.exome.20110411.bam
+995	NA19923.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+996	NA19982.mapped.illumina.mosaik.ASW.exome.20110411.bam
+996	NA19982.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+997	NA19984.mapped.SOLID.bfast.ASW.exome.20110521.bam
+997	NA19984.mapped.SOLID.bfast.ASW.exome.20110521.bam.bai
+998	NA19985.mapped.illumina.mosaik.ASW.exome.20110521.bam
+998	NA19985.mapped.illumina.mosaik.ASW.exome.20110521.bam.bai
+999	NA20126.mapped.illumina.mosaik.ASW.exome.20110411.bam
+999	NA20126.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1000	NA20127.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1000	NA20127.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1001	NA20276.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1001	NA20276.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1002	NA20278.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1002	NA20278.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1003	NA20281.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1003	NA20281.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1004	NA20282.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1004	NA20282.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1005	NA20287.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1005	NA20287.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1006	NA20289.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1006	NA20289.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1007	NA20291.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1007	NA20291.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1008	NA20294.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1008	NA20294.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1009	NA20296.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1009	NA20296.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1010	NA20298.mapped.SOLID.bfast.ASW.exome.20110411.bam
+1010	NA20298.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+1011	NA20299.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1011	NA20299.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1012	NA20314.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1012	NA20314.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1013	NA20317.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1013	NA20317.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1014	NA20322.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1014	NA20322.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1015	NA20332.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1015	NA20332.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1016	NA20334.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1016	NA20334.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1017	NA20336.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1017	NA20336.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1018	NA20339.mapped.SOLID.bfast.ASW.exome.20110411.bam
+1018	NA20339.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+1019	NA20340.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1019	NA20340.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1020	NA20341.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1020	NA20341.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1021	NA20342.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1021	NA20342.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1022	NA20344.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1022	NA20344.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1023	NA20346.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1023	NA20346.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1024	NA20348.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1024	NA20348.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1025	NA20351.mapped.SOLID.bfast.ASW.exome.20110411.bam
+1025	NA20351.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+1026	NA20356.mapped.illumina.mosaik.ASW.exome.20110411.bam
+1026	NA20356.mapped.illumina.mosaik.ASW.exome.20110411.bam.bai
+1027	NA20359.mapped.SOLID.bfast.ASW.exome.20110411.bam
+1027	NA20359.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+1028	NA20363.mapped.SOLID.bfast.ASW.exome.20110411.bam
+1028	NA20363.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+1029	NA20412.mapped.SOLID.bfast.ASW.exome.20110411.bam
+1029	NA20412.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+1030	NA20414.mapped.SOLID.bfast.ASW.exome.20110411.bam
+1030	NA20414.mapped.SOLID.bfast.ASW.exome.20110411.bam.bai
+1031	NA20502.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1031	NA20502.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1032	NA20503.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1032	NA20503.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1033	NA20504.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1033	NA20504.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1034	NA20505.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1034	NA20505.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1035	NA20506.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1035	NA20506.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1036	NA20507.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1036	NA20507.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1037	NA20508.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1037	NA20508.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1038	NA20509.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1038	NA20509.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1039	NA20510.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1039	NA20510.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1040	NA20512.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1040	NA20512.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1041	NA20513.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1041	NA20513.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1042	NA20514.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1042	NA20514.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1043	NA20515.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1043	NA20515.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1044	NA20516.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1044	NA20516.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1045	NA20517.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1045	NA20517.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1046	NA20518.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1046	NA20518.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1047	NA20519.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1047	NA20519.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1048	NA20520.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1048	NA20520.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1049	NA20521.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1049	NA20521.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1050	NA20522.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1050	NA20522.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1051	NA20524.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1051	NA20524.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1052	NA20525.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1052	NA20525.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1053	NA20526.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1053	NA20526.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1054	NA20527.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1054	NA20527.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1055	NA20528.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1055	NA20528.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1056	NA20529.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1056	NA20529.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1057	NA20530.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1057	NA20530.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1058	NA20531.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1058	NA20531.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1059	NA20533.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1059	NA20533.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1060	NA20534.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1060	NA20534.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1061	NA20535.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1061	NA20535.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1062	NA20536.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1062	NA20536.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1063	NA20537.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1063	NA20537.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1064	NA20538.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1064	NA20538.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1065	NA20539.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1065	NA20539.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1066	NA20540.mapped.SOLID.bfast.TSI.exome.20110521.bam
+1066	NA20540.mapped.SOLID.bfast.TSI.exome.20110521.bam.bai
+1067	NA20541.mapped.SOLID.bfast.TSI.exome.20110411.bam
+1067	NA20541.mapped.SOLID.bfast.TSI.exome.20110411.bam.bai
+1068	NA20542.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1068	NA20542.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1069	NA20543.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1069	NA20543.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1070	NA20544.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1070	NA20544.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1071	NA20581.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1071	NA20581.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1072	NA20582.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1072	NA20582.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1073	NA20585.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1073	NA20585.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1074	NA20586.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1074	NA20586.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1075	NA20588.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1075	NA20588.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1076	NA20589.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1076	NA20589.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1077	NA20752.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1077	NA20752.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1078	NA20753.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1078	NA20753.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1079	NA20754.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1079	NA20754.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1080	NA20755.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1080	NA20755.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1081	NA20756.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1081	NA20756.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1082	NA20757.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1082	NA20757.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1083	NA20758.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1083	NA20758.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1084	NA20759.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1084	NA20759.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1085	NA20760.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1085	NA20760.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1086	NA20761.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1086	NA20761.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1087	NA20765.mapped.illumina.mosaik.TSI.exome.20110521.bam
+1087	NA20765.mapped.illumina.mosaik.TSI.exome.20110521.bam.bai
+1088	NA20766.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1088	NA20766.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1089	NA20768.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1089	NA20768.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1090	NA20769.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1090	NA20769.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1091	NA20770.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1091	NA20770.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1092	NA20771.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1092	NA20771.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1093	NA20772.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1093	NA20772.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1094	NA20773.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1094	NA20773.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1095	NA20774.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1095	NA20774.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1096	NA20775.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1096	NA20775.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1097	NA20778.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1097	NA20778.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1098	NA20783.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1098	NA20783.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1099	NA20785.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1099	NA20785.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1100	NA20786.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1100	NA20786.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1101	NA20787.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1101	NA20787.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1102	NA20790.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1102	NA20790.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1103	NA20792.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1103	NA20792.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1104	NA20795.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1104	NA20795.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1105	NA20796.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1105	NA20796.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1106	NA20798.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1106	NA20798.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1107	NA20799.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1107	NA20799.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1108	NA20800.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1108	NA20800.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1109	NA20801.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1109	NA20801.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1110	NA20802.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1110	NA20802.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1111	NA20803.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1111	NA20803.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1112	NA20804.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1112	NA20804.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1113	NA20805.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1113	NA20805.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1114	NA20806.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1114	NA20806.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1115	NA20807.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1115	NA20807.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1116	NA20808.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1116	NA20808.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1117	NA20809.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1117	NA20809.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1118	NA20810.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1118	NA20810.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1119	NA20811.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1119	NA20811.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1120	NA20812.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1120	NA20812.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1121	NA20813.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1121	NA20813.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1122	NA20814.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1122	NA20814.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1123	NA20815.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1123	NA20815.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1124	NA20818.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1124	NA20818.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1125	NA20819.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1125	NA20819.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1126	NA20826.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1126	NA20826.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1127	NA20828.mapped.illumina.mosaik.TSI.exome.20110411.bam
+1127	NA20828.mapped.illumina.mosaik.TSI.exome.20110411.bam.bai
+1128	human_g1k_v37.fasta.fai
+1128	human_g1k_v37.fasta.gz

@@ -1,0 +1,6 @@
+
+2014-09-04 (rjm)
+-----------------
+ AWS 'current tree' was found not to reflect underlying files.
+ Using the official 1000G tree instead of the AWS current tree seems to work.
+

@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*) https://%{HTTP_HOST}/$1
+DirectoryIndex example.phtml

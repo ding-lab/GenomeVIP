@@ -1,0 +1,55 @@
+/* -------------------------------
+// @name GenomeVIP style sheet definitions
+// @version
+// @author R. Jay Mashl <rmashl@genome.wustl.edu>
+--------------------------------*/
+html *  { 
+/*  font: arial,sans-serif !important;  */
+ font-size: 15.4px !important;
+ font-family: Verdana,arial,sans-serif !important;
+}
+
+body {
+    background-color: #ffffff;
+    color: #000000; 
+/*    font: arial,sans-serif; */
+    font-size: 15.4px;
+       font-family: Verdana,arial,sans-serif;
+    margin: 0px 10px 10px 0px; /* top, R, bot, L */
+padding: 0px; 
+}
+
+/*input { font-family: Verdana,arial,sans-serif;
+        font: 15.4px;
+        }
+*/
+
+
+#myfile { 
+/* font: arial,sans-serif !important;  */
+ font-size: 15.4px  !important;
+ font-family: Verdana,arial,sans-serif !important;
+ }
+
+.spinner { 
+/* display: none; */
+position: fixed;
+top: 50%;
+left: 50%;
+margin-left: -96px;
+margin-top: -96px;
+text-align: center;
+z-index:100;
+overflow: auto;
+width: 100px;
+height: 102px;  /* +2px to fix IE8 */
+ }
+
+.tdindentd  { padding-left:10px;}
+.tdindents  { padding-left:15px;}
+.tdindent  { padding-left:30px;}
+.tdindent1  { padding-left:45px;}
+.tdindent2 { padding-left:60px;}
+.tdindent3 { padding-left:90px;}
+.tdindent4 { padding-left:120px;}
+.rindent  { margin-left:30px;}

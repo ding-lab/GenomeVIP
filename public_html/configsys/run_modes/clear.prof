@@ -1,0 +1,7 @@
+[config]
+varscan.cmd="false"
+strelka.cmd="false"
+breakdancer.cmd="false"
+pindel.cmd="false"
+genomestrip.cmd="false"
+vep.cmd="false"

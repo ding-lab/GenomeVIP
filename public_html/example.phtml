@@ -1,0 +1,3724 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+@name GenomeVIP main web browser page
+@version
+@author  R. Jay Mashl <rmashl@genome.wustl.edu>
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=us-ascii">
+<title>GenomeVIP</title>
+
+<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="js/ui/1.10.4/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/multiselect2side/js/jquery.multiselect2side.js" ></script>
+<link rel="stylesheet" type="text/css" href="js/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="js/multiselect2side/css/jquery.multiselect2side.css" type="text/css" media="screen">
+<link rel="stylesheet" type="text/css" href="example.css">
+<style>body{display:none}</style>
+
+
+<script type="text/javascript">
+$(function() {
+    $(document).tooltip({
+	track: true
+    });
+
+});
+
+$(document).ajaxStart(function() { $('.spinner').show(); });
+$(document).ajaxStop(function() {  $('.spinner').hide(); });
+
+$(function() {
+    var winw=$(window).width();
+    $("#content-panel").width(winw-120);
+});
+function mysetup() {
+    document.getElementById('login_none').checked=true;     document.getElementById('subactionR').checked=true;     $('#rpath').val("");     $('#workdir').val("");     $('#jobname').val("");     $('#upfile').val("");     $('#awsvoldb').val(""); upd_global_dbsnp(); upd_global_fpfilter(); clear_chr(5);
+}
+
+function populate_profiles() { 
+    var cmds = new Array();
+    cmds[0] = "mode_select";
+    cmds[1] = "ep_select";
+    var k;
+    // using loop construct for expediency
+    for(k=0; k<cmds.length; k++) {
+	var posting = $.ajax({
+	    url: "read_profiles.php",
+	    type: "POST",
+	    async: false,
+	    data: { 'c': 0, 'p':k },
+	    success: function(data) {
+		var data_array = JSON.parse(data);
+		$("#"+cmds[k]).empty();
+		for (var i=0; i < data_array.length; i++) {
+		    $("#"+cmds[k]).append("<option class='menu1' value='"+ data_array[i]['name']+"'  data-mymsg='"+ data_array[i]['msg']+"' >"+ data_array[i]['desc'] +"</option>");
+		}
+	    }
+	});
+    }
+}
+
+
+
+
+
+function warn_bd(){
+    if( $("input[name='pin_include_breakdancer']:checked").val()=="true") {
+	if ( $("#pindel_cmd").is(':checked') ) {
+	    if ( ! $("#bd_cmd").is(':checked')) {
+		alert("Alert: Pindel is set to use BreakDancer as input. Please configure BreakDancer!");
+		return false;
+	    }
+	}
+    }
+    return true;
+}
+
+function chr_str_fail(id,loc) {
+    // examples: 2,  MT, 1-9, 1-13, 10-20, GL00020.001, GL00020.001:200, GL00020.001:300-4000, MT:100-200, X:1000
+
+
+
+
+    // sufficient string so far...
+    var re= /\d{1}-\d{1,2}|\d{2}-\d{2}|(\d{1,2}|[A-Z]{1,2}(\d+(\.\d+)?)?)(:\d+(-\d+)?)?/;
+
+    var re3   = /[,:\-]/;
+    var re3nc = /[:\-]/;
+
+    var mystr = $("#"+id).val().trim();
+    if ( mystr == "") {
+	alert ("Please specify genomic regions in "+loc+" !"); return true;
+    }
+    var bInt=0, bBed=0;
+    var mysplit, mysplit2;
+
+    mystr = mystr.replace(/\n/g,",");   /// chr1,chr1 : 14234,chr1 : 2394 - 24032,chr1  2394  24032$
+    mysplit = mystr.split(/,/);
+    for (var i=0; i < mysplit.length; i++) {
+	mysplit[i] = mysplit[i].trim();
+	if (mysplit[i].match(/^(chr)?[\w\.]+\s*(:\s*\d+\s*(-\s*\d+)?)?$/)) { bInt=1; }
+	else if (mysplit[i].match(/^(chr)?\d+\s*-\s*(chr)?\d+$/)) { bInt=1; }
+	else if (mysplit[i].match(/^(chr)?[\w\.]+\s+\d+\s+\d+$/)) { bBed=1; }
+	else { alert("Error: Format of region \""+mysplit[i]+"\" for "+loc+" is not recognized. Please check your input."); return true;}
+    }
+    if(bInt==0 && bBed==0) { alert("Error: Format of regions input for "+loc+" is not recognized. Please check input format."); return true; }
+    if(bInt==1 && bBed==1) { alert("Error: Multiple formats detected in regions input for "+loc+". Please check input format."); return true; }
+
+    if(bInt) { // intervals
+	for (var i=0; i < mysplit.length; i++) {
+	    if (! mysplit[i].replace(/\s+/g,"").replace(/chr/g,"").match(re)) {alert("Error: The region designation \""+mysplit[i]+"\" for "+loc+" is invalid."); return true;}
+	}
+    } else {  // triad
+	for (var i=0; i < mysplit.length; i++) {
+	    mysplit2 = mysplit[i].replace(/chr/g,"").split(/\s+/);
+	    if(mysplit2.length != 3) { alert("Error: A genomic region for "+loc+" is not in chr,start,stop format."); return true;}
+	}
+    }
+
+    
+    return false;
+}
+
+function check_vs_mode(){
+    if ($("input[name='vs_gl_samples']:checked").val()=="pooled") {
+	if ($("#vs_do_hcfilter").is(':checked') || $("#vs_do_fpfilter").is(':checked')) {
+	    alert ("Filtering is currently not offered for pooled VarScan samples !");
+	    return false;
+	}
+    }
+    return true;
+}
+function check_pin_mode(){
+    if ($("input[name='pin_call_mode']:checked").val()=="pooled") {
+	if ($("#pins_do_filter").is(':checked') ) {
+	    alert ("Filtering is currently not offered for pooled Pindel samples !");
+	    return false;
+	}
+    }
+    return true;
+}
+
+
+function display(msg,cmd){
+    if(cmd=="clear") { $("#preview_div").empty(); } 
+    $("#preview_div").append(msg);
+    $("#preview_div").show();
+    $("#preview_div").dialog({
+	modal:true, position: 'center',	width: '50%', height: 800, buttons: {
+	    "Close": function() { $(this).dialog("close");  } }
+    });
+}
+
+
+function preview_ep(n) {
+    // Get current profile; update and display dialog
+    var posting = $.ajax({
+	url: "pprofile.php",
+	type: "POST",
+	async: false,
+	data:  $("#myform").serialize(),
+	error: function() { alert("Unknown error: could not generate preview!"); },
+	success: function(data) {
+	    if(data.match(/Undefined\ index/)) { 
+		alert("Error: Preview aborted due to unrecognized parameter. Please contact the GenomeVIP developers.");
+	    } else {
+		var data_array = JSON.parse(data);
+		var txt="";
+		for(var i=0; i < data_array.length; i++) { txt += data_array[i]; }
+		txt += "\n";
+		if(n==0) {
+		    display(txt.replace(/\n/g,"<br>"),"clear");
+		} else if(n==1) {
+		    $("#downtextarea").val(txt);
+		}
+
+	    }
+	}
+    });
+    
+}
+
+
+function validateform(){ 
+    var numerr = 0;
+
+    // computing target
+    if ( $("#login_none").is(':checked')) {
+	alert ("Please specify a computing resource under Accounts in the navigational menu.");
+	numerr++; return false;
+    }
+    if ( $("#login_tgi").is(':checked') && ( $("#un").val().length < 1 || $("#pw").val().length < 1 )) {
+	alert ("Please provide username and password.");
+	numerr++; return false;
+    }
+    if (document.forms.myform.bamfilesms2side__dx.length < 1) {
+	alert ("No samples have been selected. Please check that samples have been loaded and at least one has been selected.");
+	numerr++; return false;
+    }
+    if (document.getElementById("sel_genome").options.length == 0) { 
+	alert ("No reference genome was found in the directories provided. Please check sample locations.");
+	numerr++; return false;
+    }
+    //    if (document.getElementById("workdir").value == "") {
+    //	alert ("Please specify directory for running job");
+    //	return false;
+    //    }
+    //    if (document.getElementById("jobname").value == "") {
+    //	alert ("Please specify a name for the job script");
+    //	return false;
+    //    }
+    //    if (document.getElementById("resultsdir").value == "") {
+    //	alert ("Please specify directory for the results");
+    //	return false;
+    //    }
+
+    if ( ! ( $("#vs_cmd").is(':checked') || $("#strlk_cmd").is(':checked') ||  $("#bd_cmd").is(':checked') || $("#pindel_cmd").is(':checked') || $("#gs_cmd").is(':checked')) ) {
+	alert("No tools selected. Please select at least one tool before submitting.");
+	numerr++; return false;
+    }
+
+    if ( $("#vs_cmd").is(':checked') &&  $("#vs_isnone").is(':checked') ) {
+	alert("Please specify calling mode for VarScan !"); numerr++; return false;
+    }
+    if ( $("#bd_cmd").is(':checked')) {
+	if( $("#bd_call_mode_none").is(":checked")) { alert("Please specify calling mode for BreakDancer !"); numerr++; return false; }
+	if( $("#bd_trans_type0").is(":checked"))    { alert("Please specify translocation type for BreakDancer !"); numerr++; return false; }
+    }
+    if ( $("#pindel_cmd").is(':checked') && $("#pindel_mode_none").is(':checked') ) {
+        alert("Please specify calling mode for Pindel !"); numerr++; return false;
+    }
+
+
+    if (  ($("#vs_cmd").is(':checked') && $("#vs_isTRIO").is(':checked')) ||	($("#bd_cmd").is(':checked') && $("#bd_call_modeT").is(':checked')) ||	($("#pindel_cmd").is(':checked') && $("#pindel_modeT").is(':checked')) )   { 
+	if (document.forms.myform.bamfilesms2side__dx.length % 3 != 0) {
+		alert ("A de novo computation is selected but the required trio of bam files is incomplete. Please fix before submitting.");
+		    numerr++;
+		    return false;
+		}
+	    }
+    if (document.forms.myform.bamfilesms2side__dx.length % 2 != 0) {
+	if( ($("#vs_cmd").is(':checked')     && $("#vs_isSOM").is(':checked')     ) ||
+	    ($("#bd_cmd").is(':checked')   && $("#bd_call_modeP").is(':checked') ) || 
+	    ($("#pindel_cmd").is(':checked') && $("#pindel_modeP").is(':checked') ) ||
+	    ($("#strlk_cmd").is(':checked')) ) {
+	    alert ("A tumor-normal computation is selected but a bam file is unpaired. Please fix before submitting.");
+	    numerr++;
+	    return false;
+	}
+    }
+
+    // validating user chr
+    if ( $("#vs_cmd").is(':checked')) {
+	if( $("#vs_chrdef2").is(':checked')) { // user
+	    if(chr_str_fail("vs_chrdef_str","VarScan")==true) { alert("The user-input genomic region for VarScan is invalid."); numerr++; return false; }
+	}
+    }
+    if ( $("#bd_cmd").is(':checked')) {
+	if( $("#bd_chrdef2").is(':checked')) { // user
+	    if(chr_str_fail("bder_chrdef_str","BreakDancer")==true) { alert("The user-input genomic region for BreakDancer is invalid."); numerr++; return false; }
+	}
+    }
+    if ( $("#pindels_cmd").is(':checked')) {
+	if( $("#pindel_chrdef2").is(':checked')) { // user
+	    if(chr_str_fail("pin_chrdef_str","Pindel")==true) { alert("The user-input genomic region for Pindel is invalid."); numerr++; return false; }
+	}
+    }
+    if ( $("#gs_cmd").is(':checked')) {
+	if( $("#vs_chrdef2").is(':checked')) { // user
+	    if(chr_str_fail("gs_chrdef_str","GenomeSTRiP")==true) { alert("The user-input genomic region for GenomeSTRiP is invalid."); numerr++; return false; }
+	}
+    }
+
+    
+
+
+//    }
+    
+    // Currently, for pooled VarScan samples we do no offer filtering
+    var tmp2 = check_vs_mode();
+    if (tmp == false) {
+	numerr++;
+	return false;
+    }
+
+    // a particular version control at the moment
+    if ( $("input[type='radio'][name='compute_target']:checked").val() == "AWS" && $('#bd_cmd').is(':checked') &&  ( $('#version_bder_id').val()!="bder145" )) {
+	alert ("Selected BreakDancer version invalid on selected compute resource");
+	numerr++;
+	return false;
+    }
+
+    var tmp = warn_bd();
+    if (tmp == false ) { numerr++; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if ( $("#login_aws").is(':checked')) {
+	var myfound=false;
+	$("input[type='radio'][name='awsworkvols']").each(function() { if( $(this).is(":checked")) myfound = true; } );
+	if( myfound==false) {
+	    alert("Error: Please specify an EBS volume to be used as a temporary working area!");
+	    numerr++;
+	    return false;
+	}
+    }
+
+
+    if (numerr == 0) {  alert ("Validation tests passed"); } 
+    return true;
+}
+
+// Report, verify AWS choices
+function rptclust() {
+    if( $("#login_aws").is(':checked')) {  // check Amazon choices
+	var cnam=$("input[type='radio'][name='clusters']:checked").val();
+	var c_lnam=$("input[type='radio'][name='clusters_l']:checked").val();
+	var res;
+	if (cnam=="nada" && c_lnam=="nada") { alert("Please select one of the compute resources before submitting!"); return false; }  
+	if (cnam=="nada") { res = c_lnam; } else { var tmp=new Array(); tmp = JSON.parse( $("#clustdb").val()); res = tmp[cnam]; }
+    var b=document.getElementsByName('s3buckets');
+	if( !b.length) {
+	    alert("No AWS S3 buckets found for storing results. To create a bucket, sign in to the AWS Console, select S3, and click the Create Bucket button. (This option will upgraded in the future.)");
+	    return false;
+	}
+	if (confirm("Computing is set to be performed on '"+ res +"' with the results to be stored in '"+ $("input[type='radio'][name='s3buckets']:checked").val()+"'.")==true) {
+	    return true;
+	} else {
+	    return false;
+	}
+    } else {
+	return true;
+    }
+}
+
+function get_sc_running(n) {
+// n=0: manage mode
+// n=1: display mode
+    if ( $("#login_aws").is(':checked')) {
+
+	switch(n) {
+	case 0:	
+	    $('#sc_running0').empty(); 
+	    $('#sc_running0').append("<p>Manage AWS instances:  <b>Updating ... please wait ...</b></p>");
+	    $('#sc_running0').show(); 
+ 	    $('#sc_running').empty(); 
+	    break;
+	case 1: 
+ 	    $('#clustdiv0_l').empty(); 
+ 	    $('#clustdiv0_l').append("<p class='tdindents'>...or re-use an existing resource (if any): <b>Updating ... please wait ...</b></p>");
+ 	    $('#clustdiv_l').empty(); 
+	    break;
+	}
+
+	var posting = $.ajax({
+	    url: "get_sc_running.php",
+	    type: "POST",
+	    data: {'cfg':$("#scconf").val(), 'mode':n},
+	    success: function(resp) {
+//		var data = JSON.parse(resp);
+		switch(n) {
+		case 0:
+		    $('#sc_running0').empty(); 
+		    $('#sc_running0').append("<p>Manage AWS instances:</p>");
+		    $('#sc_running0').show();
+		    $('#sc_running').append("<p class='tdindent'><i>This feature may be used to terminate running clusters.</i></p><br/>");
+		    $('#sc_running').append(resp);
+		    $('#sc_running').show();
+		    break;
+		case 1:
+ 		    $('#clustdiv0_l').empty(); 
+ 		    $('#clustdiv0_l').append("<p class='tdindents'>...or re-use a running resource (if any):</p>");
+ 		    $('#clustdiv_l').empty(); 
+		    $('#clustdiv_l').append(resp);
+		    break;
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+     	    }
+	});
+	
+    } else if ( $("#login_tgi").is(':checked')) {
+	$('#sc_running0').hide();
+	$('#sc_running').hide();
+
+
+
+
+
+
+
+    }
+};
+
+function do_end_clust(n) {
+    var rr = confirm("Terminate resource "+n+" ?");
+    if (rr == true) {
+	display("Please allow 2 minutes for the resource to shut down.<br><br>After that time, you may close this dialog box and try again to manage AWS instances.","clear");
+	var posting = $.ajax({
+	    url: "get_sc_running.php",
+// Try omit
+//	   timeout: 120000,
+	    type: "POST",
+	    async: false,
+	    data: { 'nm': n, 'mode': 2, 'cfg':$("#scconf").val()},
+	    error: function() {
+		alert("The shutdown process has timed out. Click the Refresh button under Manage AWS instances in the Preferences tab to check the resource status.");
+	    },
+	    success: function(resp) {
+		$("#preview_div").dialog("Close");
+				      
+
+		if (resp=="1") {
+		    alert("Instance successfully terminated. Click OK to refresh.");
+		} else if (resp=="0") {
+		    alert("Shutdown status unknown. Click OK to refresh.");
+		} else {
+		    alert(resp);
+		}
+
+	    }
+	});
+
+	get_sc_running(0);
+	$("#preview_div").dialog("Close");
+
+    }
+}
+
+
+
+
+
+function do_sub() {
+    var cmd,name,bErr=0;
+    var bFail=0;
+    var cmsg="";
+    if ( $("#login_aws").is(':checked')) {
+	name = $("input[type='radio'][name='clusters']:checked").val();
+	if( name!="nada") { 
+	    cmd="new"; 
+	} else {
+	    name = $("input[type='radio'][name='clusters_l']:checked").val();
+	    cmd="resume";
+	}
+// (rjm) Adds nothing now, may be needed(?)
+//	if( $("#awsvoldb").val()=="") { alert("Notice: No EBS volumes were configured."); }
+// (rjm) Imposition of mutual exclusion of data sources allows us to use number of ebs menus as proxy
+	var awsvolspec = new Array();
+	var menlen = $("[id^=awsvolmenu]").length;
+	var ik=-1;
+	if (menlen) { 
+	    for(var k=0; k < menlen; k++) { 
+		awsvolspec[k] = $('#awsvolmenu'+k).val(); // volume values
+		if( $("#awsworkvol"+k).is(":checked")) { ik = k; } // work volume
+	    }
+	} 
+	if( ik == -1) { alert("Error: Please select a work volume before submitting!"); return false; }
+
+	var posting = $.ajax({
+	    url: "setup_sc.php",
+	    timxeout: 600000,  
+	    type: "POST",
+	    async: false,
+	    data: {'src': $("#scconf").val(), 'cmd': cmd, 'name': name, 'size': $("#nclust").val(), 
+		   'awsinfovol': $("#awsvoldb").val(), 'c': menlen, 'awsvolspec': JSON.stringify(awsvolspec) },
+	    error: function() {
+		alert("An unexpected error occurred while starting Amazon resource '"+name+"'.");
+		bFail=1;
+	    },
+	    success: function(resp) {
+		if(resp.match(/Mismatched/)) {
+		    alert("AWS error: Selected volumes are not in the same availability zone!");
+		    bFail=1;
+		}
+		else if(! resp.match(/OK/)) {
+		    alert("setup_sc.php resp:"+resp);
+		    alert("Unknown error in setting up cluster configuration!");
+		    bFail=1;
+		} else {
+		    cmsg = "AWS resources configured. ";
+		}
+	    }
+	});
+	
+    } // aws
+    if(bFail) {return false;}
+
+    cmsg += "Click OK to submit!";
+    if( confirm( cmsg )==true ) {
+
+	display("Setting up resources (this may require a few minutes)...<br/>", "clear");
+	var posting = $.post("parse_real.php", $("#myform").serialize(), function(data) {
+	    data  = "...done.<br><br>"+data;
+	    data += "<br/>Click the 'Close' button to close this window and to return to the GenomeVIP interface.";
+	    data = data.replace(/\r?\n/g,"<br/>");
+            display(data,""); 
+
+	});
+    } else {
+        return false;
+    }
+
+
+    
+}
+
+function reset_form(i) {
+    $("#resultsbox").empty();
+    if (i==1) {
+	document.getElementById("myform").reset(); 
+	upd_global_dbsnp();
+	upd_global_fpfilter(); 
+	alert("All options have been reset successfully !");
+    }
+}
+
+function init_selectbox(i) {
+    if (i==1) {$("#fs_div").show();} else {$("#fs_div").hide();}
+    $("#searchable").empty();
+    $("#bamfilesms2side__sx").empty();
+    $("#bamfilesms2side__dx").empty();
+    $("#pathdb_div").empty();
+    $("#sel_genome").empty();
+    $("#bai_div").empty();
+    $("#ref_div").empty();
+    $("#gs_sel_genome").empty();
+    $("#mask_div").empty();
+    $("#maski_div").empty();
+    $("#dict_div").empty();
+    $("#gs_sel_svmask").empty();
+    $("#gs_sel_cnmask").empty();
+    $("#gs_gendermap").empty();
+    $("#gs_ploidymap").empty();
+    
+}
+
+
+
+
+
+
+
+function upload_selector(p) {
+    init_selectbox(1);
+    var posting = $.ajax({
+	url: "listfile2.php",
+	type: "POST",
+	data: { 'filepath': JSON.stringify(p) },
+	success: function(data) {
+	    populate_divs(data);
+	}
+    });
+}
+
+function upload_object(p,opt,i) {
+    var posting = $.ajax({
+	url: "cat.php",
+	type: "POST",
+	data: { 'filepath': JSON.stringify(p) },
+	success: function(data) {
+	    if(data.length > 0) {
+		if(opt==1) {  // regions
+		    $("#glob_chrdef_str").val( data );
+		    $("#glob_chrdef2").prop("checked",true);
+		    alert("Success: Regions uploaded !");
+		}
+		if(opt==2) { // profile
+		    alert("Profile uploaded successfully! To apply the file, you must click the Apply Profile button below.");
+		}
+		if(opt==3) { //vol filelists
+		    $("#awsvfi"+i).val( data );
+		}
+	    } else {
+		alert("Warning: uploaded profile appears empty !");
+	    }
+
+	}
+    });
+}
+
+
+
+function clear_results() {
+    $("#resultsbox").empty();
+    $("#results_dir").val("");
+}
+
+function setup_s3() {
+    var posting = $.ajax({
+	url: "setup_s3.php",
+	type: "POST",
+	async:false,
+	data: {'aws_ak':aws_ak, 'aws_sk':aws_sk, 'src':$("#s3conf").val(), 
+	       'aws_https':$_POST['aws_https'], 'aws_ssenc':$_POST['aws_ssenc'] },
+        error: function() {
+	    alert("Error while setting up S3 information!");
+	},
+	success: function(data) {
+	    $("#s3conf").val( JSON.parse(data) );
+	}
+    });
+}
+
+function get_results() {
+    var d = $("#results_dir").val().trim();
+    if (d != "" ) {
+	$("#resultsbox").empty();
+	if($("input[type='radio'][name='compute_target']:checked").val()=="AWS") {
+	    setup_s3(); 
+
+	    var posting = $.ajax({
+		url: "get_aws_results_list.php", 
+		type: "POST",
+		async:false,
+		data: { 'd': JSON.stringify(d), 'cfg': $("#s3conf").val() },
+		error: function() { alert("Error while getting result listing."); },
+		success: function(data) {  populate_results(data); }
+	    });
+
+	} else if ($("input[type='radio'][name='compute_target']:checked").val()=="tgi") {
+
+	    // TODO - YET TO FINISH
+
+
+	} else {
+	    alert("Error: Please provide your credentials under Accounts!");
+
+	}
+
+
+    } else {
+	alert("Error: Results location is empty!");
+    }
+
+}
+
+function gotomytab(i) {
+    var myarray=[0,1,2,3,4,5,6,7,8,9,10,11,12];
+    var tabnum =[0,1,2,3,4,5,6,7,8,9,10,11,12];
+    var buttonarr=[0,1,2,3,9,10,11];
+    
+    for (var j=0; j< buttonarr.length; j++) {
+	$("#nav-button_"+buttonarr[j]).removeClass('navflow');
+    }
+    $("#nav-button_"+i).addClass('navflow');
+    
+    for (var j=0; j< myarray.length; j++) {
+	$("#litab-"+myarray[j]).hide();
+    }
+    $("#litab-"+i).show();
+    if (i==3) {
+	for (var j=4;  j<=8;  j++) { $("#litab-"+j).show(); }
+	for (var j=12; j<=12; j++) { $("#litab-"+j).show(); }
+    }
+    $("#litab-"+i).trigger('click');  // sufficient
+}
+
+function upd_vs_hcfilters() {
+    if ($("#vs_do_hcfilter").is(':checked')) { 
+	var gl=$("#vs_isGL").is(':checked');
+	var som=$("#vs_isSOM").is(':checked');
+	var trio=$("#vs_isTRIO").is(':checked');
+    	if ( gl  ) {$("#filter_vs_gl").show();} else {$("#filter_vs_gl").hide();}
+	if ( som ) {$("#filter_vs_som").show();} else {$("#filter_vs_som").hide();}
+	if ( trio) {$("#filter_vs_trio").show();} else {$("#filter_vs_trio").hide(); } 
+    	if ( gl || som || trio ) {$("#filter_vs_none").hide();} else {$("#filter_vs_none").show();}
+    } else {
+        $("#filter_vs_none").hide(); $("#filter_vs_gl").hide(); $("#filter_vs_som").hide(); $("#filter_vs_trio").hide();
+    }
+}
+function upd_vs_fpfilter() {
+    if( $("#vs_do_dbsnp").is(':checked') ) { $("#vs_filter_dbsnp").show(); } else { $("#vs_filter_dbsnp").hide(); } 
+    if( $("#vs_do_fpfilter").is(':checked') ){ $("#vs_filter_fps").show(); } else { $("#vs_filter_fps").hide(); } 
+}
+function upd_strlk_fpfilter() {
+    if( $("#strlk_do_dbsnp").is(':checked') ){ $("#strlk_filter_dbsnp").show(); } else { $("#strlk_filter_dbsnp").hide(); }
+    if( $("#strlk_do_fpfilter").is(':checked') ){ $("#strlk_filter_fps").show(); } else { $("#strlk_filter_fps").hide(); }
+}
+function upd_pin_filters() {
+    if ($("#pin_do_filter").is(':checked')) {
+	var gl  = $("#pindel_modeC").is(':checked');
+	var pool= $("#pindel_modeA").is(':checked');
+	var som = $("#pindel_modeP").is(':checked');
+	var trio= $("#pindel_modeT").is(':checked');
+	if ( gl   ) {$("#filter_pin_gl").show();} else {$("#filter_pin_gl").hide();}
+	if ( pool ) {$("#filter_pin_pool").show();} else {$("#filter_pin_pool").hide();}
+	if ( som  ) {$("#filter_pin_som").show();} else {$("#filter_pin_som").hide();}
+	if ( trio ) {$("#filter_pin_trio").show();} else {$("#filter_pin_trio").hide();}
+	if ( gl || pool || som || trio ) {$("#filter_pin_none").hide();} else {$("#filter_pin_none").show();}
+    } else {
+        $("#filter_pin_gl").hide(); $("#filter_pin_pool").hide(); $("#filter_pin_som").hide(); $("#filter_pin_trio").hide();
+    }
+}
+
+function upd_bd_regions() {
+    if( $("#bd_trans_typeB").is(':checked') || $("#bd_trans_typeI").is(':checked') ) {
+	$("#bd_regions_none").hide(); 	$("#bd_regions_disallowed").hide(); $("#bd_regions_allowed").show(); 
+    } else if( $("#bd_trans_typeC").is(':checked') ) {
+	$("#bd_regions_none").hide(); 	$("#bd_regions_disallowed").show(); $("#bd_regions_allowed").hide(); 
+    } else {
+	$("#bd_regions_none").show(); 	$("#bd_regions_disallowed").hide(); $("#bd_regions_allowed").hide(); 
+    }
+}
+
+function clear_chr(i) {
+    switch (i) {
+    case 0: $("#glob_chrdef_str").val('');   break;
+    case 1: $("#vs_chrdef_str").val('');     break;
+    case 2: $("#bder_chrdef_str").val('');   break;
+    case 3: $("#pindel_chrdef_str").val(''); break;
+    case 4: $("#gs_chrdef_str").val('');     break;
+    case 5: $("#upload_ep_div").empty();  $("#ep_frame").contents().find('#myfile').val('');  break;	
+}
+    return true;
+}
+
+// Transform profile
+function apply_profile(results) {
+    var k, k_orig, v;
+
+    if (results.length > 0) { 
+	reset_form(0);
+	for (var i=0; i < results.length; i++) {    
+	    k_orig = results[i]['n'];
+	    k = results[i]['n'].
+		replace(/^varscan\.filter\.germline/,"vs_gl_filter").
+		replace(/^varscan\.filter\.somatic/,"vs_som_filter").
+		replace(/^varscan\.filter\.trio/,"vs_trio_filter").
+		replace(/^varscan(.*)apply/,"vs_apply").
+		replace(/^varscan\.germline/,"vs_gl").
+		replace(/^varscan\.somatic/,"vs_som").
+		replace(/^varscan\.trio/,"vs_trio").
+		replace(/^varscan/,"vs").
+		replace(/^strelka/,"strlk").
+		replace(/^breakdancer/,"bd").
+		replace(/^pindel\.filter\.germline/,"pin_gl_filter").
+		replace(/^pindel\.filter\.somatic/,"pin_som_filter").
+		replace(/^pindel\.filter\.trio/,"pin_trio_filter").
+		replace(/^pindel\.filter\.apply/,"pin_apply").
+		replace(/^pindel/,"pin").
+		replace(/^genomestrip/,"gs").
+		replace(/^fpfilter/,"vs_fp").
+		replace(/^dbsnp\.dbsnp_version/,"dbsnp_version").
+		replace(/^variant_effect_predictor/,"vep").
+		replace(/^vep\.vep_version/,"vep_version").
+		replace(/\./g,"_");
+
+	    v=results[i]['v'];
+	    if($("[name="+ k +"]").length) {  // TODO: is working?
+		// Explict types
+		if($("[name="+ k +"]").is("input:checkbox")) {
+     		    if (v==="false") {
+			$("[name="+k+"]").prop('checked',false).trigger('change');
+		    } else if (v==="true") {
+			$("[name="+k+"]").prop('checked',true).trigger('change');
+		    } else {
+			alert("Warning: Value \""+v+"\" for "+k_orig+" is invalid and will be ignored.");
+		    }
+		} else if ($("[name="+ k +"]").is("input:radio")) {
+ 		    $("[name="+k+"][value="+v+"]").prop('checked',true).trigger('change');
+		} else if ($("[name="+ k +"]").is("input:text") || $("[name="+ k +"]").is("input:hidden") || $("[name="+ k +"]").is("select") ) {
+		    $("[name="+k+"]").val(results[i]['v']); 
+		    
+		} else {
+		    alert("Error: Profile key "+k_orig+" is not recognized. Please check the configuration.");
+		} 
+	    }
+	    
+	}  // for
+	
+	upd_vs_hcfilters();
+	upd_vs_fpfilter();
+	upd_bd_regions();
+	upd_pin_filters();
+	//
+	upd_global_dbsnp();
+	upd_global_fpfilter();
+
+	
+    }  // results
+}
+
+function mkbucket  () {
+    var my_bucket=prompt('Enter bucket name (only letters, numerals, and _ allowed)');
+    var re=/^[0-9a-zA-Z_]+$/;
+    if (re.test(my_bucket)) {
+	var posting = $.ajax({
+	    url: "mkbucket.php",
+	    type: "POST",
+	    data: {'s3conf': $("#s3conf").val(), 'b': my_bucket},
+	    success: function(resp) {
+		if(resp.match(/OK/)) {
+		    get_stores(0);
+		    return true;
+		} else if (resp.match(/INVALID/)){
+		    alert("Error: the server invalidated the name "+my_bucket);
+		    return false;
+		} else if (resp.match(/EXISTS/)){
+		    alert("Sorry, bucket names on Amazon must be unique. Please try another name.");
+		    return false;
+		} else {
+		    alert("An unknown error occurred while creating bucket "+my_bucket);
+		    return false;
+		}
+	    }
+	});
+    } else {
+	alert("Please try again");
+	return false;
+    }
+}
+
+
+
+function quick_setup() {
+    // Error check
+    var bFile=$("#filepath_ep").length;
+    var bSysProf=(($("#mode_select").val()!="nada"||$("#ep_select").val()!="nada")?(1):(0));
+    if( ! bSysProf &&  $("#glob_chrdefn").is(":checked") && ! bFile) { 
+	alert("Please make a selection before applying the configuration !");
+	return false;
+    }
+    if(bFile && bSysProf) {
+	alert("Error: System-provided and uploaded profiles cannot be applied at the same time !");
+	return false;
+    }
+
+    var results = new Array();
+    var status="";
+    var bOK=1;
+
+    if(bSysProf) {
+	var cmds = new Array();   var t = new Array();
+	cmds[0]  = "mode_select"; t[0]  = " run mode ";
+	cmds[1]  = "ep_select";   t[1]  = " execution ";
+	for(var k=0; k < cmds.length; k++) { // using loop construct for expediency
+	    var posting = $.ajax({
+		url: "read_profiles.php",
+		type: "POST",
+		async: false,
+		data: { 'fn': $("#"+cmds[k]).val(), 'p':k, 'c':1 },
+		error: function() {
+		    status = status+"Error applying "+t[k]+" profile !\n";
+		    bOK=0;
+		},
+		success: function(resp) {
+		    var data_array = JSON.parse(resp);
+		    if (data_array.length > 0) { results = results.concat( data_array ); }
+		}
+	    });
+	}
+	if (bOK==1) {
+	    if( results.length > 0) {
+		apply_profile(results);
+		status = status+"The selected run mode and/or profile has been applied";
+	    }
+	    // Apply regions
+	    check_glob_cb();
+	    // Update status
+	    
+	    if( status.length > 0) {  // menu selection
+		if( ! $("#glob_chrdefn").is(":checked")) { // regions
+		    status = status + ",\nand the specified genomic region "
+   			            + "information has been applied !";
+		} else {
+		    status = status + " !";
+		}
+	    } else {
+		if( ! $("#glob_chrdefn").is(":checked")) { // regions
+		    status = "The specified genomic region information has been applied !";
+		} else {
+		    status = "Warning: It appears no menu items or region was selected !";
+		}
+	    }
+	}
+    } // bSysProf
+
+    
+    if(bFile) {
+	var p=$("#filepath_ep").val();
+	var posting = $.ajax({
+	    url: "read_profiles.php",
+	    type: "POST",
+	    async: false,
+	    data: { 'fn': JSON.stringify(p), 'c':2 },
+	    error: function() {
+		status = status+"Error processing uploaded profile !\n";
+		bOK=0;
+	    },
+	    success: function(resp) {
+		results = JSON.parse(resp);
+	    }
+	});
+	if (bOK==1) {
+	    if(results.length > 0) {
+		apply_profile(results);
+		status = status+"The uploaded execution profile has been applied";
+	    }
+	    // Apply regions
+	    check_glob_cb();
+	    // Update status
+	    if( status.length > 0) {  // upload selected
+		if( ! $("#glob_chrdefn").is(":checked")) { // regions
+		    status = status + ",\nand the specified genomic region "
+		                    + "information has been applied !";
+		} else {
+		    status = status + " !";
+		}
+	    } else {
+		if( ! $("#glob_chrdefn").is(":checked")) { // regions
+		    status = "The specified genomic region information has been applied !";
+		} else {
+		    status = "Warning: It appears the upload file was empty and no region was selected !";
+		}
+	    }
+	}
+    } // bFile
+
+    if( ! bSysProf && ! bFile ) {
+	// Apply regions
+	check_glob_cb();
+	if( ! $("#glob_chrdefn").is(":checked")) { // regions                                                                                                          
+            status = "The specified genomic region information has been applied !";
+	}
+    }
+    
+    //Common
+    alert( status );
+    // Reset
+    $("#mode_select").val("nada").trigger('change'); 
+    $("#ep_select").val("nada").trigger('change');
+    
+    if (bOK==1) {return true;} else {return false;}
+    
+} // quick setup
+
+function download(filename, text) {
+    var e = document.createElement('a');
+    e.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    e.setAttribute('download', filename);
+    e.style.display = 'none';
+    document.body.appendChild(e);
+    e.click();
+    document.body.removeChild(e);
+}
+</script>
+</head>
+
+
+<body onload="mysetup();">
+  <table class="headtab">
+    <tr><td><div class="logo">
+	  <img height="72" width="160" border="0" src="image/genomevip.1in.png" alt="GenomeVIP"> Genome Variant Investigation Platform
+    </div></td></tr>
+  </table>
+
+
+  <div id="nav-panel" class="allcontent">
+    <table class="navtab" width="100%">
+      <tr><th><font color="#ffffff"><u>Navigation</u></font></th>
+      <tr><td>&nbsp;</td></tr>
+      <tr><td><button class="nav-button" type="button" id="nav-button_0" onclick="gotomytab(0);">Home</button></td></tr>
+      <tr><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td></tr>
+      <tr><td><button class="nav-button" type="button" id="nav-button_1" onclick="gotomytab(1);">Accounts</button></td></tr>
+      <tr><td align="center"><div class="arrow-down"></div></td></tr> 
+      <tr><td><button class="nav-button" type="button" id="nav-button_2" onclick="gotomytab(2);">Select Genomes</button></td></tr>
+      <tr><td align="center"><div class="arrow-down"></div></td></tr> 
+      <tr><td><button class="nav-button" type="button" id="nav-button_3" onclick="gotomytab(3);">Configure Tools</button></td></tr>
+      <tr><td align="center"><div class="arrow-down"></div> </td></tr>
+      <tr><td><button class="nav-button" type="button" id="nav-button_9" onclick="gotomytab(9);">Submit</button></td></tr>
+      <tr><td align="center"><div class="arrow-down"></div> </td></tr>
+      <tr><td><button class="nav-button" type="button" id="nav-button_10" onclick="gotomytab(10);">Results</button></td></tr>
+      <tr><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td></tr>
+      <tr><td><button class="nav-button" type="button" id="nav-button_11" onclick="gotomytab(11);">Preferences</button></td></tr>
+    </table>
+  </div>
+  
+
+  
+ <div id="content-panel" style="display:none;"> 
+    <form class="allcontent" name="myform" id="myform" method="post" action="parse_real.php">
+      <div id="tabs">
+	<ul>
+	  <li><a class="tooltip" href="#tabs-0" id="litab-0" title="">Home</a>
+	  <li><a class="tooltip" href="#tabs-1" id="litab-1" title="Enter credentials">Accounts</a>
+	  <li><a class="tooltip" href="#tabs-2" id="litab-2" title="Select alignment and reference files">Select Files</a>
+	  <li><a class="tooltip" href="#tabs-3" id="litab-3" title="Configure computations by selecting and applying a pre-made execution profile">Quick Setup</a>
+	  <li><a class="tooltip" href="#tabs-4" id="litab-4" title="Configure VarScan to call nucleotide variants, insertions & deletions for germline, somatic, or single trio analysis">VarScan</a>
+	  <li><a class="tooltip" href="#tabs-5" id="litab-5" title="Configure Strelka to call nucleotide variants, insertions & deletions for somatic analysis">Strelka</a>
+	  <li><a class="tooltip" href="#tabs-6" id="litab-6" title="Configure BreakDancer to call various structural variants in single or multiple samples">BreakDancer</a>
+	  <li><a class="tooltip" href="#tabs-7" id="litab-7" title="Configure Pindel to call insertions, deletions & tandem duplications in single or multiple samples">Pindel</a>
+	  <li><a class="tooltip" href="#tabs-8" id="litab-8" title="Configure Genome STRiP to discover and genotype deletions for a cohort of (germline) samples">Genome STRiP</a>
+	  <li><a class="tooltip" href="#tabs-12" id="litab-12" title="Configure additional filtering and annotation options">Post-discovery Analysis</a>
+	  <li><a class="tooltip" href="#tabs-9" id="litab-9" title="Provide meta-information about the calculation and submit to run">Submit</a>
+	  <li><a class="tooltip" href="#tabs-10" id="litab-10" title="Results">Results</a>
+	  <li><a class="tooltip" href="#tabs-11"  id="litab-11" title="Maintenance options">Preferences</a>
+	</ul>
+	
+	<div id="tabs-0" class="ui-tabs-panel"> 
+	  <div class="headspc subhead tdindentd">
+	    <p>Use the Navigation menu at the left to set up your computation.</p>
+	  </div> 
+
+
+	</div>
+	
+	<!-- Login --> 
+	<div id="tabs-1" class="ui-tabs-panel"> 
+	  <div class="headspc subhead tdindentd"><p>Select a computational resource:</p></div>
+
+	  <div class="tdindent"> <p><input type="radio" id="login_none" name="compute_target" value="none" hidden="true"/></p></div>
+	  <div class="tdindent"> <p><input type="radio" id="login_aws" name="compute_target" value="AWS" /><label for="login_aws">Amazon AWS cloud</label></p></div>
+          <input type="hidden" id="scconf" name="scconf" value="">
+          <input type="hidden" id="s3conf" name="s3conf" value="">
+        
+
+	  <div id="awsinfo_c" class="tdindent initiallyHidden">
+	    <table class="tdindent">
+	      <tr><td class="ltab">User ID:</td><td><input type="text" class="tb1" id="aws_un" name="aws_un" value=""/></td></tr>
+              <tr><td>Access key:</td><td><input type="password" class="tb1" id="aws_ak" name="aws_ak" value=""/></td></tr>
+	      <tr><td>Secret key:</td><td><input type="password" class="tb1" id="aws_sk" name="aws_sk" value=""/></td></tr>
+	    </table>
+	    <div id="awsinfo"></div> <!-- unused -->
+
+
+	  </div>
+	    <p><br></p>
+	  
+	  <div class="tdindent" ><p><input type="radio" id="login_tgi" name="compute_target" value="tgi" /><label for="login_tgi">Local cluster</label></p></div>
+
+	  <div id="tgiinfo_c" class="tdindent initiallyHidden">
+	    <table class="tdindent">
+	      <tr><td class="ltab">Username:</td>
+		<td><input type="text" class="tb1" id="un" name="username" value=""></td>
+	      </tr><tr>
+		<td>Passphrase:</td>
+		<td><input type="password" class="tb1" id="pw" name="phrase" value=""></td>
+
+
+	      </tr><tr>  
+		<td>Submission host:</td>
+		<td><input type="text" class="tb1" id="clust_gw" name="clust_gw">&nbsp;<img src="image/Help.png" class="inline" title="Enter hostname (or, possibly address) of a machine that can accept batch jobs."></td>
+	      </tr><tr>
+		<td>Queue name:</td>
+		<td><input type="text" class="tb1" id="clust_qn" name="clust_qn"></td>
+	      </tr><tr>
+		<td>Job limit group (OPTIONAL):</td>
+		<td><input type="text" class="tb1" id="clust_lg" name="clust_lg"></td>
+	      </tr><tr>
+		<td>Job scheduler type:</td>
+		<td><select id="jobsched" name="jobsched" class=""><option value="LSF">LSF</option></select></td>
+	      </tr>
+
+	    </table>
+
+	  </div>
+
+	  <div class="headspc"></div>
+
+
+
+
+</div>
+
+<!-- Files --> 
+<div id="tabs-2" class="ui-tabs-panel"> 
+	  <div id="spinner" class="spinner" style="display:none;">
+	    <img id="img-spinner" src="image/loading.gif" width="100" height="100" alt="Loading...">
+	  </div>  
+
+	  <div id="inputarea" >
+
+	    <div id="inp_warn" class="subhead tdindentd"><p>Please first go to Accounts in the navigation menu to select a compute resource.</p></div> 
+	    
+
+
+
+	    <div id="inp_aws_preamble" class="subhead tdindentd headspc"><p>Select from the following mutually exclusive options: Identify any EBS data volumes needed or locations of sequence alignment and genomic reference files:</p></div>
+
+	    <div id="inp_lc_preamble" class="subhead tdindentd headspc"><p>Select from the following mutually exclusive options to provide locations of sequence alignment and genomic reference files (and possibly any supporting files):</p></div>
+
+     
+    <div id="inp_ebs"><p>&nbsp;&bull; Specify EBS volumes for (i) temporary working area and (ii) any needed input datafiles:</p>
+	     <div id='multivolume' class="tdindent"></div>
+
+    <div id='ebs_actions_0' class="tdindents" style="display:none;"><p><b>Searching...</b></p></div>
+
+    <div id='ebs_actions_y' class="tdindents" style="display:none;">
+	     <p><input type='button' value='Add a volume' id='add_volume'><input type='button' value='Remove all volumes' id='rm_volumes'><input type='button' value='Apply lists' id='apply_vol_lists'></p>
+    </div>
+    <div>
+      <div id='ebs_actions_n' class="tdindents" style="display:none;">
+	<p class="tdindent"><i>There appear to be no volumes associated with your AWS account.</i></p>
+      </div>
+      <p><br/></p>
+      <div><p class="tdindent3"><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p></div>
+    </div>
+	    <p><br/></p>
+	   </div>
+	   <div id="voldb"><input type='hidden' id='awsvoldb' name='awsvoldb' value=''/></div>
+
+
+	    <div id="inp_rfile_opt"><p>&nbsp;&bull; Enter path to file containing list of files:</p>
+	      <p class="tdindents"><input type="text" class="tb2 rpath" id='rpath' name='rpath' value='' placeholder="/path/to/file" title="On AWS, the format is s3://bucket/path/to/file. Otherwise, please provide a file path"/></p>
+	      <p class="tdindents"><input type='button' value='Retrieve file' id='rpath_btn'/></p>
+
+	    <p><br/></p>
+	    <div><p class="tdindent3"><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p></div>
+	    </div>
+
+
+	    <!-- *************************************************** -->
+	    <div id="inp_upfile_opt">
+	      <iframe src="upfile_jq.htm" class="frame" scrolling="no"></iframe>
+	      <div id="file_div"></div>
+	    <p><br/></p>
+	    <div><p class="tdindent3"><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p></div>
+	    </div>
+	    <!-- *************************************************** -->
+	    <p><br/></p>
+
+
+	    <div id="inp_scan_opt">
+	      <p class="">&nbsp;&bull; Enter remote directories to scan for files:</p>
+	      <p class='fps tdindents'><input type='text' class='tb2 allpath' name='paths[]' value='' placeholder='/path/to/directory' /></p>
+	      <div id='multipath' style='border: 1px'></div>
+	      
+	      <p class="tdindents"><input type='button' value='Add another field' id='add_path'/>&nbsp;<input type='button' value='Retrieve files' id='list_files_btn2'/>&nbsp;<input type='button' value='Clear list' id='rm_path'/></p>
+	  <p><br/></p>
+	    </div>
+	    
+	    <div id="inp_sysfiletree_opt"><p>&nbsp;&bull; 1000 Genomes files:</p>
+	      <div class="tdindents">
+	      <p><input type='radio' name='awstree' id="awstree1" value='1' checked><label for="awstree1">Pilot phase (available from 743 donors)</label></p>
+	      <p><input type='radio' name='awstree' id="awstree2" value='2'><label for="awstree2">Phase 1, low coverage (available from 1,094 donors)</label></p>
+              <p><input type='radio' name='awstree' id="awstree3" value='3'><label for="awstree3">Phase 1, exome (available from 1,128 donors)</label></p>
+              <p><input type='radio' name='awstree' id="awstree4" value='4'><label for="awstree4">Phase 3, low coverage (available from 2,535 donors)</label></p>
+              <p><input type='radio' name='awstree' id="awstree5" value='5'><label for="awstree5">Phase 3, exome (available from 2,535 donors)</label></p>
+              <p><input type='radio' name='awstree' id="awstree6" value='6'><label for="awstree6">Phase 3, high coverage (available from 30 donors)</label></p>
+	      <p><br/></p>
+              <input type='button' value='Load list' id='aws_tree_btn'/></p>
+              </div>
+	      <p><br/></p>
+ 	    </div>
+
+	  </div>  <!-- input area -->
+
+
+												 	  
+	  <div id='pathdb_div'></div>
+	  <div id='bai_div'></div>
+	  <div id='fai_div'></div>
+	  <div id='ref_div'></div>
+	  <div id='fs_div'>
+
+
+	    <div id="inp_select" class="subhead tdindentd headspc"><p>Select samples and reference:</p></div>
+	    <p><b>NOTE:</b> Arrange 'Selected bams' into matched pairs (in tumor, normal order) for somatic variant discovery or into triples (in father, mother, child order) for de novo discovery, if applicable. Bam files whose index files are <em>missing</em> will be generated automatically.</p>
+	    <p><br/></p>
+	    <select id='searchable' name='bamfiles[]' multiple='multiple'></select>
+
+	    <p>Choose a reference genome:</b></p>
+	    <select id="sel_genome" class="tb2" name='refgenome' onchange="gs_sel_genome.value=this.value"></select>
+	    <p><br/></p>
+
+
+
+
+
+
+
+
+
+
+	    
+
+	    <table class="mytable" >
+	      <tr><td>Would you like us to save a copy of all sorted bam files (.bam) and bam index files (.bai) that need to be created during this run to the results storage directory?</td></tr>
+	      <tr><td class="tdindent"> <input type="radio" name="save_generated" value="true">Yes<br> <input type="radio" name="save_gen" value="false" checked >No<br></td></tr>
+	    </table>
+	  </div>
+	  
+	  <p><br/></p>
+
+
+	</div>
+
+<!-- quick setup -->
+	<div id="tabs-3" class="ui-tabs-panel"> 
+
+
+
+	  <p class="tdindentd" style="font-weight:bold">Perform high-level, multiple-tool configuration. (Optional low-level adjustments tool and filter settings may be performed under the other tabs.)</p>
+	  <p><br></p>
+	  <p class="tdindentd" style="font-weight:bold">Note: Analyses that require GenomeSTRiP in particular may need further configuration.</p>
+	  <p><br></p>
+	  <p><br></p>
+
+	  <div class="headspc subhead tdindentd"><b>STEP 1: Create execution profile</b></div>
+
+
+
+
+
+
+
+
+
+
+
+
+          <div class="tdindent"><b>OPTION 1:</b></div>
+          <div class="tdindent2">
+            Run mode:&nbsp; <div> <select id="mode_select" name="mode_select" class="tb2menubig"> </select> </div><div id="mode_msg"></div>
+          </div>
+	  <p><br></p>
+          <div class="tdindent2">
+	    Parameters:&nbsp; <div> <select id="ep_select" name="ep_select" class="tb2menubig"> </select> </div>
+	  </div>
+
+	  <p><br></p>
+
+          <div class="tdindent"><b>OPTION 2:</b></div>
+          <div class="tdindent2">
+            Upload an execution profile:
+	    <p><br></p>
+            <!-- *************************************************** -->
+            <div id="upload_ep_opt">
+              <table>
+                <tr>
+                  <td>
+              <iframe src="upload_ep.htm" class="frame" id="ep_frame" scrolling="no"></iframe>
+</td><td class="trtop">
+              <button type="button" onclick="clear_chr(5);" type="button">Deselect file</button></td>
+                  </tr></table>
+              <div id="upload_ep_div"></div>
+            </div>
+            <!-- *************************************************** -->
+          </div>
+          
+          <p><br></p>
+
+
+	  
+	  <div class="headspc subhead tdindentd"><b>STEP 2: Select genomic regions</b></div>
+	  <div class="Container">
+	    <div class="Left"> <br><br><br><br><br>Select one: </div>
+	    <div class="Right">
+
+
+	      <input type="radio" id="glob_chrdefn" name="glob_chrdef" value="nada" checked><label for="glob_chrdefn">No selection</label><br>
+	      <input type="radio" id="glob_chrdef0" name="glob_chrdef" value="standard"<label for="glob_chrdef0">Standard 1-22,X,Y</label><br>
+              <input type="radio" id="glob_chrdef1" name="glob_chrdef" value="standard_plus_contigs"><label for="glob_chrdef1">Standard 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
+      	      <input type="radio" id="glob_chrdef2" name="glob_chrdef" value="user"><label for="glob_chrdef2">User-defined list:</label>&nbsp; <img src="image/Help.png" class="inline" title="Please provide a listing of 'chr start stop' triples or a comma-separated list such as 1-4,X,6:1000,5:1000-2000,22. Prepend chromosome number with 'chr' if needed.">
+
+	      <table class="tdindent">
+		<tr><td>Enter manually...</td> <td>...or provide via file upload:</td></tr>
+		<tr><td><textarea class="textattr" id="glob_chrdef_str" name="glob_chrdef_str" value=""></textarea></td>
+		  <td>
+		    <!-- *************************************************** -->
+		    <div id="inp_regions_opt">
+		      <iframe src="regions_jq.htm" class="frame" scrolling="no"></iframe>
+		      <div id="region_div"></div>
+		      <p><br/></p>
+		    </div>
+		    <!-- *************************************************** -->
+	      </td>
+	      </tr><tr>
+	      <td><button onclick="clear_chr(0);" type="button">Clear list</button></td>
+	      </tr></table>
+	      
+
+
+	    </div> <!-- right -->
+
+	  </div>
+	  <p><br></p>
+	  
+
+
+
+
+
+
+
+
+
+
+
+	  <div class="headspc subhead tdindentd"><b>STEP 3: Review selections</b></div>
+	  <table class="mytable tdindent spread">
+	    <tr>
+	      <td width="200px"><input type="button" onclick="quick_setup();" value="Apply Profile"></td><td>Click to apply the selections above.</td>
+	    </tr><tr>
+	      <td><input type="button" onclick="reset_form(1);" value="Reset"></td><td>Initialize all tool tabs to their default settings</td>
+	  </tr></table>
+	  
+
+
+
+	
+  </div>
+<!-- VS -->
+     <div id="tabs-4" class="ui-tabs-panel"> 
+
+       <input type="checkbox" id="vs_cmd" name="vs_cmd"><label for="vs_cmd">Run VarScan</label>
+
+       <select id="version_vs" name="vs_version">
+	 <option class="menu1" value="varscan238">version 2.3.8</option>
+	 <option class="menu1" value="varscan239">version 2.3.9</option>
+       </select>
+       <br><br><br>
+       
+
+       <div class="subhead tdindents"><b>STEP 1: Select calling mode</b></div>
+
+       <p class="tdindents">Choose one of the following options:</p>
+       <div>
+	 <input type="radio" name="vs_call_mode" id="vs_isnone" value="none" hidden="true" checked>
+       </div>
+       <div class="tdindent">
+	 <input type="radio" name="vs_call_mode" id="vs_isGL" value="germline"><label for="vs_isGL">Germline</label>
+       </div>
+       
+       <div class="tdindent2"><div class="vspanel" id="vs_gl_div" > 
+
+	 <table class="mytable rindent spread" >
+	   <tr>
+	     <td class="tdw4" >Run type:</td>
+	     <td> <input type="radio" id="vs_gl_type2" name="vs_gl_calltype" value="both" checked ><label for="vs_gl_type2">Both SNVs & indels</label><br>
+	       <input type="radio" id="vs_gl_type0" name="vs_gl_calltype" value="snv"><label for="vs_gl_type0">SNVs only</label><br>
+	       <input type="radio" id="vs_gl_type1" name="vs_gl_calltype" value="indel"><label for="vs_gl_type1">Indels only</label></td>
+	   </tr><tr>
+	     <td>Run mode:</td>
+	     <td><input type="radio" id="vs_gl_singlesT" name="vs_gl_samples" value="single" checked ><label for="vs_gl_singlesT">Separate samples (default)</label><br>
+	       <input type="radio" id="vs_gl_singlesF" name="vs_gl_samples" value="pooled"><label for="vs_gl_singlesF">All (pooled) samples</label></td>
+	   </tr><tr>
+	     <td><i>p</i>-value thresholds to call variants:</td>
+	     <td><input type="text" class="tb1b" id="vs_gl_pvalue_snv" name="vs_gl_snv_p_value" value="0.99">&nbsp;<i>(for SNVs, default: 0.99)</i><br>
+	       <input type="text" class="tb1b" id="vs_gl_pvalue_indel" name="vs_gl_indel_p_value" value="0.99">&nbsp;<i>(for indels, default: 0.99)</i></td>
+	   </tr>
+	 </table>
+	 <br>
+	 <p><br></p>
+	 <input type="hidden"  name="vs_gl_output_vcf" value="true">
+
+	 
+
+	 <p id="toggle1a" class="tdindent"><img id="image1a" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS (DISCOVERY)</i></p>
+
+	 <div class="tdindent"> <div id="panel1a" style="display:none;">
+	     <br>
+	     <table class="mytable tdindentd spread">
+	       <tr><th class="myheader">Variant-specific parameters</th><th>SNVs</th><th>Indels</th>
+	       </tr><tr>
+		 <td class="tdindents">Minimum read depth at a position:</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_mincvg_snv" name="vs_gl_snv_min_coverage" value="8"><br>(default: 8)</td>
+		 <td> <input type="text" class="tb1b" id="vs_gl_mincvg_indel" name="vs_gl_indel_min_coverage" value="8"><br>(default: 8)</td>
+	       </tr><tr>
+		 
+		 <td class="tdindents">Minimum variant allele frequency threshold:</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_minvarfreq_snv" name="vs_gl_snv_min_var_allele_freq" value="0.01"><br>(default: 0.01)</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_minvarfreq_indel" name="vs_gl_indel_min_var_allele_freq" value="0.01"><br>(default: 0.01)</td>
+	       <tr></tr>
+	       <td class="tdindents">Minimum number of supporting reads at a position:</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_minsupptreads_snv" name="vs_gl_snv_min_num_supporting_reads" value="2"><br>(default: 2)</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_minsupptreads_indel" name="vs_gl_indel_min_num_supporting_reads" value="2"><br>(default: 2)</td>
+	       </tr>
+	     </table>
+	     <br>
+	     <table class="mytable tdindentd spread">				    
+	       <tr><th class="myheader">General parmeters</th><th></th>
+	       </tr><tr>
+		 <td class="tdindents">Minimum base quality at a position to count a read:</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_minABQ" name="vs_gl_min_avg_base_qual" value="15"> (default: 15)</td>
+	       </tr><tr>
+		 <td class="tdindents">Minimum variant allele frequency to call homozygote:</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_homozyg_freq" name="vs_gl_homozyg_min_var_allele_freq" value="0.75"> (default: 0.75)</td>
+	       </tr><tr>
+		 <td class="tdindents">Apply strand filter (to ignore variants with &gt;90% support on one strand) ?</td>
+		 <td><input type="radio" id="vs_gl_strandT" name="vs_gl_apply_strand_filter" value="true" checked><label for="vs_gl_strandT">True (default)</label>
+		   <input type="radio" id="vs_gl_strandF" name="vs_gl_apply_strand_filter" value="false"><label for="vs_gl_strandF">False</label></td>
+	       </tr><tr>
+		 <td class="tdindents">SAMtools: Minimum mapping quality (-q):</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_SAMmapQ" name="vs_gl_samtools_min_mapping_qual" value="0"> (default: 0)</td>
+	       </tr><tr>
+		 <td class="tdindents">SAMtools: Minimum base quality (-Q):</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_SAMbaseQ" name="vs_gl_samtools_min_base_qual" value="13"> (default: 13)</td>
+	       </tr><tr>
+		 <td class="tdindents">SAMtools: base alignment quality (BAQ) calculation (-B):</td>
+		 <td><input type="radio" id="vs_gl_SAMbaqT" name="vs_gl_samtools_perform_BAQ" value="enabled" checked><label for="vs_gl_SAMbaqT">Enabled (default)</label> 
+		   <input type="radio" id="vs_gl_SAMbaqF" name="vs_gl_samtools_perform_BAQ" value="disabled"><label for="vs_gl_SAMbaqF">Disabled</label></td>
+	       </tr>
+	     </table>
+	   </div>
+	 </div>
+	 <br>
+
+
+
+	 
+	 
+       </div></div> <!-- vs_gl_div  -->
+
+       
+       
+       <div class="tdindent">
+	 <input type="radio" name="vs_call_mode" id="vs_isSOM" value="somatic"><label for="vs_isSOM" title="Under Select Genomes, samples must be arranged into pairs with each tumor sample followed by its corresponding normal sample.">Somatic pairs</label>
+       </div>
+       <div class="tdindent2"><div class="vspanel" id="vs_som_div">
+
+           <p class="tdindent"><i>SNVs and indels will be called simultaneously.</i></p><p>&nbsp;</p>
+	   <!-- options best left as hidden in the present version -->
+           <input type="radio" id="vs_som_output_vcf" name="vs_som_output_vcf" value="true" style="display:none;" checked>
+
+
+	   <table class="mytable tdindent2 spread">
+	     <tr>
+	       <td class="tdw5"> <i>p</i>-value threshold to call a heterozygote (--p-value):</td>
+	       <td><input type="text" class="tb1b" id="vs_som_heterozyg_pvalue" name="vs_som_heterozyg_p_value" value="0.99"><i>(default: 0.99)</i><br></td>
+	     </tr><tr>
+	       <td><i>p</i>-value threshold to call a somatic site (--somatic-p-value):</td>
+	       <td><input type="text" class="tb1b" id="vs_som_calling_pvalue" name="vs_som_calling_p_value" value="0.05"><i>(default: 0.05)</i></td>
+	     </tr>
+	   </table>
+	   <p><br></p>
+	   
+	   
+
+	     <p id="toggle1b1" class="tdindent2"><img id="image1b1" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS (SNV/indel DISCOVERY)</i></p>
+
+	     <div class="tdindent2"><div id="panel1b1" style="display:none;">
+		 <table class="tdindentd">
+		   <tr>
+		     <td class="tdw4">Minimum coverages to make call:</td>
+		     <td>Tumor:&nbsp;<input type="text" class="tb1b" id="vs_som_min_tumor_cvg" name="vs_som_min_tumor_coverage" value="6"> (default: 6); &nbsp;&nbsp;Normal:&nbsp;<input type="text" class="tb1b" id="vs_som_min_normal_cvg" name="vs_som_min_normal_coverage" value="8"> (default: 8)</td>
+		   </tr><tr>
+		     <td>Minimum variant allele frequency to call heterozygote:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_heterozyg_freq" name="vs_som_heterozyg_min_var_allele_freq" value="0.20"> (default: 0.20)</td>
+		   </tr><tr>
+		     <td>Minimum variant allele frequency to call homozygote:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_homozyg_freq"  name="vs_som_homozyg_min_var_allele_freq" value="0.75"> (default: 0.75)</td>
+		   </tr><tr>
+		     <td>Estimated purity of normal sample:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_norm_pur" name="vs_som_normal_purity" value="1.00"> (default: 1.00)</td>
+		   </tr><tr>
+		     <td>Estimated purity or tumor sample:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_tumor_pur" name="vs_som_tumor_purity" value="1.00"> (default: 1.00)</td>
+		   </tr><tr>
+		     <td>Apply strand filter (to ignore variants with &gt;90% support on one strand) ?</td>
+		     <td><input type="radio" id="vs_som_sfT" name="vs_som_apply_strand_filter" value="true" checked>True (default)
+		       <input type="radio" id="vs_som_sfF" name="vs_som_apply_strand_filter" value="false">False</td>
+		   </tr><tr>
+		     <td>Minimum average base quality at call site:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_minABQ" name="vs_som_min_avg_base_qual" value="15"> (default: 15)</td>
+		   </tr><tr>
+		     <td>Perform validation mode (reports all sites meeting coverage requirement)?</td>
+		     <td><input type="radio" id="vs_som_validT" name="vs_som_report_validation" value="true">True
+		       <input type="radio" id="vs_som_validF" name="vs_som_report_validation" value="false" checked>False (default)</td>
+		   </tr><tr>
+		     <td>&nbsp;</td> <td></td>
+		   </tr><tr>
+		     <td><u>SAMtools parameters</u>:</td><td></td>
+		   </tr><tr>
+		     <td class="tdindent">Minimum mapping quality (-q):</td>
+		     <td><input type="text" class="tb1b" id="vs_som_SAMmapQ" name="vs_som_samtools_min_mapping_qual" value="0"> (default: 0)</td>
+		   </tr><tr>
+		     <td class="tdindent">Minimum base quality (-Q):</td>
+		     <td><input type="text" class="tb1b" id="vs_som_SAMbaseQ" name="vs_som_samtools_min_base_qual" value="13"> (default: 13)</td>
+		   </tr><tr>
+		     <td class="tdindent">Base alignment quality (BAQ) calculation (-B):</td>
+		     <td><input type="radio" id="vs_som_SAMbaqT" name="vs_som_samtools_perform_BAQ" value="enabled" checked>Enabled (default)
+		       <input type="radio" id="vs_som_SAMbaqF" name="vs_som_samtools_perform_BAQ" value="disabled">Disabled</td>
+		   </tr>
+		 </table>
+	       </div></div>
+	     <br>
+	     
+       
+
+
+
+
+
+
+       </div></div>  <!-- vs_som_div -->
+       
+
+       
+       <div class="tdindent">
+	 <input type="radio" name="vs_call_mode" id="vs_isTRIO" value="trio"><label for="vs_isTRIO" title="Under Select Genomes, samples must be arranged into father - mother - child triples."><i>de novo</i> mutations (Trios)</label>
+       </div>
+       <div class="tdindent2"><div class="vspanel" id="vs_trio_div">
+	   <table class="rindent" >
+	     <tr>
+	       <td class="twd5">Minimum coverage for each trio sample:</td>
+	       <td><input type="text" class="tb1b" id="vs_trio_mincvg"   name="vs_trio_min_coverages"   value="20"> (default: 20)</td>
+	     </tr><tr>
+	       <td>Minimum variant allele frequency in child:</td>
+	       <td><input type="text" class="tb1b" id="vs_trio_child_vaf"   name="vs_trio_child_var_allele_freq"   value="0.20"> (default: 0.20)</td>
+	     </tr><tr>
+	       <td><i>p</i>-value threshold to call variant:</td>
+	       <td><input type="text" class="tb1b" id="vs_trio_pvalue"   name="vs_trio_p_value"   value="0.05"> (default: 0.05)</td>
+	     </tr><tr>
+	       <td>Adjusted variant allele frequency in child:</td>
+	       <td><input type="text" class="tb1b" id="vs_trio_adj_child_vaf"   name="vs_trio_adj_child_var_allele_freq"   value="0.05"> (default: 0.05)</td>
+	     </tr><tr>
+	       <td>Adjusted <i>p</i>-value threshold to call variant:</td>
+	       <td><input type="text" class="tb1b" id="vs_trio_adj_pvalue"   name="vs_trio_adj_p_value"   value="0.10"> (default: 0.10)</td>
+	     </tr>
+	   </table>
+	   <p><br></p>
+       
+
+	   <p id="toggle1c1" class="tdindent"><img id="image1c1" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS (TRIO DISCOVERY)</i></p>
+
+	   <div class="tdindent"><div id="panel1c1" style="display:none;">
+	       <table class="tdindentd">
+		 <tr>
+		   <td class="tdindents">Minimum number of supporting reads:</td>
+		   <td><input type="text" class="tb1b" id="vs_trio_minsupptreads" name="vs_trio_min_num_supporting_reads" value="2"> (default: 2)</td>
+		 </tr><tr>
+		   <td class="tdindents">Minimum average base quality for variant-supporting reads:</td>
+		   <td><input type="text" class="tb1b" id="vs_trio_minABQ" name="vs_trio_min_avg_base_qual" value="15"> (default: 15)</td>
+		 </tr><tr>
+		   <td class="tdindents">Minimum variant allele frequency to call homozygote:</td>
+		   <td><input type="text" class="tb1b" id="vs_trio_homozyg_freq" name="vs_trio_homozyg_min_var_allele_freq" value="0.75"> (default: 0.75)</td>
+		 </tr><tr>
+		     <td class="tdindents">Apply strand filter (to ignore variants with &gt;90% support on one strand) ?</td>
+		     <td><input type="radio" id="vs_trio_sfT" name="vs_trio_apply_strand_filter" value="true" checked>True (default)&nbsp;
+  		         <input type="radio" id="vs_trio_sfF" name="vs_trio_apply_strand_filter" value="false">False</td>
+		 </tr><tr>
+		   <td>&nbsp;</td>
+		 </tr><tr>
+		   <td class="tdindents"><u>SAMtools parameters</u>:</td><td></td>
+		 </tr><tr>
+		   <td class="tdindent">Minimum mapping quality (-q):</td>
+		   <td><input type="text" class="tb1b" id="vs_trio_SAMmapQ" name="vs_trio_samtools_min_mapping_qual" value="0"> (default: 0)</td>
+		 </tr><tr>
+		   <td class="tdindent">Minimum base quality (-Q):</td>
+		   <td><input type="text" class="tb1b" id="vs_trio_SAMbaseQ" name="vs_trio_samtools_min_base_qual" value="13"> (default: 13)</td>
+		 </tr><tr>
+		   <td class="tdindent">Base alignment quality (BAQ) calculation (-B):</td>
+		   <td><input type="radio" id="vs_trio_SAMbaqT" name="vs_trio_samtools_perform_BAQ" value="enabled" checked>Enabled (default)
+		     <input type="radio" id="vs_trio_SAMbaqF" name="vs_trio_samtools_perform_BAQ" value="disabled">Disabled</td>
+		 </tr>
+	       </table>
+	     </div>
+	   </div>
+	   <p><br></p>
+	   
+
+       </div></div> <!-- vs_trio_div -->
+       <p><br></p>
+       
+       
+       
+       <p><br></p>
+       <div class="subhead tdindents"><b>STEP 2: Select genomic regions</b></div>
+
+       <table class="tdindents">
+	 <tr><td class="tdw3">Select one:</td>   
+
+	   <td><input type="radio" id="vs_chrdef0" name="vs_chrdef" value="standard" checked><label for="vs_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
+	       <input type="radio" id="vs_chrdef1" name="vs_chrdef" value="standard_plus_contigs"><label for="vs_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
+               <input type="radio" id="vs_chrdef2" name="vs_chrdef" value="user"><label for="vs_chrdef2">User-defined:</label>&nbsp;
+  	       <textarea id="vs_chrdef_str"  name="vs_chrdef_str" value=""></textarea>
+  	       <img src="image/Help.png" class="inline" title="Enter a list of regions (in BED or interval format), delimited by commmas or line return. (Example: 1-4, X, 6:1000, 5:1000-2000, 22)"> <button onclick="clear_chr(1);" type="button">Clear list</button></td>
+	   </tr>
+       </table>
+
+
+
+
+       <p><br></p>
+       <div class="subhead tdindents">
+	 <b>STEP 3: Select filtering (optional)</b>
+       </div>
+       <p class="tdindents">The selected steps will be applied in the order listed.</pr><br><br>
+       
+       
+       <div class="tdindentd">       
+	 <p class="tdindent">1.<input type="checkbox" id="vs_do_hcfilter" name="vs_apply_high_confidence_filter"><label for="vs_do_hcfilter">Apply VarScan call confidence filtering</label></p>
+
+	   <!-- div for none -->
+	   <div class="tdindent1"><div id="filter_vs_none" class="vspanel" style="display:none;">
+	       <table class="tdindentd tabsp1">
+		 <tr><td><p style="color:red">To display this panel, please select a calling mode in Step 1 above.</p></td></tr>
+	       </table>
+	   </div></div>
+
+	   <!-- div for gl -->
+	 <div class="tdindent1"><div id="filter_vs_gl" class="vspanel" style="display:none;">
+	     <table class="tdindentd tabsp1">
+	       <tr><th class="myheader">High-confidence filtering</th><th>SNVs</th><th>Indels</th>
+	       </tr><tr>
+		 <td class="tdw5 tdindents">Minimum coverage:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_gl_mincvg_snv_f"   name="vs_gl_filter_snv_min_coverage"   value="10"> (default: 10)</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_mincvg_indel_f" name="vs_gl_filter_indel_min_coverage" value="10"> (default: 10)</td>
+	       </tr><tr>
+		 
+		 <td class="tdindents">Minimum variant allele frequency threshold:</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_minvarfreq_snv_f" name="vs_gl_filter_snv_min_var_allele_freq" value="0.2"> (default: 0.2)</td>
+		 <td><input type="text" class="tb1b" id="vs_gl_minvarfreq_indel_f" name="vs_gl_filter_indel_min_var_allele_freq" value="0.2"> (default: 0.2)</td>
+	       <tr></tr>
+	       <td class="tdindents">Minimum number of supporting reads:</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_minsupptreads_snv_f" name="vs_gl_filter_snv_min_num_supporting_reads" value="2"> (default: 2)</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_minsupptreads_indel_f" name="vs_gl_filter_indel_min_num_supporting_reads" value="2"> (default: 2)</td>
+	       
+	       <tr></tr>
+	       <td class="tdindents">Minimum number of supporting strands (1 or 2):</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_numstrand_snv_f" name="vs_gl_filter_snv_min_num_strands" value="1"> (default: 1)</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_numstrand_indel_f" name="vs_gl_filter_indel_min_num_strands" value="1"> (default: 1)</td>
+	       <tr></tr>
+	       <td class="tdindents">Minimum average base quality for variant-supporting reads:</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_minABQ_snv_f" name="vs_gl_filter_snv_min_avg_base_qual" value="15"> (default: 15)</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_minABQ_indel_f" name="vs_gl_filter_indel_min_avg_base_qual" value="15"> (default: 15)</td>
+	       <tr></tr>
+	       <td class="tdindents"><i>p</i>-value threshold to call variant:</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_pvalue_snv_f"   name="vs_gl_filter_snv_p_value"   value="0.1"> (default: 0.1)</td>
+	       <td><input type="text" class="tb1b" id="vs_gl_pvalue_indel_f" name="vs_gl_filter_indel_p_value" value="0.1"> (default: 0.1)</td>
+	       </tr>
+	     </table>
+	 </div></div>
+
+
+	 <!-- div for som -->
+	     <div class="tdindent1"><div id="filter_vs_som" class="vspanel" style="display:none;">
+		 <table class="tdindentd tabsp1">
+		   <tr> <th class="myheader">High-confidence filtering</th><th>SNVs</th><th>Indels</th>
+		   </tr><tr> <td class="tdw5 tdindent">Minimum variant allele frequency in the tumor:</td>
+ 		     <td><input type="text" class="tb1b" id="vs_som_snv_min_tumor_freq_f" name="vs_som_filter_snv_min_tumor_var_allele_freq" value="0.10"> (default: 0.10)</td>
+ 		     <td><input type="text" class="tb1b" id="vs_som_indel_min_tumor_freq_f" name="vs_som_filter_indel_min_tumor_var_allele_freq" value="0.10"> (default: 0.10)</td>
+		   </tr><tr> <td class="tdindent">Maximum variant allele frequency in the normal:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_snv_max_norm_freq_f" name="vs_som_filter_snv_max_normal_var_allele_freq" value="0.05"> (default: 0.05)</td>
+		     <td><input type="text" class="tb1b" id="vs_som_indel_max_norm_freq_f" name="vs_som_filter_indel_max_normal_var_allele_freq" value="0.05"> (default: 0.05)</td>
+		   </tr><tr> <td class="tdindent">High-confidence <i>p</i>-value:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_snv_pvalue_f" name="vs_som_filter_snv_p_value"     value="0.07"> (default: 0.07)</td>
+		     <td><input type="text" class="tb1b" id="vs_som_indel_pvalue_f" name="vs_som_filter_indel_p_value"     value="0.07"> (default: 0.07)</td>
+		   </tr>
+		   </table>
+
+
+		 <p class="tdindents myheader2"></p><br>
+		 <table class="tdindents">
+		   <tr> <th class="myheader">Somatic filtering</th><th></th>
+		   <tr></tr> <td class="tdw5 tdindent">Minimum coverage:</td>
+ 		   <td><input type="text" class="tb1b" id="vs_som_min_cvg_f" name="vs_som_filter_min_coverage" value="8"> (default: 8)</td>
+		   </tr><tr> <td class="tdindent">Minimum number of supporting reads:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_numreads_f" name="vs_som_filter_min_num_supporting_reads" value="4"> (default: 4)</td>
+		   </tr><tr> <td class="tdindent">Minimum number of supporting strands for variant (1 or 2):</td>
+		     <td><input type="text" class="tb1b" id="vs_som_numstrands_f" name="vs_som_filter_min_num_strands" value="1"> (default: 1)</td>
+		   </tr><tr> <td class="tdindent">Minimum average base quality at call site:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_minABQ_f" name="vs_som_filter_min_avg_base_qual" value="20"> (default: 20)</td>
+		   </tr><tr> <td class="tdindent">Minimum variant allele frequency:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_vaf_f" name="vs_som_filter_min_var_allele_freq" value="0.20"> (default: 0.20)</td>
+		   </tr><tr> <td class="tdindent"><i>p</i>-value threshold to call variants:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_pvalue_f" name="vs_som_filter_p_value" value="0.05"> (default: 0.05)</td>
+
+
+		   </tr><tr> <td class="tdindent"><i>Window size:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_window_size_f" name="vs_som_filter_window_size" value="10"> (default: 10)</td>
+		   </tr><tr> <td class="tdindent"><i>Window size SNVs:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_snv_window_size_f" name="vs_som_filter_snv_window_size" value="3"> (default: 3)</td>
+		   </tr><tr> <td class="tdindent"><i>indel margin:</td>
+		     <td><input type="text" class="tb1b" id="vs_som_indel_margin_f" name="vs_som_filter_indel_margin" value="3"> (default: 3)</td>
+		   </tr>
+		 </table>
+	       </div></div>
+
+
+	 <!-- div for trio -->
+	 <div class="tdindent1"><div id="filter_vs_trio" class="vspanel" style="display:none;">
+	     <p class="tdindent myheader2">High-confidence filtering</p>
+	     <table class="tdindentd">
+
+	       <tr> <td class="tdindent">Maximum number of variant reads in parents combined:</td>
+		 <td><input type="text" class="tb1b" id="vs_trio_parents_maxsupptreads" name="vs_trio_filter_parents_max_num_supporting_reads" value="0"> (default: 0)</td>
+	       </tr>
+	     </table>
+	 </div></div>
+	 <p><br></p>
+
+	 
+
+	 <!-- div for dbSNP -->
+	 <p  class="tdindent">2.<input type="checkbox" id="vs_do_dbsnp" name="vs_apply_dbsnp_filter"><label for="vs_do_dbsnp">Apply dbSNP filter</label></p>
+	 <div class="tdindent1"><div id="vs_filter_dbsnp" class="vspanel" style="display:none;">
+	     <p><br></p>
+	     <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	     <p><br></p>
+	 </div> </div>
+	 <p><br></p>
+
+
+	 <!-- div for fpfilter -->
+
+	 <p  class="tdindent">3.<input type="checkbox" id="vs_do_fpfilter" name="vs_apply_false_positives_filter"><label for="vs_do_fpfilter">Apply false-positives filter (currently SNV-only)</label></p>
+
+	 <div class="tdindent1"><div id="vs_filter_fps" class="vspanel" style="display:none;">
+	     <p><br></p>
+	     <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	     <p><br></p>
+	 </div> </div>
+
+	 
+
+	 
+       </div>
+
+
+
+
+
+     </div>
+<!-- Strelka -->
+
+     <div id="tabs-5" class="ui-tabs-panel"> 
+
+       <input type="checkbox" id="strlk_cmd" name="strlk_cmd"><label for="strlk_cmd">Run Strelka</label>
+       <select id="version_strlk" name="strlk_version">
+	 <option class="menu1" value="strlk1014">version 1.0.14</option>
+       </select>
+       for somatic variant calling
+       <br><br><br>
+
+       <div class="subhead tdindents"><b>STEP 1: Configure discovery</b></div>
+
+       <table class="tdindents">
+	 <tr> <th class="myheader">Read depth settings</th><th></th><th></th>
+	 </tr><tr> 
+	   <td class="">Skip depth filters?</td>
+ 	   <td> <input type="radio" id="strlk_depthf_y" name="strlk_skip_depth_filters" value="true"><label for="strlk_depthf_y">True</label>&nbsp;&nbsp;
+	     <input type="radio" id="strlk_depthf_n" name="strlk_skip_depth_filters" value="false" checked><label for="strlk_depthf_n">False (default)</label></td>
+	   <td><img src="image/Help.png" class="inline" title="Should be set to True for whole exome or targeted sequencing data"></td>
+	 </tr><tr> 
+	   <td class="tdindent2">If false, filter out variants whose depth is this multiple of the chromosome mean depth:</td>
+	   <td><input type="text" class="tb1b" id="strlk_depthFilterMultiple" name="strlk_depth_filter_multiple" value="3.0"> (default: 3.0)</td>
+	   <td><img src="image/Help.png" class="inline" title="Filters out variants having a depth greater than this many times the chromosome mean depth"> </td>
+	 </tr><tr> 
+	  <td> &nbsp;</td>
+	 </tr><tr> 
+	   <td class="">Ignore regions with depths greater than (use 0 to disable):</td>
+	   <td><input type="text" class="tb1b" id="strlk_maxInputDepth" name="strlk_max_input_depth" value="10000"> (default: 10000)</td>
+	 </tr>
+       </table>
+       <br><br>
+
+
+	 <p id="toggle1as" class="tdindent"><img id="image1as" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+
+	 <div class="tdindent"> <div id="panel1as" style="display:none;">
+	     <table class="tdindentd">
+	       <tr><th class="myheader">Filtering</th><th></th>
+	       </tr><tr>
+		 <td class="tdindents">SNV maximum filtered basecall fraction:</td>
+		 <td><input type="text" class="tb1b" id="strlk_snvMaxFilteredBasecallFrac" name="strlk_snv_max_filtered_basecall_frac" value="0.4"> (default: 0.4)</td>
+	       </tr><tr>
+		 <td class="tdindents">SNV maximum spanning deletion fraction:</td>
+		 <td><input type="text" class="tb1b" id="strlk_snvMaxSpanningDeletionFrac" name="strlk_snv_max_spanning_deletion_frac" value="0.75"> (default: 0.75)</td>
+	       </tr><tr>
+		 <td class="tdindents">Indel maximum reference repeat:</td>
+		 <td><input type="text" class="tb1b" id="strlk_indelMaxRefRepeat" name="strlk_indel_max_ref_repeat" value="8"> (default: 8)</td>
+	       </tr><tr>
+		 <td class="tdindents">Indel maximum window filtered basecall fraction:</td>
+		 <td><input type="text" class="tb1b" id="strlk_indelMaxWindowFilteredBasecallFrac" name="strlk_indel_max_window_filtered_basecall_frac" value="0.3"> (default: 0.3)</td>
+               </tr><tr>
+                 <td class="tdindents">Indel maximum &quot;interrupted homopolymer&quot; length:</td>
+                 <td><input type="text" class="tb1b" id="strlk_indelMaxIntHpolLength" name="strlk_indel_max_interrupted_homopolymer_length" value="14"> (default: 14)</td>
+               </tr>
+             </table>
+	     <br>
+	     
+	     <table class="tdindentd">
+	       <tr><th class="myheader">Probabilities</th><th></th>
+	       </tr><tr>
+		 <td class="tdindents">Prior probability of somatic SNV:</td>
+		 <td><input type="text" class="tb1b" id="strlk_ssnvPrior" name="strlk_somatic_snv_prior_prob" value="0.000001"> (default: 0.000001)</td>
+	       </tr><tr>
+		 <td class="tdindents">Prior probability of somatic indel:</td>
+		 <td><input type="text" class="tb1b" id="strlk_sindelPrior" name="strlk_somatic_indel_prior_prob" value="0.000001"> (default: 0.000001)</td>
+	       </tr><tr>
+		 <td class="tdindents">Probability of a SNV noise allele:</td>
+		 <td><input type="text" class="tb1b" id="strlk_ssnvNoise" name="strlk_snv_noise_prob" value="0.0000005"> (default: 0.0000005)</td>
+	       </tr><tr>
+		 <td class="tdindents">Probability of a indel noise allele:</td>
+		 <td><input type="text" class="tb1b" id="strlk_sindelNoise" name="strlk_indel_noise_prob" value="0.000001"> (default: 0.000001)</td>
+	       </tr><tr>
+		 <td class="tdindents">Fraction of SNV noise due to strand bias:</td>
+		 <td><input type="text" class="tb1b" id="strlk_ssnvNoiseStrandBiasFrac" name="strlk_snv_noise_strand_bias_frac" value="0.5"> (default: 0.5)</td>
+	       </tr>
+	     </table>
+	     <br>
+
+	     <table class="tdindentd">
+	       <tr><th class="myheader">Quality Score filtering</th><th></th>
+	       </tr><tr>
+		 <td class="tdindents">Minimum mapping quality for read pairs (tier 1 calling)):</td>
+		 <td><input type="text" class="tb1b" id="strlk_minTier1Mapq" name="strlk_min_mapping_qual_tier1" value="20"> (default: 20)</td>
+	       </tr><tr>
+		 <td class="tdindents">Minimum mapping quality for read pairs (tier 2 calling):</td>
+		 <td><input type="text" class="tb1b" id="strlk_minTier2Mapq" name="strlk_min_mapping_qual_tier2" value="5"> (default: 5)</td>
+	       </tr><tr>
+		 <td class="tdindents">Somatic quality score below which somatic SNVs are marked as filtered:</td>
+		 <td><input type="text" class="tb1b" id="strlk_ssnvQuality_LowerBound" name="strlk_somatic_snv_quality_lower_bound" value="15"> (default: 15)</td>
+	       </tr><tr>
+		 <td class="tdindents">Somatic quality score below which somatic indels are marked as filtered:</td>
+		 <td><input type="text" class="tb1b" id="strlk_sindelQuality_LowerBound" name="strlk_somatic_indel_quality_lower_bound" value="30"> (default: 30)</td>
+	       </tr>
+	     </table>
+	     <br>
+
+	     <table class="tdindentd">
+	       <tr><th class="myheader">Realignment</th><th></th>
+	       </tr><tr>
+		 <td class="tdindents">Write out read alignment which were altered during the realignment step:</td>
+ 		 <td> <input type="radio" id="strlk_w_realign_y" name="strlk_write_realignments" value="true"><label for="strlk_w_realign_y">True</label>&nbsp;&nbsp;
+   		      <input type="radio" id="strlk_w_realign_n" name="strlk_write_realignments" value="false" checked><label for="strlk_w_realign_n">False (default)</label></td>
+	       </tr>
+	     </table>
+	     <br>
+
+	     <table class="tdindentd">
+	       <tr><th class="myheader">Other</th><th></th>
+	       </tr><tr>
+		 <td class="tdindents">Maximum size of segments:</td>
+		 <td><input type="text" class="tb1b" id="strlk_binSize" name="strlk_max_segment_size" value="25000000"> (default: 25000000)</td>
+	       </tr><tr>
+		 <td class="tdindents">Additional command line arguments:</td>
+		 <td><input type="text" class="tb2" id="strlk_extraArguments" name="strlk_extra_arguments" value=""></td>
+	       </tr>
+	     </table>
+	     
+	   </div>
+	 </div>
+	 <p><br></p>
+
+
+	 <div class="subhead tdindents"><b>STEP 2: Select genomics regions</b></div>
+	 <br>
+	 <div>
+	   <p class="tdindent">No options are provided by Strelka.</p>
+	 </div>
+       <p><br></p>
+
+
+       <div class="subhead tdindents"><b>STEP 3: Select filtering (optional)</b></div>
+	 <br>
+
+
+	 <p  class="tdindent">1.<input type="checkbox" id="strlk_do_dbsnp" name="strlk_apply_dbsnp_filter"><label for="strlk_do_dbsnp">Apply dbSNP filter</label></p>
+	 <div class="tdindent1"><div id="strlk_filter_dbsnp" class="vspanel" style="display:none;">
+	     <p><br></p>
+	     <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	     <p><br></p>
+	 </div> </div>
+       <p><br></p>
+	 <p  class="tdindent">2.<input type="checkbox" id="strlk_do_fpfilter" name="strlk_apply_false_positives_filter"><label for="strlk_do_fpfilter">Apply false-positives filter (currently SNV-only)</label></p>
+	 <div class="tdindent1"><div id="strlk_filter_fps" class="vspanel" style="display:none;">
+	     <p><br></p>
+	     <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	     <p><br></p>
+	 </div> </div>
+       <p><br></p>
+
+
+
+
+
+
+     </div>
+<!-- BreakDancer -->
+     <div id="tabs-6" class="ui-tabs-panel"> 
+       
+       <input type="checkbox" id="bd_cmd" name="bd_cmd"><label for="bd_cmd">Run BreakDancer</label>
+	 <select name="bd_version" id="version_bder_id">
+	   <option class="menu1" value="bder145">version 1.4.5</option>
+	 </select>
+	 <br><br><br>
+	 
+	 
+	 <div class="subhead tdindents"> <b>STEP 1: Select calling mode</b><br></div>
+	 <div>
+	   <input type="radio" name="bd_call_mode" id="bd_call_mode_none" value="none" hidden="true" checked/>
+	 </div>
+	 <table class="mytable tdindents spread">
+	   <tr><td class="tdw4">Run mode:</td>
+	     <td>
+	       <input type="radio" id="bd_call_modeC" name="bd_call_mode" value="germline"><label for="bd_call_modeC" title="Selected samples will be analyzed separately">Germline (single samples)</label><br>
+	       <input type="radio" id="bd_call_modeA" name="bd_call_mode" value="pooled"><label for="bd_call_modeA" title="Selected samples will be analyzed jointly">Germline (pooled samples)</label><br>
+	       <input type="radio" id="bd_call_modeP" name="bd_call_mode" value="somatic"><label for="bd_call_modeP" title="Requires an even number of samples selected">Somatic (tumor-normal pairs)</label><br>
+	       <input type="radio" id="bd_call_modeT" name="bd_call_mode" value="trio"><label for="bd_call_modeT" title="Requires three samples selected"><i>de novo</i> mutations (family trio)</label><br>
+	     </td>
+	   </tr>
+	 </table>
+
+
+	 
+	 <div class="subhead tdindents"><b>STEP 2: Choose library configuration</b><br></div>
+	 <table class="mytable tdindents spread">
+	   <tr>
+             <td class="tdw4">Output mapping flag distribution (-g)?</td>
+	     <td><input type="radio" id="bd_bamcfg_output_mapping_flag_distnT" name="bd_bamcfg_output_mapping_flag_distn" value="true"><label for="bd_bamcfg_output_mapping_flag_distnT">True</label>
+  	       <input type="radio" id="bd_bamcfg_output_mapping_flag_distnF" name="bd_bamcfg_output_mapping_flag_distn" value="false" checked><label for="bd_bamcfg_output_mapping_flag_distnF">False (default)</label></td>
+	   </tr><tr>
+	     <td>Plot insert size histogram for each BAM (-h)?</td>
+	     <td><input type="radio" id="bd_bamcfg_create_insert_size_histoT" name="bd_bamcfg_create_insert_size_histo" value="true"><label for="bd_bamcfg_create_insert_size_histoT">True</label>
+	       <input type="radio" id="bd_bamcfg_create_insert_size_histoF" name="bd_bamcfg_create_insert_size_histo" value="false" checked><label for="bd_bamcfg_create_insert_size_histoF">False (default)</label></td>
+	   </tr>
+	 </table>
+       <p><br></p>
+	 
+       <p id="toggle2a" class="tdindent"><img id="image2a" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+	 <div class="tdindent">
+	   <div id="panel2a"  style="display:none;">
+	     <table class="rindent">
+	       <tr>
+		 <td class="tdw4">Minimum mapping quality (-q):</td>
+		 <td><input type="text" class="tb1b" id="bd_bamcfg_min_mapqual"  name="bd_bamcfg_min_mapping_qual" value="35"> (default: 35)</td>
+	       </tr><tr>
+		 <td>Use mapping quality instead of alternative mapping quality (-m)?</td>
+		 <td><input type="radio" id="bd_bamcfg_use_mapqualT" name="bd_bamcfg_use_mapping_qual" value="true"><label for="bd_bamcfg_use_mapqualT">True</label>
+		     <input type="radio" id="bd_bamcfg_use_mapqualF" name="bd_bamcfg_use_mapping_qual" value="false" checked><label for="bd_bamcfg_use_mapqualF">False (default)</label></td>
+	       </tr><tr>
+		 <td>Minimal mean insert size (-s):</td>
+		 <td><input type="text" class="tb1b" id="bd_bamcfg_insert_size"  name="bd_bamcfg_insert_size" value="50"> (default: 50)</td>
+	       </tr><tr>
+		 <td>Sequencing platform used: </td>
+		 <td><input type="radio" id="bd_bamcfg_system_typeI" name="bd_bamcfg_system_type" value="illumina" checked><label for="bd_bamcfg_system_typeI">Illumina (default)</label>
+		     <input type="radio" id="bd_bamcfg_system_typeS" name="bd_bamcfg_system_type" value="solid" ><label for="bd_bamcfg_system_typeS">SOLiD</label></td>
+	       </tr><tr>
+		 <td>Cutoff (in number of stdevs) (-c):</td>
+		 <td><input type="text" class="tb1b" id="bd_bamcfg_stdev_cutoff" name="bd_bamcfg_stdev_cutoff" value="4"> (default: 4)</td>
+	       </tr><tr>
+		 <td>Cutoff on coefficients of variation (-v):</td>
+		 <td><input type="text" class="tb1b" id="bd_bamcfg_coeffvariation_cutoff" name="bd_bamcfg_coeffs_variation_cutoff" value="1"> (default: 1)</td>
+	       </tr><tr>
+		 <td>Number of observations needed to estimate mean and stdev of insert size (-n):</td>
+		 <td><input type="text" class="tb1b" id="bd_bamcfg_num_observations"  name="bd_bamcfg_num_observations_for_stats" value="10000"> (default: 10000)</td>
+	       </tr><tr>
+		 <td>Number of histogram bins (-b):</td>
+		 <td><input type="text" class="tb1b" id="bd_bamcfg_numbins" name="bd_bamcfg_num_bins" value="50"> (default: 50)</td>
+	       </tr>
+	     </table>
+	   </div>
+	 </div>
+	 <br>
+	 <br>
+	 
+	 <div class="subhead tdindents"><b>STEP 3: Specify translocation type(s)</b><br></div>
+	 <div>
+	   <input type="radio" name="bd_translocation_calltype" id="bd_trans_type0" value="none" hidden="true" checked>
+	 </div>
+	 
+	 <table class="tdindents spread">
+	   <tr>
+	     <td class="tdw4">Chromosomal rearrangement type:</td>
+	     <td><input type="radio" id="bd_trans_typeB" name="bd_translocation_calltype" value="both"><label for="bd_trans_typeB">Both inter (CTX) and intra (ITX) (default)</label><br>
+	       <input type="radio" id="bd_trans_typeC" name="bd_translocation_calltype" value="ctx"><label for="bd_trans_typeC">Inter (CTX) only</label><br>
+	       <input type="radio" id="bd_trans_typeI" name="bd_translocation_calltype" value="itx"><label for="bd_trans_typeI">Intra (ITX) only</label><br></td>
+	   </tr><tr>
+
+	     <td>Prefix of fastq files for which SV supporting reads will be saved (-d):</td>
+	     <td><input type="text" class="tb1"  id="bd_fastq_outfile_prefix_of_suppt_reads" name="bd_fastq_outfile_prefix_of_supporting_reads" value=""> (default: none)</td>
+	   </tr>
+	 </table>
+       <p><br></p>
+       
+       
+       
+	 
+       <p id="toggle2b" class="tdindent"><img id="image2b" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+	 <div class="tdindent"><div id="panel2b"  style="display:none;">
+	     <table class="rindent">
+	       <tr>
+		 <td class="tdw4">Dump SVs and supporting reads in BED format for GBrowse (-g):</td>
+		 <td><input type="radio" id="bd_dumpSVsF" name="bd_dump_SVs_and_supporting_reads" value="false" checked><label for="bd_dumpSVsF">False (default)</label> 
+		     <!-- <input type="radio" id="bd_dumpSVsT" name="bd_dump_SVs_and_suppt_reads" value="true"><label for="bd_dumpSVsT">True (string:</label> <input type="text" id="tb1b"  name="bd_dump_SVs_GBrowse_string" value="">) --> </td>
+	       </tr><tr>
+		 <td>Minimum length of region (-s):</td>
+		 <td><input type="text" class="tb1b" id="bd_min_region_length" name="bd_min_region_length" value="7"> (default: 7)</td>
+	       </tr><tr>
+		 <td>Cutoff (in number of standard deviations) (-c):</td>
+		 <td><input type="text" class="tb1b" id="bd_stdev_cutoff" name="bd_num_stdevs_for_cutoff" value="3"> (default: 3)</td>
+	       </tr><tr>
+		 <td>Maximum SV size (-m):</td>
+		 <td><input type="text" class="tb1b" id="bd_maxSVsize" name="bd_max_sv_size" value="1000000000"> (default: 1e+9)</td>
+	       </tr><tr>
+		 <td>Minimum alternate mapping quality (-q):</td>
+		 <td><input type="text" class="tb1b" id="bd_min_alt_mapqual"  name="bd_min_alt_mapping_qual" value="35"> (default: 35)</td>
+	       </tr><tr>
+		 <td>Minimum number of required read pairs for SV (-r):</td>
+		 <td><input type="text" class="tb1b" id="bd_min_read_pairs"  name="bd_min_num_read_pairs" value="2"> (default: 2)</td>
+	       </tr><tr>
+		 <td>Coverage threshold above which haploid sequence coverage for regions is to be ignored (-x):</td>
+		 <td><input type="text" class="tb1b" id="bd_max_coverage"  name="bd_max_coverage_for_ignoring_region" value="1000"> (default: 1000)</td>
+	       </tr><tr>
+		 <td>Buffer size for building connection (-b):</td>
+		 <td><input type="text" class="tb1b" id="bd_buffer_size"  name="bd_connection_buffer_size" value="100"> (default: 100)</td>
+	       </tr><tr>
+
+		 <td>Analyze Illumina long insert (mate-pair) library (-l)?</td>
+		 <td>
+		   <!--	   <input type="radio" id="bd_long_insertT" name="bd_analyze_long_insert" value="true"><label for="bd_long_insertT">True</label> -->
+		   <input type="radio" id="bd_long_insertF" name="bd_analyze_long_insert" value="false" checked><label for="bd_long_insertF">False (default)</label> </td> 
+	       </tr><tr> 
+		 <td>Print CN and supporting reads per library or per bam? (-a)? </td>
+		 <td> <!-- <input type="radio" id="bd_count_support_modeT" name="bd_count_support_mode" value="library"><label for="bd_count_support_modeT">library</label> -->
+		     <input type="radio" id="bd_count_support_modeF" name="bd_count_support_mode" value="bam" checked><label for="bd_count_support_modeF">bam (default)</label></td>
+	       </tr><tr>
+		 <td>Print allele frequency column (-h)? </td>
+		 <td> <!-- <input type="radio" id="bd_allele_colT" name="bd_print_allele_column" value="true"><label for="bd_allele_colT">True</label> -->
+		     <input type="radio" id="bd_allele_colF" name="bd_print_allele_freq_column" value="false" checked><label for="bd_allele_colF">False (default)</label></td>
+	       </tr><tr>
+		 <td>Minimum score for outputting SVs (-y):</td>
+		 <td><input type="text" class="tb1b" id="bd_min_score_to_output" name="bd_min_score_to_output" value="30"> (default: 30)</td>
+	       </tr></table>
+	 </div></div>
+       <p><br></p>
+	 
+
+
+
+       <div class="subhead tdindents"><b>STEP 4: Select genomics regions</b></div>
+       <p></p><br>
+       <!-- div for none -->
+       <div class="tdindents"><div id="bd_regions_none" class="vspanel">
+	   <p class="tdindents">
+	     <u><b>NOTE:</b></u> To display this panel, please select a rearrangement type in Step 3 above.
+	   </P>
+       </div></div>
+       <!-- div for disallowed -->
+       <div class="tdindents"><div id="bd_regions_disallowed" class="vspanel" style="display:none;">
+	   <p class="tdindents">
+	   <p>This item is non-configurable for inter-chromosomal translocations (CTX); the entire bam file will be used.</p>
+	   </P>
+       </div></div>
+       
+       <!-- div not for none -->
+       <div class="tdindents"><div id="bd_regions_allowed" class="vspanel" style="display:none;">
+	   <table class="tdindents spread">
+	     <tr>
+	       <td class="tdw4">Regions over which ITX / intra-chromosomal discovery is to be performed:</td>
+               <td><input type="radio" id="bder_chrdef0" name="bd_chrdef" value="standard" checked><label for="bder_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
+		   <input type="radio" id="bder_chrdef1" name="bd_chrdef" value="standard_plus_contigs"><label for="bder_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
+		 <input type="radio" id="bder_chrdef2" name="bd_chrdef" value="user"><label for="bder_chrdef2">User-defined:</label>&nbsp;
+		 <textarea name="bd_chrdef_str" id="bder_chrdef_str" value=""></textarea>
+               <img src="image/Help.png" class="inline" title="Enter a list of regions (in BED or interval format), delimited by commmas or line return. (Example: 1-4, X, 6:1000, 5:1000-2000, 22)"><button onclick="clear_chr(2);" type="button">Clear list</button></td>
+	   </tr></table>
+       </div></div>
+       <p><br></p>
+       
+       
+       <div class="subhead tdindents"><b>STEP 5: Select filtering (optional)</b></div>
+       <p class="tdindents"><input type="checkbox" id="bd_do_bam_filter" name="bd_apply_bam_filter"><label for="bd_do_bam_filter">Apply call filtering</label></p><br>
+       <div class="tdindent1">
+	 <p><i>For germline studies, no additional filtering is currently available. For somatic (trio) studies, raw calls are considered to have passed the filter if they have tumor-only (child-only) bam support.</i></p>
+       </div>
+       
+
+     </div>
+
+
+<!-- Pindel -->
+     <div id="tabs-7" class="ui-tabs-panel"> 
+       
+       <input type="checkbox" id="pindel_cmd" name="pin_cmd"><label for="pindel_cmd">Run Pindel</label>
+       <select name="pin_version">
+	 <option class="menu1" value="pindel025b5">version 0.2.5b5</option>
+	 <option class="menu1" value="pindel025a7">version 0.2.5a7</option>
+       </select>
+       <br><br><br>
+	 
+
+       <div class="subhead tdindents"><b>STEP 1: Select calling mode</b></div>
+       <div>
+	 <input type="radio" name="pin_call_mode" id="pindel_mode_none" value="none" hidden="true" checked/>
+       </div>
+       <table class="mytable tdindents spread"> 
+	 <tr><td class="tdw4">Run mode:</td>
+	   <td><input type="radio" id="pindel_modeC" name="pin_call_mode" value="germline"><label for="pindel_modeC" title="Selected samples will be analyzed separately">Germline (single samples)</label><br>
+             <input type="radio" id="pindel_modeA" name="pin_call_mode" value="pooled"><label for="pindel_modeA" title="Selected samples will be analyzed jointly">Germline (pooled samples)</label><br>
+	     <input type="radio" id="pindel_modeP" name="pin_call_mode" value="somatic"><label for="pindel_modeP" title="Requires an even number of samples selected">Somatic (tumor-normal pairs)</label><br>
+	     <input type="radio" id="pindel_modeT" name="pin_call_mode" value="trio"><label for="pindel_modeT" title="Requires a multiple of three samples"><i>de novo</i> mutations (family trio)</label></td>
+	 </tr>
+       </table>
+
+
+       <div class="subhead tdindents"> <b>STEP 2: Configure call types</b></div>
+       <table class="mytable tdindents spread"> 
+	 <tr>
+	   <td class="tdw4">Reporting options:<br>Deletions (D), short insertions (SI), and also the following:</td>
+	   <td><input type="checkbox" id="pin_do_inversions" name="pin_do_inversions" checked><label for="pin_do_inversions">Inversions (INV)</label><br>
+	     <input type="checkbox" id="pin_do_tandem_dups" name="pin_do_tandem_dups" checked><label for="pin_do_tandem_dups">Tandem duplications (TD)</label><br>
+	     <!-- disabled: pin_LI, Long insertions (LI) -->
+	     <!-- disabled: pin_BP, Breakpoints (BP) -->
+	 </tr><tr>
+	   <td>Include SV calls from BreakDancer (-b) (NOTE: chromosome selections must agree)?</td>
+	   <td><input type="radio" id="pin_incl_bdT" name="pin_include_breakdancer" value="true" onclick="warn_bd();"/><label for="pin_incl_bdT">Yes</label>
+	     <input type="radio" id="pin_incl_bdF" name="pin_include_breakdancer" value="false" checked/><label for="pin_incl_bdF">No (default)</label></td>
+	 </tr><tr>
+	   <td>Expected average insert size:</td>
+	   <td><input type="text" class="tb1b" id="pin_insert_size" name="pin_insert_size" value="500"></td>
+	 </tr><tr>
+	   <td>Maximum size of SVs (-x):</td>
+	   <td><select name="pin_sv_max_size_index" class="tb2menu">
+	       <option value="1"> 128 bp (ID #1)</option>
+	       <option value="2"> 512 bp (ID #2)</option>
+	       <option value="3"> 2,048 bp (ID #3)</option>
+	       <option value="4"> 8,092 bp (ID #4)</option>
+	       <option value="5" selected="selected"> 32,368 bp (default) (ID #5)</option>
+	       <option value="6"> 129,472 bp (ID #6)</option>
+	       <option value="7"> 517,888 bp (ID #7)</option>
+	       <option value="8"> 2,071,552 bp (ID #8)</option>
+	       <option value="9"> 8,286,208 bp (ID #9)</option>
+	   </select></td>
+	 </tr>
+       </table>
+       <p><br></p>
+	 
+
+       <p id="toggle3" class="tdindent"><img id="image3" src="image/plus.gif" alt="toggle advanced options"><i>ADVANCED OPTIONS</i></p>
+	 <div class="tdindent">
+	   <div id="panel3" style="display:none;">
+	     
+	     <table class="rindent">
+	       <tr>
+		 <td>Window size (for conserving memory) (-w):</td>
+		 <td><input type="text" class="tb1b" id="pin_window_size"  name="pin_window_size" value="10"> (in millions; default 10)</td>
+	       </tr><tr>
+		 <td>Additional mismatch (-a):</td>
+		 <td><input type="text" class="tb1b" id="pin_addtl_mismatch"  name="pin_additional_mismatch" value="1"> (default: 1)</td>
+	       </tr><tr>
+		 <td>Minimum number of perfectly matching bases around BP (-m):</td>
+		 <td><input type="text" class="tb1b" id="pin_num_basematch"  name="pin_min_num_matching_bases" value="3"> (default: 3)</td>
+	       </tr><tr>
+		 <td>Minimum inversion size to report (-v):</td>
+		 <td><input type="text" class="tb1b" id="pin_min_inv_size"  name="pin_min_inversion_size" value="50"> (default: 50)</td>
+	       </tr><tr>
+		 <td>Minimum number of bases mappable to reference (-d)</td>
+		 <td><input type="text" class="tb1b" id="pin_min_mappable_bases"  name="pin_min_num_mappable_bases" value="30"> (default: 30)</td>
+	       </tr><tr>
+		 <td>Balance cutoff value (-B):</td>
+		 <td><input type="text" class="tb1b" id="pin_balance_cutoff"  name="pin_balance_cutoff" value="100"> (default: 100)</td>
+	       </tr><tr>
+		 <td>Anchor quality (-A):</td>
+		 <td><input type="text" class="tb1b" id="pin_anchor_qual"  name="pin_anchor_qual" value="20"> (default: 20)</td>
+	       </tr><tr>
+		 <td>Minimum number of supporting reads per event (-M):</td>
+		 <td><input type="text" class="tb1b" id="pin_min_supptreads"  name="pin_min_num_supporting_reads" value="3"> (default: 3)</td>
+	 <!--      </tr><tr>
+		 <td>Include search for mobile element insertions (-q):</td>
+		 <td>  <input type="radio" id="pin_mobile_insT" name="pin_do_mobile_insertions"  value="true"><label for="pin_mobile_insT">True</label> 
+		   <input type="radio" id="pin_mobile_insF" name="pin_do_mobile_insertions" value="false" checked><label for="pin_mobile_insF">False (default)</label></td> -->
+	       </tr><tr>
+		 <td>Sequencing error rate (-e):</td>
+		 <td><input type="text" class="tb1b" id="pin_seq_err_rate"  name="pin_seq_err_rate" value="0.03"> (default: 0.03)</td>
+	       </tr><tr>
+		 <td>Maximum allowed mismatch rate (-u):</td>
+		 <td><input type="text" class="tb1b" id="pin_mismatch_rate"  name="pin_max_mismatch_rate" value="0.05"> (default: 0.05)</td>
+	       </tr><tr>
+		 <td>Number of threads (-T):</td>
+		 <td><input type="text" class="tb1b" id="pin_numthreads"  name="pin_num_threads" value="1"></td>
+	       </tr>
+<!-- 	       <tr>
+		 <td>Log file (-L):</td>
+		 <td><input type="text" class="tb1b" id="pin_logfile"  name="pin_logfile_prefix" value="" placeholder="pindel.log"> (default: pindel.log)</td> -->
+	       </tr>
+	     </table>
+	   </div>
+	 </div>
+       <p><br></p>
+
+
+       <div class="subhead tdindents">
+	 <b>STEP 3: Select genomic regions</b>
+       </div>
+       <table class="mytable tdindents spread"> 
+	 <tr>
+	   <td class="tdw4">Chromosome(s):</td>    
+           <td><input type="radio" id="pindel_chrdef0" name="pin_chrdef" value="standard" checked><label for="pindel_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
+             <input type="radio" id="pindel_chrdef1" name="pin_chrdef" value="standard_plus_contigs"><label for="pindel_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
+             <input type="radio" id="pindel_chrdef2" name="pin_chrdef" value="user"><label for="pindel_chrdef2">User-defined:</label>&nbsp;
+	     <textarea name="pin_chrdef_str" id="pindel_chrdef_str" value=""></textarea>
+               <img src="image/Help.png" class="inline" title="Enter a list of regions (in BED or interval format), delimited by commmas or line return. (Example: 1-4, X, 6:1000, 5:1000-2000, 22)"><button onclick="clear_chr(3);" type="button">Clear list</button></td>
+	 </tr>
+       </table>
+       
+
+
+       <div class="subhead tdindents">
+	 <b>STEP 4: Select filtering</b>
+       </div>
+       <p class="tdindents">&nbsp;</p>
+
+       <div class="tdindentd">       
+	 <p class="tdindent">1.<input type="checkbox" id="pin_do_filter" name="pin_apply_filter"><label for="pin_do_filter">(OPTIONAL) Apply call filtering</label></p>
+
+
+	 <!-- div for none -->
+	 <div class="tdindent1"><div id="filter_pin_none" class="vspanel" style="display:none;">
+	     <table class="tdindentd tabsp1">
+	       <tr><td><p style="color:red">To display this panel, please select a run mode in Step 1 above.</p></td></tr>
+	     </table>
+	 </div> </div>
+	 
+	 <!-- div for pooled -->
+	 <div class="tdindent1"><div id="filter_pin_pool" class="vspanel" style="display:none;">
+	     <table class="tdindentd tabsp1">
+	       <tr>
+		 <td>Maximum number of allowed homopolymer repeat units:</td>
+		 <td><input type="text" class="tb1b"  name="pin_pool_filter_max_num_homopolymer_repeat_units" id="pin_pool_homop_f" value="6"> (default: 6)</td>
+	       </tr> <tr><td><p style="color:red"><i>Additional filtering of general pooled samples is currently unsupported.</i></p></td>
+	       </tr>
+	     </table>
+	 </div> </div>
+	 
+	 
+	 <!-- div for gl -->
+	 <div class="tdindent1"><div id="filter_pin_gl" class="vspanel" style="display:none;">
+             <p class="tdindentd myheader2">Filtering parameters for germline</p>
+	     <table class="tdindents">
+	       <tr> <td class="tdw5">Minimum coverage:</td>
+		 <td><input type="text" class="tb1b" name="pin_gl_filter_min_coverages"  id="pin_gl_mincoverage_f" value="10"> (default: 10)</td>
+	       </tr><tr> 
+		 <td>Minimum variant allele frequency:</td>
+		 <td><input type="text" class="tb1b" name="pin_gl_filter_min_var_allele_freq" id="pin_gl_minvaf_f"  value="0.20"> (default: 0.20)</td>
+	       </tr><tr> 
+		 <td>Retain only balanced reads (strand filter)?</td>
+		 <td><input type="radio" name="pin_gl_filter_require_balanced_reads" id="pin_gl_bal_fT" value="true" checked=""><label for="pin_gl_bal_fT">True (default)</label>
+	           <input type="radio" name="pin_gl_filter_require_balanced_reads"   id="pin_gl_bal_fF" value="false"><label for="pin_gl_bal_fF">False</label></td>
+	       </tr><tr>
+		 <td>Maximum number of allowed homopolymer repeat units:</td>
+		 <td><input type="text" class="tb1b"  name="pin_gl_filter_max_num_homopolymer_repeat_units" id="pin_gl_homop_f" value="6"> (default: 6)</td>
+	       </tr>
+
+	     </table>
+	 </div></div>
+	 
+
+	 
+	 <!-- div for som -->
+	 <div class="tdindent1"><div id="filter_pin_som" class="vspanel" style="display:none;">
+             <p class="tdindentd myheader2">Filtering parameters for somatic</p>
+	     <table class="tdindents">
+	       <tr> <td class="tdw5">Minimum coverage:</td>
+		 <td><input type="text" class="tb1b"  name="pin_som_filter_min_coverages"  id="pin_som_mincoverage_f"  value="10"> (default: 10)</td>
+	       </tr><tr> 
+		 <td>Minimum variant allele frequency:</td>
+		 <td><input type="text" class="tb1b" name="pin_som_filter_min_var_allele_freq"  id="pin_som_minvaf_f" value="0.10"> (default: 0.10)</td>
+	       </tr><tr> 
+		 <td>Retain only somatic balanced reads (strand filter)?</td>
+		 <td><input type="radio" name="pin_som_filter_require_balanced_reads" id="pin_som_bal_fT" value="true" checked=""><label for="pin_som_bal_fT">True (default)</label>
+	           <input type="radio" name="pin_som_filter_require_balanced_reads" id="pin_som_bal_fF" value="false"><label for="pin_som_bal_fF">False</label></td>
+	       </tr><tr> 
+		 <td>Filter to remove complex indels?</td>
+		 <td><input type="radio" name="pin_som_filter_remove_complex_indels" id="pin_som_cmplx_fT" value="true" checked=""><label for="pin_som_cmplx_fT">True (default)</label>
+	           <input type="radio" name="pin_som_filter_remove_complex_indels" id="pin_som_cmplx_fF" value="false"><label for="pin_som_cmplx_fF">False</label></td>
+	       </tr><tr> 
+		 <td>Maximum number of allowed homopolymer repeat units:</td>
+		 <td><input type="text" class="tb1b"  name="pin_som_filter_max_num_homopolymer_repeat_units" id="pin_som_homop_f" value="6"> (default: 6)</td>
+	       </tr>
+	     </table>
+	 </div></div>
+	 
+	 
+	 <!-- div for trio -->
+	 <div class="tdindent1"><div id="filter_pin_trio" class="vspanel" style="display:none;">
+             <p class="tdindentd myheader2">Filtering parameters for trio</p>
+             <table class="tdindents">
+               <tr>
+		 <td class="tdw5">Minimum coverage in each trio sample:</td>
+		 <td><input type="text" class="tb1b" id="pin_trio_mincvg"   name="pin_trio_filter_min_coverages"   value="10"> (default: 10)</td>
+	       </tr><tr>
+		 <td>Minimum variant allele frequency in child:</td>
+		 <td><input type="text" class="tb1b" id="pin_trio_child_vaf"   name="pin_trio_filter_child_var_allele_freq"   value="0.20"> (default: 0.20)</td>
+	       </tr><tr>
+		 <td>Maximum number of variant reads in parents combined:</td>
+		 <td><input type="text" class="tb1b" id="pin_trio_parents_maxsupptreads" name="pin_trio_filter_parents_max_num_supporting_reads" value="0"> (default: 0)</td>
+	       </tr><tr>
+		 <td>Retain only balanced reads in child (strand filter)?</td>
+		 <td><input type="radio" name="pin_trio_filter_require_balanced_reads" id="pin_trio_bal_fT" value="true" checked=""><label for="pin_trio_bal_fT">True (default)</label>
+	           <input type="radio" name="pin_trio_filter_require_balanced_reads"   id="pin_trio_bal_fF" value="false"><label for="pin_trio_bal_fF">False</label></td>
+	       </tr><tr> 
+		 <td>Maximum number of allowed homopolymer repeat units:</td>
+		 <td><input type="text" class="tb1b"  name="pin_trio_filter_max_num_homopolymer_repeat_units" id="pin_trio_homop_f" value="6"> (default: 6)</td>
+	     </tr></table>
+	 </div> </div>
+	 <br>
+	 
+	 
+	 <!-- div for permanent options -->
+         <p class="tdindent">2. Allele status thresholds</p>
+
+	 <div class="tdindent1"><div id="filter_pin_gen" class="vspanel">
+             <table class="tdindents">
+               <tr>
+		 <td class="tdw5">Minimum variant allele frequency to call a heterozygote:</td>
+		 <td><input type="text" class="tb1b" name="pin_filter_heterozyg_min_var_allele_freq"   id="pin_gen_vcf_heterozyg_freq"  value="0.2"> (default: 0.2)</td>
+	       </tr><tr>
+		 <td>Minimum variant allele frequency to call a homozygote:</td>
+		 <td><input type="text" class="tb1b" name="pin_filter_homozyg_min_var_allele_freq"  id="pin_gen_vcf_homozyg_freq" value="0.8"> (default: 0.8)</td>
+	     </tr></table>
+	 </div></div>
+	 
+
+       </div>
+
+	 
+       <p><br></p>
+
+	 
+     </div>
+
+     <!-- GenomeSTRiP -->
+     <div id="tabs-8" class="ui-tabs-panel"> 
+       <input type="checkbox" id="gs_cmd" name="gs_cmd"><label for="gs_cmd">Run Genome STRiP</label>
+       <select name="version_gs">
+	 <option class="menu1" value="gs1_04_1441">version 1.04.1441</option>
+       </select>
+       <br><br>
+       
+       <div id='mask_div'></div>
+       <div id='maski_div'></div>
+       <div id='dict_div'></div>
+
+
+       <div class="subhead tdindents">	 <b>STEP 1: Select calling mode</b></div>
+       <table class="mytable tdindents spread">
+	 <tr>
+	   <td class="tdw3">Run pipeline:</td>
+	   <td><input type="radio" id="gs_mode1" name="gs_run_mode" value="discovery_and_genotyping" checked><label for="gs_mode1">Discovery and genotyping (default)</label><br>
+	     <input type="radio" id="gs_mode2" name="gs_run_mode" value="discovery"><label for="gs_mode2">Discovery only</label></td>
+	 </tr><tr>
+	   <td>Run mode:</td>
+	   <td><input type="radio" id="gs_singlesT" name="gs_samples" value="single" checked><label for="gs_singlesT">Separate samples (default)</label><br>
+	     <input type="radio" id="gs_singlesF" name="gs_samples" value="pooled"><label for="gs_singlesF">All (pooled) samples</label></td>
+	 </tr></table>
+       <p><br></p>
+
+
+       <div class="subhead tdindents"><b>STEP 2: Specify calling and metadata information</b></div>
+       <table class="mytable tdindents spread">
+	 <tr>
+	   <td class="tdw3">Choose reference genome:</td>
+	   <td><select id="gs_sel_genome" class="tb2" name="gs_sel_genome" onchange="sel_genome.value=this.value"></select></td>
+	 </tr><tr>
+	   <td>Choose reference mask:</td>
+	   <td><select id="gs_sel_svmask" class="tb2" name="gs_sel_svmask"></select></td>
+	 </tr><tr>
+	   <td >Choose gender map file:</td>
+	   <td><select id="gs_gendermap" class="tb2" name="gs_gendermap"></select>
+	     <img src="image/Help.png" class="inline" title="20130606_g1k.gender.map should contain all 1000G samples"></td>
+	 </tr><tr>
+	   <td>Choose ploidy map for pre-processing step:</td>
+	   <td><select id="gs_ploidymap" class="tb2" name="gs_ploidymap"></select></td>
+	 </tr><tr>
+	   <td>Use GC normalization during discovery step?</td>
+	   <td><input type="radio" id="gs_depth_useGCnormT"  name="gs_depth_useGCNormalization" value="true" checked><label for="gs_depth_useGCnormT">True (default)</label> &nbsp;
+	     <select id="gs_sel_cnmask" name="gs_sel_cnmask"></select><br>
+	     <input type="radio" id="gs_depth_useGCnormF" name="gs_depth_useGCNormalization" value="false"><label for="gs_depth_useGCnormF">False</label><br></td>
+	 </tr><tr>
+	   <td>Specify variant size range for discovery step:</td>
+	   <td><select name="gs_sizerange" class="select2">
+	       <option class="menu1" value="default">100 bp - 100 kbp (&quot;default&quot;)</option>
+	       <option class="menu1" value="large">100 kbp -  10 Mbp (&quot;large&quot;)</option>
+	   </select></td>
+	 </tr>
+       </table>
+       
+       <p><br></p>
+       
+       
+	 
+       <p id="toggle4" class="tdindent"><img id="image4" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+       <div class="tdindent"><div id="panel4" style="display:none;">
+	   <p class="tdindent"><b>Please note: The default values are applicable to 1000 Genomes data</b></p>
+	   
+	   <table class="mytable tdindent"> 
+	     <tr>
+	       <td class="subtitle">Cluster and window options</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="tdindents tdw4">Subset of orientations to cluster:</td>
+	       <td><select name="gs_cluster_clusterOrientations" id="gs_cluster_clusterOrientations">
+		   <option class="menu1" value="LR">LR (default)</option>
+		   <option class="menu1" value="All">All</option>
+	       </select></td>
+	     </tr><tr>
+	       <td class="tdindents">Minimum pairs required to form a cluster:</td>
+	       <td><input type="text" id="gs_cluster_minimumClusterPairs"  name="gs_cluster_minimumClusterPairs" value="2"><br><i>(default: 2)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Write auxiliary file of the log likelihood values in the measured window?</td>
+	       <td><input type="radio" id="gs_cohT" name="gs_coherence_writeCoherenceDataFile" value="true" checked><label for="gs_cohT">True (default)</label>
+		 <input type="radio" id="gs_cohF" name="gs_coherence_writeCoherenceDataFile" value="false"><label for="gs_cohF">False</label></td>
+	     </tr><tr>
+	       <td>&nbsp;</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="subtitle">Genotyping Modules</td>
+	       <td></td>
+	     </tr><tr>
+	       <td  class="tdindents">Methods to use:</td>
+	       <td><input type="checkbox" id="gs_genotyping_depth" name="gs_genotyping_depth" checked><label for="gs_genotyping_depth">depth</label>
+		 <input type="checkbox" id="gs_genotyping_pairs" name="gs_genotyping_pairs" checked><label for="gs_genotyping_pairs">pairs</label>
+		 <input type="checkbox" id="gs_genotyping_split" name="gs_genotyping_split" checked><label for="gs_genotyping_split">split</label> &nbsp; <i>(default: all)</i></td>
+	     </tr><tr>
+	       <td>&nbsp;</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="subtitle">Depth module options</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="subtitle2 tdindents">Depth parameters</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="tdindents">Minimum effective length at which to include depth-based genotype likelihoods:</td>
+	       <td><input type="text" name="gs_depth_effectiveLengthThreshold" id="gs_depth_effectiveLengthThreshold" value="200"><br><i>(default: 200)</i></td>
+	     </tr><tr>
+	       <td  class="tdindents">Minimum mapping quality for reads used in genotyping by depth:</td>
+	       <td><input type="text" name="gs_depth_minimumMappingQuality" id="gs_depth_minMQ" value="10"><br><i>(default: 10)</i></td>
+	     </tr><tr>
+	       <td  class="tdindents">Copy number parity correction:</td>
+	       <td><input type="text" name="gs_depth_parityCorrectionThreshold" id="gs_depth_parcorr" value="0.4"><br><i>(default: 0.4)</i></td>
+	     </tr><tr>
+	       <td>&nbsp;</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="subtitle2 tdindents">Output file selections</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="tdindents">Write auxiliary file of read counts per sample during discovery?</td>
+	       <td><input type="radio" id="gs_depth_w_countT" name="gs_depth_writeSampleCountFile" value="true" checked><label for="gs_depth_w_countT">True (default)</label>
+ 		 <input type="radio" id="gs_depth_w_countF" name="gs_depth_writeSampleCountFile" value="false"><label for="gs_depth_w_countF">False</label></td>
+	     </tr><tr>
+	       <td class="tdindents">Write auxiliary file of read depth per sample during discovery?</td>
+	       <td><input type="radio" id="gs_depth_w_covT" name="gs_depth_writeSampleCoverageFile" value="true" checked><label for="gs_depth_w_covT">True (default)</label>
+		 <input type="radio" id="gs_depth_w_covF" name="gs_depth_writeSampleCoverageFile" value="false"><label for="gs_depth_w_covF">False</label></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate file containing read count data (but only if it does not already exist)?</td>
+	       <td><input type="radio" id="gs_depth_w_rcT" name="gs_depth_writeReadCounts" value="true" checked><label for="gs_depth_w_rcT">True (default)</label>
+		 <input type="radio" id="gs_depth_w_rcF" name="gs_depth_writeReadCounts" value="false"><label for="gs_depth_w_rcF">False</label></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate file containing expected count data?</td>
+	       <td><input type="radio" id="gs_depth_w_ecT" name="gs_depth_writeExpectedCounts" value="true" checked><label for="gs_depth_w_ecT">True (default)</label>
+		 <input type="radio" id="gs_depth_w_ecF" name="gs_depth_writeExpectedCounts" value="false"><label for="gs_depth_w_ecF">False</label></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate file containing normalization statistics?</td>
+	       <td><input type="radio" id="gs_depth_w_nT" name="gs_depth_writeNormalization" value="true" checked><label for="gs_depth_w_nT">True (default)</label>
+		 <input type="radio" id="gs_depth_w_nF" name="gs_depth_writeNormalization" value="false"><label for="gs_depth_w_nF">False</label></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate file containing mixture model statistics?</td>
+	       <td><input type="radio" id="gs_depth_w_mT" name="gs_depth_writeModels" value="true" checked><label for="gs_depth_w_mT">True (default)</label>
+		 <input type="radio" id="gs_depth_w_mF" name="gs_depth_writeModels" value="false"><label for="gs_depth_w_mF">False</label></td>
+	     </tr><tr>
+	       <td>&nbsp;</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="subtitle">Pairs-related options</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="tdindents">Error likelihood for read pairs:</td>
+	       <td><input type="text" name="gs_pairs_fixedErrorLikelihood" id="gs_pairs_fixedErrorLikelihood" value="0.01"><br><i>(default: 0.01)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Fixed cutoff on minimum insert size for read pair selection during discovery:</td>
+	       <td><input type="text" name="gs_select_minimumInsertSize" id="gs_select_minInsSize" value="0"><br><i>(default: 0)</i> </td>
+	     </tr><tr>
+	       <td class="tdindents">Variable cutoff on minimum insert size based on RSD of insert size distribution for read pair selection:</td>
+	       <td><input type="text" name="gs_select_minimumInsertSizeStandardDeviations" id="gs_select_minInsSizeStdev" value="10.0"><br><i>(default: 10.0)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Minimum mapping quality cutoff for read pair selection during discovery:</td>
+	       <td><input type="text" name="gs_select_minimumPairMappingQuality" id="gs_select_minPairMQ" value="10"><br><i>(default: 10)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Mapping quality filter applied to read pairs used in genotyping:</td>
+	       <td><input type="text" name="gs_pairs_minimumMappingQuality" id="gs_pairs_minMQ" value="10"><br><i>(default: 10)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Threshold for detecting aberrant read pairs against the alternate allele (in standard deviations of insert size): </td>
+	       <td><input type="text" name="gs_pairs_aberrantInsertSizeRadius" id="gs_pairs_aberrantInsertSizeRadius" value="3.0"><br><i>(default: 3.0)</i> </td>
+	     </tr><tr>
+	       <td class="tdindents">Distance to search for alternative homes (in standard deviations of insert size):</td>
+	       <td><input type="text" name="gs_pairs_alternativeHomeSearchRadius" id="gs_pairs_alternativeHomeSearchRadius" value="5.0"><br><i>(default: 5.0)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Threshold for rejection of an alternative home (in mismatches per read base):</td>
+	       <td><input type="text" name="gs_pairs_alternativeHomeMismatchThreshold" id="gs_pairs_altHomeMismatchThres" value="0.25"><br><i>(default: 0.25)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Width of window to use to search for read pairs around event boundaries:</td>
+	       <td><input type="text" name="gs_pairs_mateWindowSize" id="gs_pairs_mateWindowSize" value="1000"><br><i>(default: 1000)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate file containing read pair counts?</td>
+	       <td><input type="radio" id="gs_pairs_w_pcT" name="gs_pairs_writePairCounts" value="true" checked><label for="gs_pairs_w_pcT">True (default)</label>
+		 <input type="radio" id="gs_pairs_w_pcF" name="gs_pairs_writePairCounts" value="false"><label for="gs_pairs_w_pcF">False</label></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate sam file containing aberrant read pairs used in genotyping?</td>
+	       <td><input type="radio" id="gs_pairs_w_rpT" name="gs_pairs_writeReadPairs" value="true" checked><label for="gs_pairs_w_rpT">True (default)</label>
+		 <input type="radio" id="gs_pairs_w_rpF" name="gs_pairs_writeReadPairs" value="false"><label for="gs_pairs_w_rpF">False</label></td>
+	     </tr><tr>
+	       <td>&nbsp;</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="subtitle">Split-related options</td>
+	       <td></td>
+	     </tr><tr>
+	       <td class="tdindents">Minimum mapping quality for reads used in junction mapping:</td>
+	       <td><input type="text" name="gs_split_minimumMappingQuality" id="gs_split_minMQ" value="10"><br><i>(default: 10)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Limit on sum of mismatch quality scores to include an unmapped alternate allele read:</td>
+	       <td><input type="text" name="gs_split_maximumAlternateAlleleScore" id="gs_split_maxAltAlleleScore" value="100"><br><i>(default: 100)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Width of window to use to search for unmapped mates as split read candidates:</td>
+	       <td><input type="text" name="gs_split_mateWindowSize" id="gs_split_mateWindowSize" value="1000"><br><i>(default: 1000)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Mapping quality to assume for unmapped reads that have mapped to the alternative allele:</td>
+	       <td><input type="text" name="gs_split_unmappedReadMappingQuality" id="gs_split_unmappedReadMQ" value="30"><br><i>(default: 30)</i></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate SAM file containing split reads covering breakpoint junctions?</td>
+	       <td><input type="radio" id="gs_split_w_srT" name="gs_split_writeSplitReads" value="true" checked><label for="gs_split_w_srT">True (default)</label>
+		 <input type="radio" id="gs_split_w_srF" name="gs_split_writeSplitReads" value="false"><label for="gs_split_w_srF">False</label></td>
+	     </tr><tr>
+	       <td class="tdindents">Generate text file containing inforamation about split reads covering breakpoint junctions?</td>
+	       <td><input type="radio" id="gs_split_w_sriT" name="gs_split_writeSplitReadInfoFile" value="true" checked><label for="gs_split_w_sriT">True (default)</label>
+		 <input type="radio" id="gs_split_w_sriF" name="gs_split_writeSplitReadInfoFile" value="false"><label for="gs_split_w_sriF">False</label></td>
+	     </tr><tr>
+	       <td>&nbsp;</td>
+	       <td></td>
+	     </tr>
+	   </table>
+
+	   <input type="hidden" name="gs_split_genotypingModel" value="2"/>
+           <input type="hidden" name="gs_split_ignoreReferenceMatches" value="false"/>
+           <input type="hidden" name="gs_output_writeDepthProbs" value="true"  />
+	   <input type="hidden" name="gs_output_writeReadPairProbs" value="true" />
+	   <input type="hidden" name="gs_output_writeSplitReadProbs" value="true"  />
+	   <input type="hidden" name="gs_metadata_writeArrayIntensityFile" value="true" />
+	   <input type="hidden" name="gs_coherence_windowSize" value="1000"  />
+           <input type="hidden" name="gs_coherence_windowOffset" value="100" />
+           <input type="hidden" name="gs_membership_minimumSampleSpanCoverage" value="1.0" />
+           <input type="hidden" name="gs_depth_mixtureModel" value="GMM" />
+	   <input type="hidden" name="gs_depth_readCountCacheSize" value="1000000" />
+           <input type="hidden" name="gs_depth_readCountBinSize" value="1000"  />
+           <input type="hidden" name="gs_depth_minimumUnobservedSampleSpanCoverage" value="1.0" />
+           <input type="hidden" name="gs_depth_readReadCounts" value="false"  />
+           <input type="hidden" name="gs_pairs_excludeJunctionReads" value="false" />
+	   	     
+	 </div></div>
+       
+       <p><br></p>
+       
+
+
+       <div class="subhead tdindents"><b>STEP 3: Select genomic regions</b></div>
+       <table class="mytable tdindents spread">
+	 <tr>
+	   <td class="tdw3">Specify chromosome(s) or region:</td>
+
+	   <td><input type="radio" id="gs_chrdef0" name="gs_chrdef" value="standard" checked><label for="gs_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
+               <input type="radio" id="gs_chrdef1" name="gs_chrdef" value="standard_plus_contigs"><label for="gs_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
+     	       <input type="radio" id="gs_chrdef2" name="gs_chrdef" value="user"><label for="gs_chrdef2">User-defined:</label>&nbsp;
+
+	       <textarea id="gs_chrdef_str"  name="gs_chrdef_str" value=""></textarea>
+               <img src="image/Help.png" class="inline" title="Enter a list of regions (in BED or interval format), delimited by commmas or line return. (Example: 1-4, X, 6:1000, 5:1000-2000, 22)"><button onclick="clear_chr(4);" type="button">Clear list</button></td>
+
+	 </tr></table>
+  
+       <p><br></p>
+
+
+
+
+     </div>
+
+     <!-- submit -->
+     <div id="tabs-9" class="ui-tabs-panel"> 
+       <div id="clustdiv0" class="subhead tdindentd"><p>Please select a compute resource under Accounts to allow additional input item to be displayed below.</p></div>
+       <p><br></p>
+       <div id="clustdiv"></div>
+       <div id="clustdiv_c"></div>
+       <div id="clustdiv0_l" style="display:none;"></div>
+       <div id="clustdiv_l" style="display:none;"></div>
+       <div id="stordiv0"></div>
+       <div id="stordiv"></div>
+       <div id="clustdb_div"></div>
+       <p><br></p>
+       
+
+       <div id="jobinst" class="initiallyHidden subhead tdindentd fps"><p>Provide any additional necessary information:</p></div>
+
+       <div id="titleinfo" class="initiallyHidden fps">
+    <div class="tdindents"><p class="fps">Comment to place into execution profile (OPTIONAL):</p>
+	   <input type="text" class="tb2" id="jobtitle" name="jobtitle" value=""/>
+
+	 </div>
+       </div>
+
+       <p><br></p>
+
+       <div id="runinfo" class="initiallyHidden fps">
+	 <div class="tdindents"><p>Working directory for running job:&nbsp;<img src="image/Help.png" class="inline" title="This directory will be created at the full path provided or else under your home directory."></p>
+	   <input type="text" class="tb2" id="workdir" name="workdir" value="" placeholder="mydir"/>
+	 </div>
+       <p><br></p>
+	 <div class="tdindents"><p>Specify submit action:</p>
+	   <div class="tdindent">
+	   <input type="radio" class="tb1" id="subactionS" name="subaction" value="transmit"/><label for="subactionS">Transmit script only</label><br>
+	   <input type="radio" class="tb1" id="subactionR" name="subaction" value="execute"/><label for="subactionR">Transmit and submit script (default)</label>
+	   </div>
+	 </div>
+       </div>
+       <p><br></p>
+
+
+       <div id="finalsel" class="subhead tdindentd"><p>Select command:</p></div>
+ <div id="preview_div" class="initiallyHidden"></div>
+       <table class="tdindents">
+
+
+
+	 <tr>
+	   <td align="center"><input type="button" id="Preview" name="Preview" value="Preview" onclick="preview_ep(0);"/></td>
+    <td>Preview execution profile (or, download <input type='button' value='here' id='do_downbox'>)</td>
+	 </tr><tr>
+	   <td align="center"><input type="button" id="Validate" name="Validate" value="Validate" onclick="var a=validateform();if(a==true){rptclust();}"/></td>
+	   <td>Validate form</td>
+	 </tr><tr>
+	   <td align="center"><input type="button" id="Submit" name="Submit" value="Submit" onclick="var a=validateform();if(a==true){var b=rptclust();if(b==true){do_sub();}}"/></td>
+	   <td>Run the current configuration</td>
+ 	 </tr><tr>
+	   <td><p><br></p></td>
+	   <td></td>
+ 	 </tr><tr>
+	   <td align="center"><input type="button" onclick="reset_form(1);" value="Reset"></td>
+	   <td>Reset all tabs to their default settings</td>
+	 </tr>
+       </table>
+       <p><br></p>
+     </div>
+     
+
+     <!-- results -->
+     <div id="tabs-10" class="ui-tabs-panel"> 
+    <div class="subhead tdindentd"><p>Please provide the appropriate results location.</p></div>
+       <p><br></p>
+<!--    TODO: AWS results directory 
+
+
+
+
+-->
+       <p></p>
+       <p></p>
+       <div id="resultsbox"></div>
+       <p><br></p>
+       <p><br></p>
+     </div>
+
+
+     <!-- setup -->
+     <div id="tabs-11" class="ui-tabs-panel"> 
+       <div id="aws_settings" class="subhead tdindentd"><p>AWS Settings</p></div>
+	 <table class="tdindent">
+	   <tr><td>Enable secure protocol (HTTPS) for transfers between computing resources and S3:</td>
+	     <td><input type="radio" name="aws_https" id="aws_https" value="True">Yes<input type="radio" name="aws_https" value="False" checked>No</td>
+	   </tr><tr>
+	     <td>Enable S3 server-side encryption:</td>
+	     <td><input type="radio" name="aws_ssenc" id="aws_ssenc" value="True">Yes<input type="radio" name="aws_ssenc" value="False" checked>No</td>
+	   </tr><tr>
+	     <td>File encryption for S3 transfers:</td><td><i>Not currently supported</i></td>
+	   </tr><tr>
+             <td>Mount point prefix for EBS data volumes:</td><td>/ebsdata_</td>
+	   </tr>
+	 </table>
+       <p><br></p>
+       
+       <div id="sc_running0" class="subhead tdindentd"><p>Launched AWS instances to manage will appear below.</p></div>
+       <p><br></p>
+       <div id="sc_running"></div>
+
+
+
+
+
+
+       <p><br></p>
+     </div>
+     
+
+     <!-- Post-discovery analysis -->
+     <div id="tabs-12" class="ui-tabs-panel"> 
+       <div class="subhead tdindents">   <b>Filtering</b></div>
+
+
+       <p><input type="checkbox" id="global_do_dbsnp" name="global_apply_dbsnp_filter"><label for="global_do_dbsnp">Identify and remove dbSNP variants</label>&nbsp;<img class="inline" title="Check this box to activate filtering for all appropriate tools (i.e., VarScan and Strelka). Filtering may be deselected under individual tool tabs." src="image/Help.png"</img></p>
+	<div class="tdindent2">
+	  <select class="tb2menu" id="dbsnp_version" name="dbsnp_version">
+	    <option class="menu1" value="ncbi_grch37_snp142">NCBI, v.142, GRCh37</option>
+	    <option class="menu1" value="ncbi_grch38_snp142">NCBI, v.142, GRCh38</option>
+	  </select>
+	</div>
+       <p><br></p>
+
+
+
+    <p><input type="checkbox" id="global_do_fpfilter" name="global_apply_false_positives_filter"><label for="global_do_fpfilter">Identify and remove false positives (snvs only)</label>&nbsp;<img class="inline" title="Check this box to activate filtering for all appropriate tools (i.e., VarScan and Strelka). Filtering may be deselected under individual tool tabs." src="image/Help.png"</img></p>
+       <p id="toggle5a" class="tdindent2"><img id="image5a" src="image/plus.gif" alt="toggle options">&nbsp;<i>OPTIONS</i></p>
+       <div class="tdindent2"><div id="panel5a" style="display:none;">
+	     <table class="rindent">
+	       <tr> <td class="tdw5 ">Minimum mapping quality of reads used for counting depth:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_MQ" name="vs_fp_min_mapping_qual" value="0"> (default: 0)</td>
+	       </tr><tr> <td class="">Minimum base quality at variant position used for counting depth:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_BQ" name="vs_fp_min_base_qual" value="15"> (default: 15)</td>
+	       </tr><tr> <td class="">Mininum number of variant-supporting reads:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_mincnt" name="vs_fp_min_num_var_supporting_reads" value="4"> (default: 4)</td>
+	       </tr><tr> <td class="">Minimum variant allele frequency:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_minvaf" name="vs_fp_min_var_allele_freq" value="0.05"> (default: 0.05)</td>
+	       </tr><tr> <td class="">Minimum average relative read position of variant supporting reads:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_minreadpos" name="vs_fp_min_avg_rel_read_position" value="0.10"> (default: 0.10)</td>
+	       </tr><tr> <td class="">Minimum average relative distance to effective 3&prime; end:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_mindist3" name="vs_fp_min_avg_rel_dist_to_3prime_end" value="0.10"> (default: 0.10)</td>
+	       </tr><tr> <td class="">Minimum fraction of variant reads from each strand (strandedness):</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_minstrand" name="vs_fp_min_var_strandedness" value="0.01"> (default: 0.01)</td>
+	       </tr><tr> <td class="">Minimum allele depth required to perform strand tests:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_mindepth_for_strand" name="vs_fp_min_allele_depth_for_testing_strandedness" value="5"> (default: 5)</td>
+	       </tr><tr> <td class="">Minimum average base quality for reference allele:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_minrefBQ" name="vs_fp_min_ref_allele_avg_base_qual" value="30"> (default: 30)</td>
+	       </tr><tr> <td class="">Minimum average base quality for variant allele:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_minvarBQ" name="vs_fp_min_var_allele_avg_base_qual" value="30"> (default: 30)</td>
+	       </tr><tr> <td class="">Maximum average relative read length difference (ref minus var):</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_max_readlen_diff" name="vs_fp_max_rel_read_length_difference" value="0.25"> (default: 0.25)</td>  
+	       </tr><tr> <td class="">Maximum mismatch quality sum of variant supporting reads:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_max_var_mmqs" name="vs_fp_max_mismatch_qual_sum_for_var_reads" value="150"> (default: 150)</td>
+	       </tr><tr> <td class="">Maximum average mismatch quality sum difference (var minus ref):</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_max_mmqs_diff" name="vs_fp_max_avg_mismatch_qual_sum_difference" value="150"> (default: 150)</td>
+	       </tr><tr> <td class="">Minimum average mapping quality for reference allele:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_minrefMQ" name="vs_fp_min_ref_allele_avg_mapping_qual" value="30"> (default: 30)</td>
+	       </tr><tr> <td class="">Minimum average mapping quality for variant allele:</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_minvarMQ" name="vs_fp_min_var_allele_avg_mapping_qual" value="30"> (default: 30)</td>
+	       </tr><tr> <td class="">Maximum average mapping quality difference (ref minus var):</td>
+ 		 <td><input type="text" class="tb1b" id="vs_fp_max_MQdiff" name="vs_fp_max_avg_mapping_qual_difference" value="50"> (default:50)</td>
+	       </tr>
+	     </table>
+       </div></div>
+       <p><br></p>
+
+
+       <div class="subhead tdindents">   <b>Annotation</b></div> 
+  
+       <p><input type="checkbox" id="vep_cmd" name="vep_cmd"><label for="vep_cmd">Run VEP (Variant Effect Predictor)</label></p>
+       <div class="tdindent2"><select class="tb2menu" id="vep_version" name="vep_version">
+	   <option class="menu1" value="vep81_grch37_hsapiens">v.81, homo sapiens, GRCh37</option>
+	 </select>
+       </div>
+       <p><br></p>
+
+
+
+
+
+     </div>   <!-- end tabs -->
+   </form> <!-- end myform -->
+
+
+   <form id="downform"><input type="text" id="downname" name="downname" value="profile.ep" style="display:none;">
+     <div id="downbox">
+       <textarea id='downtextarea' name='downtext' style='display:none;'></textarea>
+     </div>
+   </form>
+
+
+</div>    <!-- end content-panel -->
+
+
+
+  <p></p>
+
+  <table class="foottab">
+    <tr>
+      <td class="logo2"><p>Copyright &#169; 2014-2015.</p><p>All rights reserved.</p></td>
+      <td><img title="The Genome Institute" src="image/mgi_logo.1.png" alt="The Genome Institute"></td>
+      <td><img title="Washington University School of Medicine"  src="image/Washington_University_Medical_School_Logo.rev.png" alt="Washington University School of Medicine"></td>
+    </tr>
+  </table>
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#content-panel").show();
+    $(window).on('resize',function() {
+	var winw=$(window).width();
+	$("#content-panel").width(winw-120);
+    });
+    gotomytab(0);
+    populate_profiles();
+
+    $("#vs_gl_div").hide();    $("#vs_som_div").hide();    $("#vs_trio_div").hide();
+    if ($("#vs_isGL").is(':checked'))        { $("#vs_gl_div").show();   }
+    else if ($("#vs_isSOM").is(':checked'))  { $("#vs_som_div").show();  }
+    else if ($("#vs_isTRIO").is(':checked')) { $("#vs_trio_div").show(); }
+
+
+
+
+
+    upd_vs_hcfilters();
+    upd_vs_fpfilter();
+    upd_strlk_fpfilter();
+    upd_bd_regions();
+    upd_pin_filters();
+
+    $("body").fadeIn(500);
+
+    check_vs_mode();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+ $(document).ready(function() {
+
+     $("#tabs").tabs();
+
+     $("#searchable").multiselect2side({ search: "Available bams / Search: "});
+     $(".allpath").val("");
+	
+     // input tab
+     $("#inp_warn").show();
+     $("#inp_aws_preamble").hide();
+     $("#inp_lc_preamble").hide();
+     $("#inp_ebs").hide();
+     $("#inp_rfile_opt").hide();
+     $("#inp_upfile_opt").hide();
+     $("#inp_scan_opt").hide();
+     $("#inp_sysfiletree_opt").hide();
+     $("#fs_div").hide();
+ });
+
+
+
+ $(document).ready(function() { 
+     var i; var next; var prev;
+     /* tab navigation */
+     var $tabs = $('#tabs').tabs();
+     $(".ui-tabs-panel").each(function (i) {
+         var totalSize = $(".ui-tabs-panel").size() - 1;
+         if (i != 0) {
+             prev = i-1;
+	     // (rjm) orig full buttons to ignore with navigation area
+	     //            $(this).append("<a href='#' class='prev-tab mover' rel='" + prev + "'>&nbsp;&#171; Previous&nbsp;</a>");
+         }
+         if (i != totalSize) {
+             next = i + 1;
+	     // (rjm) orig full buttons to ignore with navigation area
+	     //            $(this).append("<a href='#' class='next-tab mover' rel='" + next + "'>&nbsp;Next &#187;&nbsp;</a>");
+         }
+     });
+     
+     $('.next-tab, .prev-tab').click(function () {
+         var cc = $(this).attr("rel");
+	 
+         $('#tabs').tabs({ active: parseInt(cc) });
+
+         return false;
+     });
+});
+
+
+
+  /* toggle panels */
+$("[id^=toggle]").click(function(){
+    my_id = $(this).attr('id');
+    tgt_id = my_id.replace("toggle","panel");
+    img_id = my_id.replace("toggle","image");
+    $("#"+tgt_id).slideToggle(50);
+    var $img = $("#"+img_id,this);
+    if ($img.attr('src').indexOf("plus.gif") > -1) {
+	$img.attr('src', $img.attr('src').replace('plus','minus'));
+    } else {
+	$img.attr('src', $img.attr('src').replace('minus','plus'));
+    }
+});
+
+
+
+
+     // Of the half dozen or so things I tried, this finally works
+
+
+
+     $('input[type=text],input[type=password]').keypress(function(e){
+	 var code=null;
+	 code=(e.keyCode ? e.keyCode : e.which); 
+	 return(code==13)?false:true;
+     });
+
+
+
+
+$("#do_downbox").click(function(){
+    preview_ep(1); download( $("#downname").val(), $("#downtextarea").val());
+});
+
+
+
+
+$("#add_path").click(function () {$("#multipath").append("<p class='fps tdindents'><input type='text' class='tb2 allpath' name='paths[]' value='' placeholder='/path/to/directory' /></p>");  });
+$("#rm_path").click(function () { $("input[name^='paths']").each(function() { $(this).val(""); });  $("#multipath").empty(); });
+
+
+$("#add_volume").click(function () {
+    var posting = $.ajax({
+	url: "addvolume.php",
+	type: "POST",
+	async: false,
+	data: {'c': $("[id^=awsvolmenu]").length, 'voldb': $("#awsvoldb").val() },
+	success: function(data) {
+	    $("#multivolume").append(data.trim());
+	}
+    });
+});
+
+$("#rm_volumes").click(function () { $("#multivolume").empty();});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$("#aws_tree_btn").click(function () {
+    $('#multivolume').empty();
+    $('#ebs_actions_n').hide();
+    $('#ebs_actions_0').hide();
+// (rjm) Think we're excluding this for now
+//    if($("#awsvoldb").val().match(/volid/)) {$('#ebs_actions_y').show();} else {$('#ebs_actions_y').hide();}
+    init_selectbox(1);
+    var posting = $.ajax({
+	url: "get_aws_tree2.php", 
+	type: "POST",
+	async:false,
+	data: {'n': $("input[name=awstree]:checked").val()},
+	error: function(err) { alert("An unknown error occurred while loading AWS file tree."); },
+	success: function(data) { populate_divs(data); }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+											
+
+function populate_divs(data) {
+    var s=[];
+    s = data.split("\n");
+    $("#pathdb_div").append( $.grep(s, function(x) { return /pathdb/.test(x); }).join(""));
+    $("#bai_div").append( $.grep(s, function(x)    { return /baipath/.test(x); }).join(""));
+    var c = $.grep(s, function(x) { return /isbamX/.test(x); }).join("");
+    $("#searchable").append( c.replace(/isbamX/g,"isbam") );  // provide original classes though unused
+    var c = $.grep(s, function(x) { return /isbamY/.test(x); }).join("");
+    $("#bamfilesms2side__sx").append( c.replace(/isbamY/g,"isbam") );  // provide original classes though unused
+    $("#fai_div").append( $.grep(s, function(x) { return /faipath/.test(x); }).join(""));
+    $("#sel_genome").append( $.grep(s, function(x) { return /isref/.test(x); }).join(""));
+    $("#gs_sel_genome").append( $.grep(s, function(x) { return /isref/.test(x); }).join("")); 
+    $("#ref_div").append( $.grep(s, function(x) { return /reffiles/.test(x); }).join(""));
+
+    $("#mask_div").append( $.grep(s, function(x) { return /maskfiles/.test(x); }).join(""));
+    $("#maski_div").append( $.grep(s, function(x) { return /maskipath/.test(x); }).join(""));
+    $("#gs_sel_svmask").append( $.grep(s, function(x) { return /ismask/.test(x); }).join(""));
+    $("#gs_sel_cnmask").append( $.grep(s, function(x) { return /ismask/.test(x); }).join(""));
+
+    $("#gs_ploidymap").append( $.grep(s, function(x) { return /isploidy/.test(x); }).join(""));
+    $("#gs_gendermap").append( $.grep(s, function(x) { return /isgender/.test(x); }).join(""));
+
+    $("#dict_div").append( $.grep(s, function(x) { return /dictfiles/.test(x); }).join(""));
+
+}
+
+function populate_results(data) {
+    var s=[];
+    s = data.split("\n");
+    $("#resultsbox").empty();
+    $("#resultsbox").append( $.grep(s, function(x) { return /gviplabel/.test(x); }).join(""));
+
+}
+
+
+
+
+$("#rpath_btn").click(function () {
+    init_selectbox(1);
+    var filepaths;
+    var neat = $("#rpath").val().trim();
+    if (neat.length > 0 ) {
+	filepaths = neat;
+    }
+    $bAS =  ($("input[type='radio'][name='compute_target']:checked").val()=="AWS")?(1):(0);
+
+    var posting = $.ajax({
+	url: "get_rpathfile2.php",
+	type: "POST",
+	data: { 'username': $('#un').val(), 'phrase':  $('#pw').val(), 'target': $bAS, 'host': $('#clust_gw').val().trim(), 'filepath': JSON.stringify( filepaths ) },
+	success: function(data) {
+	    populate_divs(data);
+	    $("#multivolume").empty();	    // Enforce mutual exclusivity of data sources
+	    $("#rpath").val("");
+	}
+    });
+});
+
+
+// Process EBS information
+// TODO: possibly check for changes due to Console activity ?
+$("#apply_vol_lists").click(function () {
+    var k=$("select[id^=awsvolmenu]").length; 
+    var idx=0; // legacy index
+    var pl;
+    var aws_vid = new Array(); var aws_vna = new Array(); var aws_vfi = new Array();
+    
+    // Validate
+    if (k) {
+	for(var j=0; j < k; j++) {
+
+// Omit check due to scratch disk requirement
+//	    if( $("#awsvfi"+j).val().trim() != "") {
+
+		if( $('#awsvolmenu'+j).val() == "none") {
+		    if( confirm("Alert: A file list without a volume ID has been given. Click OK to ignore that file list or click Cancel to make changes.")==false) {
+			return false;
+		    }
+		} else { // possibly ok
+		    aws_vid[idx] = $('#awsvolmenu'+j).val();
+		    aws_vfi[idx] = $('#awsvfi'+j).val().trim();
+		    idx++;
+		}
+//	    } 
+	}
+    }
+
+    if(idx) {   // number of validated
+	var awsvol_sel=new Array();
+	for(var j=0; j < idx; j++) { awsvol_sel[j] = {id: aws_vid[j], files: aws_vfi[j]}; }
+	var posting = $.ajax({
+	    url: "listvolfiles.php",
+	    type: "POST",
+	    data: {'src': JSON.stringify(awsvol_sel)},
+	    success: function(data) {
+                populate_divs(data);
+	    }
+	});
+	init_selectbox(1);
+	if(idx>1) { pl="s were"; } else {pl=" was"; }
+	alert(idx+" EBS volume"+pl+" processed!");
+
+    } else {
+	alert("Notice: No EBS information detected or processed!");
+    }
+});
+
+
+
+$("#list_files_btn2").click(function () {
+    if( $('#un').val().trim().length == 0 ||   $('#pw').val().trim().length == 0 ||   $('#clust_gw').val().trim().length == 0 ) {
+	alert("Please make sure username, passphrase, and queue host are provided under Accounts!");
+	return false;
+    }
+    var filepaths=[];
+    // TODO: loop over class to clean up input; could move to php instead
+    var cnt=0; 
+    $('.allpath').each(function() {
+	var neat = $(this).val().trim();
+	if ( neat.length > 0  &&  neat != '/') {
+	    filepaths.push( neat );             // (rjm) Order of these serves as an index 
+	    cnt++;
+	}
+    });
+    if (cnt == 0) {
+	alert("Please provide at least one directory or folder name before retrieving files");
+	return false;
+    }
+
+    $('.spinner').show(); 
+    init_selectbox(1);
+    var posting = $.ajax({
+	url: "listfiles_real_json_key2.php",
+	type: "POST",
+	data: {'username':  $('#un').val() , 'phrase': $('#pw').val(), 'gw': $('#clust_gw').val(), 'filepath': JSON.stringify( filepaths )}, 
+	success: function(data) {
+	    populate_divs(data);
+	}
+    });
+    $('.spinner').hide(); 
+    
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Get potential instance types
+function get_clust(n) {
+    $('#clustdiv').empty(); 
+    $('#clustdb_div').empty(); 
+    var posting = $.ajax({
+	url: "resources2.php",
+	type: "POST",
+	data: { cmd: 'cluster', tgt: n, scconf: $("#scconf").val()},
+	success: function(resp) {
+	    if (n==0) { // aws
+		var bigdat = JSON.parse(resp);
+		var data = bigdat['myresults'];
+		var clustdb = bigdat['clustdb'];
+	    } else {
+		var data = JSON.parse(resp);
+	    }
+
+
+	    $('#clustdiv0').empty(); 
+
+	    if (n==0) {
+		$('#clustdiv0').append("<p>Choose AWS resources:</p>");
+		$('#clustdiv').append("<p class='tdindents'>Launch a new computing resource...</p>");
+	    } else {
+		$('#clustdiv0').append("<p>Choose local resources:</p>");
+		$('#clustdiv').append("<p>Select a compute cluster to use:</p>");
+	    }
+	    $('#clustdiv').append("<div class='tdindents'><table id='clusttab' class='clusttab'><tr><th>Select</th><th>Base Name</th><th>n(VCPU)</th><th>n(ECPU)</th><th>Memory(GB)</th></tr></table></div>");
+	    
+	    
+  	    for (var k=0; k < data.length; k++) {
+		if (n==0) {  // aws
+		    $('#clusttab tr:last').after("<tr><td align='center'><input type='radio' name='clusters' value='" + data[k]['ec2'] + "'/></td>" +
+						 "<td align='center'>" + data[k]['name'] + "</td>" + 
+						 "<td align='center'>" + data[k]['vcpu']+ "</td>" +
+						 "<td align='center'>" + data[k]['ecpu']+ "</td>" +
+						 "<td align='center'>" + data[k]['mem'] + "</td></tr>");
+
+		} else {
+
+		    $('#clusttab tr:last').after("<tr><td align='center'><input type='radio' name='clusters' value='" + data[k]['name'] + "' "+ ((k==0)?"checked='checked'":"")+"/></td>" + 
+						 "<td align='center'>" + data[k]['name'] + "</td>" +
+						 "<td align='center'>" + "n/a" + "</td>" + 
+						 "<td align='center'>" + "n/a" + "</td>" +
+						 "<td align='center'>" + "n/a"  + "</td></tr>");
+		    
+		}
+		
+	    }
+
+	    if (n==0) { // aws
+		$('#clusttab tr:last').after("<tr><td align='center'><input type='radio' name='clusters' value='nada' checked/></td>" +
+					     "<td align='center'><i>None</i></td><td></td><td></td><td></td></tr>");
+		$('#clustdiv').append("<p><br></p>");
+		$('#clustdb_div').append("<input type='hidden' id='clustdb' value='"+clustdb+"' name='clustdb'/>");
+
+
+		var mystr="";
+		mystr="<p class='tdindents'>Enter number of instances in cluster:&nbsp;";
+		mystr+="<select id='nclust' name='nclust' class='tb1dmenu'>";
+		for(jj=1;jj<=20;jj++) { mystr+="<option class='menu1' value='"+jj+"'>"+jj+"</option>"; }
+		mystr+="</select></p>";
+		$('#clustdiv').append(mystr);
+
+
+
+
+	    }
+
+	    $('#clustdiv').append("<p><br></p>");
+	    
+	    
+	}
+    });
+
+// (rjm) TODO later -- need to handle attached volumes gracefully
+//    $('#clustdiv0_l').html("<p class='tdindents'>...or re-use a running resource (if any):</p>");
+// But keep nada definition, used by parse_real
+    get_sc_running(1);
+
+
+};
+
+
+function get_stores(n) {
+    if ( n != 0 ) {  // local
+	$('#clustdiv0_l').empty();
+	$('#clustdiv_l').empty();
+//	$('#stordiv').append("<div class='tdindents'><p>Directory into which to place results:</p><p><input type='text' class='tb1' id='resultsdir' name='resultsdir' value='' placeholder='mydir/results'/></p></div>");
+//	$('#stordiv').append("<p><br></p>");
+	$('#stordiv0').empty();
+	$('#stordiv').empty();
+	
+    } else {  // aws
+
+	$('#stordiv0').empty();
+	$('#stordiv0').append("<p><b>Searching for AWS S3 storage buckets...</b></p>");
+	$('#stordiv').empty(); 
+
+	// For general approach, call resources2.php using {cmd=s3bucket, tgt=n, scconf=$("#scconf").val()}
+	var posting = $.ajax({
+	    url: "get_sc_resource.php",
+	    type: "POST",
+	    data: {'cfg': $("#scconf").val(), 'res': "lb"},
+	    success: function(resp) {
+		var data = JSON.parse(resp);
+		$('#stordiv0').empty();
+		$('#stordiv0').append("<p><br></p>");
+		$('#stordiv0').append("<p>Choose an AWS S3 storage bucket into which place results:</p>");
+		
+		if(data.length==0) {
+  		    $('#stordiv').append("<div class='tdindents'><p>None found.</p></div>");
+		} else {
+		    for (var k=0; k < data.length; k++) {
+  			$('#stordiv').append("<div class='tdindents'><input type='radio' class='rindent' name='s3buckets' value='" + 
+					     data[k] + "' "+ ((k==0)?"checked='checked'":"") + "/> "+data[k]+"</div>");
+		    }
+		    $('#stordiv').append("<p><br></p><p class='tdindent1'><input type='button' onclick='mkbucket();' value='Create a new bucket'/></p><p><br></p>");
+		}
+	    }
+
+       	});
+    }
+};
+
+function get_vstores() {
+    var posting = $.ajax({
+	url: "get_sc_resource.php",
+	type: "POST",
+	aysnc: false,
+	data: {'cfg': $("#scconf").val(), 'res': "lv"},
+	success: function(resp) {
+	    $("#awsvoldb").val(resp);
+	    if(resp.match(/volid/)) {
+		$("#ebs_actions_0").hide();
+		$("#ebs_actions_y").show();
+	    } else {
+		$("#ebs_actions_0").hide();
+		$("#ebs_actions_n").show();
+
+	    }
+	}
+    });
+}
+
+
+
+$("#login_aws").click(function () {
+    $("#inp_warn").hide();
+    $("#inp_aws_preamble").show();
+    $("#inp_lc_preamble").hide();
+    $("#inp_ebs").show();
+    $("#inp_rfile_opt").show();
+    $("#inp_upfile_opt").show();
+    $("#inp_scan_opt").hide();
+    $("#inp_sysfiletree_opt").show();
+    init_selectbox(0);
+    $("div#inp_upfile_opt iframe").contents().find("#myfile").val("");
+    $("div#inp_regions_opt iframe").contents().find("#myfile").val("");
+    $("#rpath").val("");
+
+
+    $("#awsinfo_c").show();
+    $("#tgiinfo_c").hide();
+
+
+
+
+    $("#jobinst").show();						   
+    $("#runinfo").hide();
+    $("#titleinfo").show();
+
+
+
+
+
+
+});
+
+$("#login_tgi").click(function () {
+    $("#inp_warn").hide();
+    $("#inp_aws_preamble").hide();
+    $("#inp_lc_preamble").show();
+    $("#inp_ebs").hide();
+    $("#inp_rfile_opt").show();
+    $("#inp_upfile_opt").show();
+    $("#inp_scan_opt").show();
+    $("#inp_sysfiletree_opt").hide();
+    init_selectbox(0);
+    $("div#inp_upfile_opt iframe").contents().find("#myfile").val("");
+    $("div#inp_regions_opt iframe").contents().find("#myfile").val("");
+    $("#rpath").val("");
+
+
+
+    $("#awsinfo_c").hide();
+    $("#tgiinfo_c").show();
+
+
+
+
+    $("#jobinst").show();						   
+    $("#runinfo").show();
+    $("#titleinfo").show();
+
+
+
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// (rjm) For applying profiles to work
+$("#vs_isGL").change(function() {
+    if( $(this).is(':checked')) {
+	$("#vs_gl_div").show();	$("#vs_som_div").hide(); $("#vs_trio_div").hide(); upd_vs_hcfilters();
+    }
+});
+$("#vs_isSOM").change(function() {
+    if( $(this).is(':checked')) {
+	$("#vs_gl_div").hide();	$("#vs_som_div").show(); $("#vs_trio_div").hide(); upd_vs_hcfilters();
+    }
+});
+$("#vs_isTRIO").change(function() {
+    if( $(this).is(':checked')) {
+	$("#vs_gl_div").hide();	$("#vs_som_div").hide(); $("#vs_trio_div").show(); upd_vs_hcfilters();
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
+$("#vs_do_hcfilter").change(function() { upd_vs_hcfilters(); check_vs_mode(); });
+$("#vs_do_fpfilter, #vs_do_dbsnp").change(function() { upd_vs_fpfilter(); check_vs_mode(); });
+$("#strlk_do_fpfilter, #strlk_do_dbsnp").change(function() { upd_strlk_fpfilter(); });
+
+
+$("[id^=pindel_mode]").change(function() { upd_pin_filters(); check_pin_mode(); });
+$("#pin_do_filter").change(function() { upd_pin_filters(); check_pin_mode(); });
+
+$("[id^=bd_trans_type]").change(function() { upd_bd_regions(); });
+
+
+// Select global regions
+function clickall_chrdef(i) {
+    $("#vs_chrdef"+i).trigger('click'); 
+    $("#bder_chrdef"+i).trigger('click'); 
+    $("#pindel_chrdef"+i).trigger('click'); 
+    $("#gs_chrdef"+i).trigger('click'); 
+}
+function copy_chr_str(s) {
+    $("#vs_chrdef_str").val( s );
+    $("#bder_chrdef_str").val( s );
+    $("#pindel_chrdef_str").val( s );
+    $("#gs_chrdef_str").val( s );
+}
+function check_glob_cb() {
+    // it is possible none has been checked
+    for(var k=0; k <= 2; k++) {
+	if( $("#glob_chrdef"+k).is(":checked")) { 
+	    clickall_chrdef(k); 
+	    break;
+	}
+    }
+    var str=$("#glob_chrdef_str").val().trim();
+    if( str != "" ) { copy_chr_str(str); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function enable_resources() {
+    if( $("#login_tgi").is(":checked") ){
+	get_clust(1);
+	get_sc_running(0);
+	get_stores(1);
+
+    } else if( $("#login_aws").is(":checked")){
+	var aws_un = $("#aws_un").val().trim();
+	var aws_ak = $("#aws_ak").val().trim();
+	var aws_sk = $("#aws_sk").val().trim();
+	if( aws_un=="" || aws_ak=="" || aws_sk=="") {
+	    alert("Alert: Please provide your Amazon credentials so we can determine your available resources.");
+	} else {
+	    $("#ebs_actions_y").hide();
+	    $("#ebs_actions_n").hide();
+	    $("#ebs_actions_0").show();
+
+	    $('#sc_running0').empty();
+	    $('#sc_running0').append("<p>Manage AWS instances:  <b>Updating ... please wait ...</b></p>");
+	    $('#sc_running').empty();
+
+	    // Create initial config
+	    if( $("#scconf").val().trim() == "") {
+		var posting = $.ajax({
+		    url: "setup_sc.php",
+		    type: "POST",
+		    async: false, 
+		    data: {'aws_un':aws_un, 'aws_ak':aws_ak, 'aws_sk':aws_sk, 'src': $("#scconf").val(), 'cmd': 'init'},
+		    success: function(resp) {
+			if(resp.match(/AuthFailure/)) {
+			    alert("Error: AWS was not able to validate the provided access credentials. Please try again.");
+			    return false;
+			} else {
+			    resp = JSON.parse(resp);
+			    $("#scconf").val(resp);
+			    $("#s3conf").val(resp.replace(/sc$/,"s3cfg"));
+			}
+		    }
+		});
+	    }
+
+	    var posting = $.ajax({
+		url: "prepare_s3.php",
+		type: "POST",
+		async: false,
+		data: {'s3conf': $("#s3conf").val(), 'aws_ak': aws_ak, 'aws_sk': aws_sk, 'aws_https': $("input[name=aws_https]:checked").val(), 'aws_ssenc': $("input[name=aws_ssenc]:checked").val() },
+//		success: function(resp) {
+//		    $("#s3conf").val( JSON.parse(resp) );
+//		    }
+	    });
+
+	    // Get AWS info
+	    get_vstores();
+	    get_clust(0);
+	    get_sc_running(0);
+	    get_stores(0);
+
+	}
+    }
+}
+
+$("#mode_select").change(function() {
+    $("#mode_msg").html("<b><i>"+$("#mode_select option:selected").data('mymsg')+"</i></b>");
+});
+
+$("#global_do_fpfilter").click(function() {
+    if ($("#global_do_fpfilter").is(':checked')) {
+        $("#vs_do_fpfilter").prop('checked',true).trigger('change');
+        $("#strlk_do_fpfilter").prop('checked',true).trigger('change');
+    } else {
+        $("#vs_do_fpfilter").prop('checked',false).trigger('change');
+        $("#strlk_do_fpfilter").prop('checked',false).trigger('change');
+}
+
+});
+$("#global_do_dbsnp").click(function() {
+    if ($("#global_do_dbsnp").is(':checked')) {
+        $("#vs_do_dbsnp").prop('checked',true).trigger('change');
+        $("#strlk_do_dbsnp").prop('checked',true).trigger('change');
+    } else {
+        $("#vs_do_dbsnp").prop('checked',false).trigger('change');
+        $("#strlk_do_dbsnp").prop('checked',false).trigger('change');
+    }
+});
+function upd_global_dbsnp() {
+    if( $("#vs_do_dbsnp").is(':checked') &&  $("#strlk_do_dbsnp").is(':checked')) {
+	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
+	$("#global_do_dbsnp").prop('checked',true).trigger('change');
+    } else if ( ! $("#vs_do_dbsnp").is(':checked') &&  ! $("#strlk_do_dbsnp").is(':checked')) {
+	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
+	$("#global_do_dbsnp").prop('checked',false).trigger('change');
+    } else {
+	$("#global_do_dbsnp").prop('indeterminate',true).trigger('change');
+	$("#global_do_dbsnp").prop('checked',false).trigger('change');
+    }
+}
+function upd_global_fpfilter() {
+    if( $("#vs_do_fpfilter").is(':checked') &&  $("#strlk_do_fpfilter").is(':checked')) {
+	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
+	$("#global_do_fpfilter").prop('checked',true).trigger('change');
+    } else if ( ! $("#vs_do_fpfilter").is(':checked') &&  ! $("#strlk_do_fpfilter").is(':checked')) {
+	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
+	$("#global_do_fpfilter").prop('checked',false).trigger('change');
+    } else {
+	$("#global_do_fpfilter").prop('indeterminate',true).trigger('change');
+	$("#global_do_fpfilter").prop('checked',false).trigger('change');
+    }
+}
+$("#vs_do_dbsnp,#strlk_do_dbsnp").click(function() {  upd_global_dbsnp(); });
+$("#vs_do_fpfilter,#strlk_do_fpfilter").click(function() {  upd_global_fpfilter(); });
+
+
+$("#nav-button_2, #nav-button_9, #nav-button_11").click(function() { $("#scconf").val(""); enable_resources(); });
+</script>
+</body></html>
+

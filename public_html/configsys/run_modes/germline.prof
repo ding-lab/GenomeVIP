@@ -1,0 +1,24 @@
+[config]
+varscan.cmd="true"
+varscan.call_mode="germline"
+strelka.cmd="false"
+breakdancer.cmd="true"
+breakdancer.call_mode="germline"
+pindel.cmd="true"
+pindel.call_mode="germline"
+genomestrip.cmd="true"
+genomestrip.run_mode="discovery_and_genotyping"
+genomestrip.samples="single"
+
+; filtering
+varscan.apply_high_confidence_filter="true"
+varscan.apply_dbsnp_filter="true"
+varscan.apply_false_positives_filter="true"
+pindel.apply_filter="true"
+breakdancer.apply_bam_filter="false"
+
+; filtering and annotation
+dbsnp.dbsnp_version = "ncbi_grch37_snp142"
+vep.cmd="true"
+vep.vep_version="vep81_grch37_hsapiens"
+;

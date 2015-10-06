@@ -1,0 +1,459 @@
+/* -------------------------------
+// @name GenomeVIP style sheet definitions
+// @version
+// @author R. Jay Mashl <rmashl@genome.wustl.edu>
+--------------------------------*/
+
+body {
+/*    background-color: #ccffcc; */
+/*    background: #6a7b95; */
+    background-color: #4679db;
+    color: #000000; 
+    font-family: arial,sans-serif;
+    font-size: 14px;
+    margin: 5px 10px 10px 10px;
+    padding: 0px; 
+    overflow-y: scroll;   /* make div (re)sizing reliable */
+    height: 100%;
+/*     padding-bottom: 25px; */
+}
+.tb1 {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 400px;
+    background-color: #ffffff }
+
+.tb1b {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 75px;
+    background-color: #ffffff }
+.tb1c {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 300px;
+    background-color: #ffffff }
+.tb1d {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 150px;
+    background-color: #ffffff }
+.tb2  {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 600px;
+    background-color: #ffffff  } 
+.tb2menu  {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 300px;
+     background-color: #ffffff  } 
+.tb2menubig  {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 800px;
+    background-color: #ffffff  } 
+.tb3menu  {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 400px;
+     background-color: #ffffff  } 
+.tb1dmenu {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 150px;
+    background-color: #ffffff  } 
+.ta1  {
+    overflow-x: scroll;
+    overflow-y: scroll;
+    width: 450px;
+}
+.tabsp1 { 
+  border-spacing: 8px 2px;
+ }
+.menu1  {
+    border: 0px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 14px;
+    background-color: #ffffff  } 
+.menu2  {
+    border: 0px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 14px;
+    background-color: #ffffff; 
+    width: 150px;
+}
+hr { 
+     margin-top:20px;
+     margin-bottom:20px;
+     margin-left:auto;
+     margin-right:auto;
+     width: 50%;
+ }
+
+select { 
+    height: 32px;
+    width: 200px;
+    font-size: 14px;
+    border: 1px solid #888888;
+ }
+.select2 { 
+    height: 32px;
+    width: 300px;
+    font-size: 14px;
+    border: 1px solid #888888;
+ }
+
+input[type=radio] { 
+  height: 1.5em;
+  width: 1.5em;
+  vertical-align: baseline;
+ }
+ input[type=checkbox]{ 
+  height: 1.5em;
+  width: 1.5em;
+  vertical-align: baseline;
+ }
+
+
+div[id^="panel"] {  
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size:13px;
+/*    background-color: #aaffaa  */
+   border-radius: 10px; 
+   -webkit-border-radius: 10px; 
+   -moz-border-radius: 10px; 
+    background-color: #eeeeee;
+   margin-right: 10px;
+} 
+.volw { 
+    width: 100px;
+} 
+.vspanel {  
+    border: 1px solid #000000;
+   border-radius: 10px; 
+   -webkit-border-radius: 10px; 
+   -moz-border-radius: 10px; 
+   margin-right: 10px;
+     margin-bottom:10px;
+} 
+
+
+p[id^="toggle"] { 
+    border: 0px solid #000000;
+    font-family: arial,sans-serif;
+    font-weight: bold;
+    font-size:14px;
+}
+
+.mytable { 
+           border-spacing: 0px 6px; 
+           padding: 0px;
+           width: 95%;
+           margin-left: 0px;
+}
+
+.clusttab { 
+   border-radius: 10px;
+   border: 1px solid;
+   border-color: #aaaaaa;
+   padding: 3px;
+         }
+.clusttab th { 
+   background: #eeeeee;
+}
+.clusttab td { 
+   border-spacing: 0px;
+ }
+
+
+
+.headspc {  margin: 0px 0px 15px; }  
+
+p { margin: 0.15em 0; } /* top=bot; R=L */
+
+p em { font-style: italic; }
+.nobai { font-style: italic; }
+.norefi { font-style: italic; }
+.nomaski { font-style: italic; }
+.norm { background: #e5f5e0;}
+.tumor { background: #a1d99b;}
+
+a.hdr:link {text-decoration: none; color:#000000; } 
+a.hdr:visited { color:#000000; } 
+/* a.hdr:hover {
+background:#b7d8f0;
+color:#000000; 
+} 
+*/
+
+
+.next-tab { 
+position: absolute;
+right: 25px;
+/* width: 100px; */
+border: 1px solid;
+ background-color: #eeeeee;
+ border-radius: 10px;
+
+ }
+.prev-tab { 
+position: absolute;
+left: 25px;
+/* width: 100px; */
+border: 1px solid;
+ background-color: #eeeeee;
+ border-radius: 10px; 
+
+ }
+
+a { position: relative; }
+
+a.mover:link {text-decoration: none; color:#000000;}
+a.mover:visited { color:#000000; } 
+/* a.mover:hover { 
+background:#b7d8f0;
+color:#550000;
+ }  */
+
+.center { margin-left: auto; margin-right: auto; width: 90%;  }
+
+.subhead { 
+background:#b7d8f0;
+color:#000000; 
+ border-radius: 10px;
+border: 1px solid;
+border-color:#b7d8f0;
+           }
+
+.ltab { width: 250px; }
+
+.tdw3 { width: 300px; }
+.tdw4 { width: 400px; }
+.tdw5 { width: 500px; }
+
+.tdindentd  { padding-left:10px;}
+.tdindents  { padding-left:15px;}
+.tdindentk  { padding-left:20px;}
+.tdindent  { padding-left:30px;}
+.tdindent1  { padding-left:45px;}
+.tdindent2 { padding-left:60px;}
+.tdindent3 { padding-left:90px;}
+.tdindent4 { padding-left:120px;}
+.rindent  { margin-left:30px;}
+
+.subtitle { font-weight: bold; text-decoration: underline;}
+.subtitle2 { font-style: italic; font-weight: bold;}
+
+
+#prevBtn{ display:none; }
+
+.fps { margin-top: 3px; margin-bottom: 3px; }
+
+.hasbai { font-style: normal; background-color: #ffffff; }
+.hasrefi { font-style: normal; background-color: #ffffff; }
+.initiallyHidden { display: none; }
+
+.spinner { 
+/* display: none; */
+position: fixed;
+top: 50%;
+left: 50%;
+margin-left: -96px;
+margin-top: -96px;
+text-align: center;
+z-index:100;
+overflow: auto;
+width: 100px;
+height: 102px;  /* +2px to fix IE8 */
+ }
+
+
+.compres { width: 400px; }
+
+.inputarea { 
+/*  background-color: lightblue; */
+  background-color: #b7d8f0;
+ padding: 5px;
+ border-radius: 10px;
+ border: 1px solid;
+ }
+
+.psep { 
+        margin-top:30px;
+}
+
+.trtop { 
+ margin-top: 12px;
+ vertical-align: top;
+}
+.frame { 
+ overflow: hidden;
+ border: 0;
+ width: 100%; padding: 0px;
+ height: 120px; margin: 0px;
+/*  margin-top: 12px; */
+ }
+
+img { 
+  /* Responsive images (ensure images don't scale beyond their parents) */
+  max-width: 100%;
+  /* Part 1: Set a maxium relative to the parent */
+  width: auto \9;
+  /* IE7-8 need help adjusting responsive images */
+  height: auto;
+  /* Part 2: Scale the height according to the width, otherwise you get stretching */
+  vertical-align: middle;
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}      
+
+.inline { 
+  height: 1.5em;
+  vertical-align: middle;
+}
+
+.foottab{ width: 98%; left: 1px; padding: 1px; border-spacing: 0px; 
+   border-top: 2px solid; border-left: 0px; border-right: 0px; border-bottom: 0px;
+   margin: -5px 0px 0px 0px; 
+   background-color: #4679db;
+   /* border-radius: 10px; -moz-border-radius: 10px; -webkit-border-radius: 10px;  */
+   border-color: #aaaaaa;   border-style: solid; position: fixed; z-index: 2;
+   bottom: 0; 
+   height: 40px;
+}
+.foottab td { width: 33%; /* padding: auto; */ text-align: center; } 
+.foottab tr { line-height: 40px; padding: 0px;}
+.foottab img { height: 35px; max-height: 35px; width: auto;}
+
+
+
+.headtab { width: 100%; padding: 1px; border-spacing: 0px; 
+   border-top: 0px; border-left: 0px; border-right: 0px; border-bottom: 2px solid;
+   margin: -5px 0px 0px 0px; 
+   background-color: #4679db; 
+   border-radius: 0px; -moz-border-radius: 0px; -webkit-border-radius: 0px; 
+   border-color: #aaaaaa; border-style: solid; position: fixed; z-index: 2; }
+.headtab td { padding: 0px; }             
+.headtab tr { padding: 0px; }
+
+.myheader { 
+   width: 400px;
+   text-align: left;
+   text-decoration: underline;
+ }
+.myheader2 { 
+   text-decoration: underline;
+   font-weight: bold;
+ }
+
+.logo { color: #ffffff;  font-size: 24px; font-family: arial,sans-serif; font-weight: bold; }
+.logo2 { color: #ffffff;  font-size: 12px; font-family: arial,sans-serif; font-weight: bold; }
+
+.allcontent { padding-top: 78px; padding-bottom: 38px;}
+
+
+#nav-panel { 
+ width: 100px;
+  height: 0px; 
+ position: fixed;
+ background: #4679db;
+ z-index:1;
+ }
+/* .nav-button { background: #aaa; border-radius: 5px; border-width: 2px;}
+.nav-button:hover{ border-color: #f5da81;}
+.navflow { background: #eee; }
+*/
+
+.nav-button { background: #eee; 
+   border-width: 3px;
+   border-radius: 5px; 
+   -webkit-border-radius: 5px; 
+   moz-border-radius: 5px; 
+   border-color: #cccccc;
+   width: 75px;
+}
+.nav-button:hover{
+   border-style: ridge;
+   border-color: #ffff00;
+}
+.nav-button:active{
+    background: #e18728; 
+}
+.navflow { 
+   background: #f7d358;
+   border-width: 3px; 
+   border-radius: 5px; 
+   -webkit-border-radius: 5px; 
+   moz-border-radius: 5px; 
+}
+
+
+#content-panel { 
+ position: relative;
+ left: 100px;
+ }
+
+table.navtab td { 
+  text-align: center;
+  border: white;
+  vertical-align: middle;
+ }
+
+table.cnvtab { 
+   width: 80%; 
+   margin-left: 0px;
+   border-spacing: 0px; 
+   padding: 0px;
+ }
+
+table.spread td { 
+     padding-top: .5em;
+     padding-bottom: .5em;
+ }
+
+.arrow-down { 
+width: 0;
+height: 0;
+border-left: 10px solid transparent;
+border-right: 10px solid transparent;
+border-top: 10px solid #e18728;
+top: 50%;
+left:40%;
+position: relative;
+}
+
+
+.Container { 
+  margin-left: auto;
+  margin-right: auto;
+}
+.Right   { 
+   margin-left: 150px;
+}      
+.Left   { 
+   float: left;
+   width: 150px;
+   text-align: center;
+   vertical-align: middle;
+}
+.textattr { 
+  width: 300px;
+  height: 150px;
+}
+.voltb { 
+  width: 400px;
+  height: 150px; /*no gap*/
+  overflow-x: scroll;
+  overflow-y: scroll;
+ }

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+@name GenomeVIP upload regions page
+@version
+@author R. Jay Mashl <rmashl@genome.wustl.edu>
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=us-ascii">
+<title></title>
+<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="js/ui/1.10.4/jquery-ui.min.js"></script>
+<!-- <script type="text/javascript" src="js/multiselect2side/js/jquery.multiselect2side.js" ></script> -->
+<script type="text/javascript" src="js/jquery.form.js"></script>
+<link rel="stylesheet" type="text/css" href="js/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<!-- <link rel="stylesheet" href="js/multiselect2side/css/jquery.multiselect2side.css" type="text/css" media="screen"> -->
+<link rel="stylesheet" type="text/css" href="frame.css"> 
+
+<script>
+    $(document).ajaxStart(function() {
+        $('.spinner').show();
+    });
+$(document).ajaxStop(function() {
+    $('.spinner').hide();
+});
+$(document).ready(function(event) {
+	$('#frm2').ajaxForm(function(data) {
+	    var a = data.split("\n");
+//	    $('#file_result',parent.document.body).html(a[1]);
+
+	    if (a[0] == 1) { 
+              $('#file_div',parent.document.body).empty();
+               $('#file_div',parent.document.body).append("<input type='hidden' name='filepath' value='"+ a[2]+"'/>"); 
+		parent.upload_selector(a[2]);
+	    }
+	});
+    });
+</script>
+<!-- <style>input {font:13px arial,sans-serif;}</style>  -->
+</head>
+<body>
+
+<p>&nbsp;&bull; Select upload file containing list of files:</p>
+<div class="tdindents">
+  <form name="frm2" id="frm2" action="upfile.php" method="post" enctype="multipart/form-data">
+  <div class="checkbutton">
+  <input type="file" name="myfile" id="myfile" value=""/><br/>
+  <input type="submit" id="submit" value="Upload File" />
+  </div>
+  </form>
+</div>
+</body>
+</html>
+
+

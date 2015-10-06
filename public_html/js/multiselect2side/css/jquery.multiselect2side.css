@@ -1,0 +1,134 @@
+.ms2side__div {  /* rjm: this is the global width */
+	clear: left;
+	width: 100%; /* rjm: original is 100% */
+	padding: 1px;
+	float: left;
+	background : url('') repeat-x; /* HACK FOR CHROME */
+/* overflow-x: scroll; */ /* rjm */
+/* overflow-y: hidden; */ /* rjm */
+/* overflow-x: hidden; */ /* rjm */
+
+}
+
+.mystuff { /* rjm */
+overflow-x: auto;
+ }
+
+.ms2side__select {
+	float: left;
+      width: 90%;  /* rjm: width of both sides but not listbox */
+     height: 400px; /* rjm:  alters surround space not listbox; should be > .ms2side__div select height below */
+/*  overflow-x: scroll; */   /* rjm: adds horiz scroll to each side, but one level too high */
+}
+
+
+
+.ms2side__header {  /* rjm: size of header on top of listboxes */
+	color: #000088;
+	background-color: #EEEEFF;
+	margin-left: 3px;
+	width: 90%;
+	height: 24px;  /* rjm: was 20 */
+}
+
+.ms2side__div select {
+	 width: 90%;  /* rjm: listbox width -- if large enough, the vertical scroll vanishes
+                             Omit this to allow horiz scroll*/
+      height: 300px;
+	float: left;
+/* overflow-x: auto; */ /* rjm: does nothing */
+/* overflow-y: scroll; */ /* rjm: does nothing */
+overflow-x: auto; /* rjm */
+overflow: auto; /* rjm */
+overflow-y: auto; /* rjm */
+}
+
+.ms2side__options, .ms2side__updown {  /* rjm: command buttons */
+	float: left;
+	font-size: 12pt;
+	margin: 0;
+	padding: 0 8px;
+	width: 50px;
+	color: black;
+	text-align: center;
+ 	overflow: hidden;
+}
+
+.ms2side__updown {
+	font-size: 9pt;
+}
+
+.ms2side__options p, .ms2side__updown p {
+	margin: 2px 0;
+	padding: 0;
+	cursor: pointer;
+	border: 1px solid black;
+}
+
+.ms2side__options p.ms2side_hover, .ms2side__updown p.ms2side_hover {
+	background-color: #F0F0FF;
+	border-color: #0000FF;
+	cursor: pointer;
+}
+
+.ms2side__options p.ms2side__hide, .ms2side__updown p.ms2side__hide {
+	cursor: default;
+	color: gray;
+	border: 1px solid gray;
+	background-color: #F0F0F0;
+}
+
+
+
+/* INPUT FOR SEARCH */
+.ms2side__header input {
+	width: 200px;
+	height: 16px;
+}
+
+.ms2side__header input.wait {
+	width: 200px;
+	height: 12px;
+	background: #FFFFFF url(../img/loading.gif) no-repeat center right;
+}
+
+.ms2side__header input.small {
+	width: 50px;
+	height: 12px;
+}
+
+
+/* INPUT FOR SELECT SEARCH */
+.ms2side__header select {
+	width: 100px;
+	font-size: 11px;
+	height: 18px;
+	float: none;
+}
+
+.ms2side__header select.small {
+	width: 70px;
+}
+
+
+/* REMOVE FILTER OPTION FOR SEARCH */
+.ms2side__header a {
+	font-size: 10pt;
+	padding: 0 8px;
+	width: 16px;
+	height: 16px;
+	color: black;
+	text-align: center;
+	text-decoration: none;
+	border: 1px solid gray;
+	background: #FFFFFF url(../img/close.gif) no-repeat center center;
+	margin: 0 0 0 3px;
+}
+
+.ms2side__header a:hover {
+	background-color: #F0F0FF;
+	border-color: gray;
+}
+
+
+

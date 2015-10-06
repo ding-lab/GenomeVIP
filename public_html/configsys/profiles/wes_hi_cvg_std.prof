@@ -1,0 +1,210 @@
+[config]
+; ----------------------------------------
+; varscan 
+; ----------------------------------------
+varscan.germline.calltype = both
+varscan.germline.samples = single
+varscan.germline.snv.p_value = 0.05
+varscan.germline.snv.min_coverage = 60
+varscan.germline.snv.min_var_allele_freq = 0.20
+varscan.germline.snv.min_num_supporting_reads = 2
+varscan.germline.indel.p_value = 0.10
+varscan.germline.indel.min_coverage = 60
+varscan.germline.indel.min_var_allele_freq = 0.20
+varscan.germline.indel.min_num_supporting_reads = 2
+varscan.germline.min_avg_base_qual = 15
+varscan.germline.homozyg_min_var_allele_freq = 0.75
+varscan.germline.apply_strand_filter = "true"
+varscan.germline.samtools_min_mapping_qual = 1
+varscan.germline.samtools_min_base_qual = 13
+varscan.germline.samtools_perform_BAQ = "disabled"
+
+
+varscan.somatic.heterozyg_p_value = 0.99
+varscan.somatic.calling_p_value = 0.05
+varscan.somatic.heterozyg_min_var_allele_freq = 0.08
+varscan.somatic.min_normal_coverage = 60
+varscan.somatic.min_tumor_coverage = 45
+varscan.somatic.homozyg_min_var_allele_freq = 0.75
+varscan.somatic.normal_purity = 1.00
+varscan.somatic.tumor_purity = 1.00
+varscan.somatic.apply_strand_filter = "true"
+varscan.somatic.min_avg_base_qual = 15
+varscan.somatic.report_validation = "false"
+varscan.somatic.samtools_min_mapping_qual = 1
+varscan.somatic.samtools_min_base_qual = 13
+varscan.somatic.samtools_perform_BAQ = "disabled"
+
+
+varscan.trio.min_coverages = 60
+varscan.trio.child_var_allele_freq = 0.20
+varscan.trio.p_value = 0.05
+varscan.trio.adj_child_var_allele_freq = 0.05
+varscan.trio.adj_p_value = 0.10
+varscan.trio.min_num_supporting_reads = 4
+varscan.trio.min_avg_base_qual = 15
+varscan.trio.homozyg_min_var_allele_freq = 0.75
+varscan.trio.apply_strand_filter = "true"
+varscan.trio.samtools_min_mapping_qual = 1
+varscan.trio.samtools_min_base_qual = 13
+varscan.trio.samtools_perform_BAQ = "disabled"
+
+; high-confidence filters
+varscan.filter.germline.snv.min_coverage = 60
+varscan.filter.germline.snv.min_var_allele_freq = 0.20
+varscan.filter.germline.snv.min_num_supporting_reads = 2
+varscan.filter.germline.snv.min_num_strands = 1
+varscan.filter.germline.snv.min_avg_base_qual = 15
+varscan.filter.germline.snv.p_value = 0.10
+varscan.filter.germline.indel.min_coverage = 60
+varscan.filter.germline.indel.min_var_allele_freq = 0.20
+varscan.filter.germline.indel.min_num_supporting_reads = 2
+varscan.filter.germline.indel.min_num_strands = 1
+varscan.filter.germline.indel.min_avg_base_qual = 15
+varscan.filter.germline.indel.p_value = 0.10
+
+varscan.filter.somatic.snv_min_tumor_var_allele_freq = 0.10
+varscan.filter.somatic.snv_max_normal_var_allele_freq = 0.05
+varscan.filter.somatic.snv_p_value = 0.07
+varscan.filter.somatic.indel_min_tumor_var_allele_freq = 0.10
+varscan.filter.somatic.indel_max_normal_var_allele_freq = 0.05
+varscan.filter.somatic.indel_p_value = 0.07
+varscan.filter.somatic.min_coverage = 60
+varscan.filter.somatic.min_num_supporting_reads = 4
+varscan.filter.somatic.min_num_strands = 1
+varscan.filter.somatic.min_avg_base_qual = 20
+varscan.filter.somatic.min_var_allele_freq = 0.20
+varscan.filter.somatic.p_value = 0.05
+
+varscan.filter.trio.parents_max_num_supporting_reads = 0
+
+
+; ----------------------------------------
+; strelka 
+; ----------------------------------------
+strelka.skip_depth_filters = "false"
+strelka.depth_filter_multiple = 3.0
+strelka.max_input_depth = 10000
+
+; Filtering -- defaults
+strelka.snv_max_filtered_basecall_frac = 0.4
+strelka.snv_max_spanning_deletion_frac = 0.75
+strelka.indel_max_ref_repeat = 8
+strelka.indel_max_window_filtered_basecall_frac = 0.3
+strelka.indel_max_interrupted_homopolymer_length = 14
+
+; Probabilities -- defaults
+strelka.somatic_snv_prior_prob = 0.000001
+strelka.somatic_indel_prior_prob = 0.000001
+strelka.snv_noise_prob = 0.0000005
+strelka.indel_noise_prob = 0.000001
+strelka.snv_noise_strand_bias_frac = 0.5
+
+; Quality score filtering -- defaults
+strelka.min_mapping_qual_tier1 = 20
+strelka.min_mapping_qual_tier2 = 5
+strelka.somatic_snv_quality_lower_bound = 15
+strelka.somatic_indel_quality_lower_bound = 30
+
+; Realignment -- defaults
+strelka.write_realignments = "false"
+
+; Other -- defaults
+strelka.max_segment_size = 25000000
+strelka.extra_arguments =
+
+; ----------------------------------------
+; breakdancer
+; ----------------------------------------
+breakdancer.bamcfg.output_mapping_flag_distn = "false"
+breakdancer.bamcfg.create_insert_size_histo = "false"
+breakdancer.bamcfg.min_mapping_qual = 35
+breakdancer.bamcfg.use_mapping_qual = "false"
+breakdancer.bamcfg.insert_size = 50
+breakdancer.bamcfg.system_type = "illumina"
+breakdancer.bamcfg.stdev_cutoff = 4
+breakdancer.bamcfg.coeffs_variation_cutoff = 1
+breakdancer.bamcfg.num_observations_for_stats = 10000
+breakdancer.bamcfg.num_bins = 50
+breakdancer.translocation_calltype = "both"
+breakdancer.fastq_outfile_prefix_of_supporting_reads = ""
+breakdancer.dump_SVs_and_supporting_reads = "false"
+breakdancer.min_region_length = 7
+breakdancer.num_stdevs_for_cutoff = 3
+breakdancer.max_sv_size = 1000000000
+breakdancer.min_alt_mapping_qual = 35
+breakdancer.min_num_read_pairs = 2
+breakdancer.max_coverage_for_ignoring_region = 1000
+breakdancer.connection_buffer_size = 100
+breakdancer.analyze_long_insert = "false"
+breakdancer.count_support_mode = "bam"
+breakdancer.print_allele_freq_column = "false"
+breakdancer.min_score_to_output = 30
+
+; breakdancer filtering -- no user adjustable options
+
+; ----------------------------------------
+; pindel
+; Note: In GenomeVIP, pindel is always set to discover deletions and short insertions
+; ----------------------------------------
+pindel.do_inversions = "true"
+pindel.do_tandem_dups = "true"
+pindel.include_breakdancer = "false"
+pindel.insert_size = 500
+pindel.sv_max_size_index = 5
+pindel.window_size = 0.5
+pindel.additional_mismatch = 1
+pindel.min_num_matching_bases = 3
+pindel.min_inversion_size = 50
+pindel.min_num_mappable_bases = 30
+pindel.balance_cutoff = 100
+pindel.anchor_qual = 20
+pindel.min_num_supporting_reads = 3
+pindel.seq_err_rate = 0.03
+pindel.max_mismatch_rate = 0.05
+pindel.num_threads = 1
+
+; allele filter 
+pindel.filter.heterozyg_min_var_allele_freq = 0.2
+pindel.filter.homozyg_min_var_allele_freq = 0.8
+
+; filter parameters
+pindel.filter.germline.min_coverages = 20
+pindel.filter.germline.min_var_allele_freq = 0.20
+pindel.filter.germline.require_balanced_reads = "true"
+pindel.filter.germline.max_num_homopolymer_repeat_units = 6
+
+pindel.filter.somatic.min_coverages = 20
+pindel.filter.somatic.min_var_allele_freq = 0.10
+pindel.filter.somatic.require_balanced_reads = "true"
+pindel.filter.somatic.remove_complex_indels = "true"
+pindel.filter.somatic.max_num_homopolymer_repeat_units = 6
+
+pindel.filter.trio.min_coverages = 20
+pindel.filter.trio.child_var_allele_freq = 0.20
+pindel.filter.trio.parents_max_num_supporting_reads = 0
+pindel.filter.trio.require_balanced_reads = "true"
+pindel.filter.trio.max_num_homopolymer_repeat_units = 6
+
+
+; ----------------------------------------
+; false-positives filter settings
+; ----------------------------------------
+fpfilter.min_mapping_qual = 0
+fpfilter.min_base_qual = 15
+fpfilter.min_num_var_supporting_reads = 4
+fpfilter.min_var_allele_freq = 0.05
+fpfilter.min_avg_rel_read_position = 0.10
+fpfilter.min_avg_rel_dist_to_3prime_end = 0.10
+fpfilter.min_var_strandedness = 0.01
+fpfilter.min_allele_depth_for_testing_strandedness = 5
+fpfilter.min_ref_allele_avg_base_qual = 30
+fpfilter.min_var_allele_avg_base_qual = 30
+fpfilter.max_rel_read_length_difference = 0.25
+fpfilter.max_mismatch_qual_sum_for_var_reads = 150
+fpfilter.max_avg_mismatch_qual_sum_difference = 100
+fpfilter.min_ref_allele_avg_mapping_qual = 30
+fpfilter.min_var_allele_avg_mapping_qual = 30
+fpfilter.max_avg_mapping_qual_difference = 50
+
+

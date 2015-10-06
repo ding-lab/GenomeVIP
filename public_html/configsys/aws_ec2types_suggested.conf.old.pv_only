@@ -1,0 +1,30 @@
+; instance types for GenomeVIP supported by StarCluster
+
+
+[instance m2.xlarge]
+   VCPU=2
+   ECPU=6.5
+   MEM=17.1
+   NAME=cluster_1
+   ODP=0.245
+
+[instance m2.2xlarge]
+   VCPU=4
+   ECPU=13
+   MEM=34.2
+   NAME=cluster_2
+   ODP=0.49
+
+[instance m2.4xlarge]
+   VCPU=8
+   ECPU=26
+   MEM=68.4
+   NAME=cluster_3
+   ODP=0.98
+
+[instance t1.micro]
+   VCPU=1
+   ECPU=1
+   MEM=1
+   NAME=micro
+   ODP=0.02

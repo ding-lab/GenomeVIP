@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+@name GenomeVIP upload regions page
+@version 
+@author R. Jay Mashl <rmashl@genome.wustl.edu>
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=us-ascii">
+<title></title>
+<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="js/ui/1.10.4/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/jquery.form.js"></script>
+<link rel="stylesheet" type="text/css" href="js/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="frame.css"> 
+
+<script>
+    $(document).ajaxStart(function() {
+        $('.spinner').show();
+    });
+$(document).ajaxStop(function() {
+    $('.spinner').hide();
+});
+$(document).ready(function(event) {
+    $('#frm_reg').ajaxForm(function(data) {
+	
+	var a = data.split("\n");
+	
+	if (a[0] == 1) { 
+	    $('#region_div',parent.document.body).empty();
+	    $('#region_div',parent.document.body).append("<input type='hidden' id='filepath_region' name='filepath_region' value='"+ a[2]+"'/>"); 
+	    parent.upload_object(a[2],1);
+	}
+    });
+});
+</script>
+
+</head>
+<body>
+<form name="frm_reg" id="frm_reg" action="upfile.php" method="post" enctype="multipart/form-data">
+<div class="checkbutton">
+  <input type="file" name="myfile" id="myfile" value=""/><br/>
+  <input type="submit" id="submit" value="Upload File" />
+</div>
+</form>
+
+</body>
+</html>
+
+
