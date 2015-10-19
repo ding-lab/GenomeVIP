@@ -7,15 +7,15 @@
 #ini_set('display_errors',1);
 #error_reporting(E_ALL & ~E_DEPRECATED);
 #print "start\n";
-require_once "../fileconfig.php";
+include "fileconfig.php";
 function callHome() {
 	/* Collect only tools (and version) used, whether AWS or local, and ip. */
 	$endline = '<br>';
 	$endl = "\n";
-	global $home;
+	#global $home;
 	#$home = "localhost:8888/portal/PhoneHome/phoneHomeOperator.php";
 
-	$client = "localhost:8888/Portals/GenomeVIP/PhoneHome/test.html";
+	#$client = "localhost:8888/Portals/GenomeVIP/PhoneHome/test.html";
 	#echo "et".$endline;
 #print "check POST\n";
 	if ( isset( $_POST ) ) {
@@ -34,7 +34,7 @@ function callHome() {
 				( strcmp( $element , 'pin_version' ) && isset( $_POST['pin_version'] ) ) ||
 				( strcmp( $element , 'version_gs' ) && isset( $_POST['version_gs'] ) ) ||
 				( strcmp( $element , 'compute_target' ) ) ||
-				( strcmp( $element , 'bam_count' ) ) {
+				( strcmp( $element , 'bam_count' ) ) ) {
 				$fields[$element] = urlencode( $value );
 			}
 #print $element." => ".$value.$endl;
