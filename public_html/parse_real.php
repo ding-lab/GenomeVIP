@@ -455,6 +455,9 @@ function write_vep_input_common($fp, $prefix) {
 
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
+	require_once "et.php";
+	$_POST['bam_count'] = count( $list_of_sorted_bams );
+	$ok = callHome();
 
   //  if($do_html==1) {
   //  }
