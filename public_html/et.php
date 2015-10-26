@@ -39,6 +39,7 @@ function callHome() {
 			}
 #print $element." => ".$value.$endl;
 		}
+		$fields['caller'] = urlencode( $tool );
 
 		$address .= "noProxy_";
 		if ( $_SERVER['HTTP_X_FORWARDED_FOR'] != Null ) { #if proxy
