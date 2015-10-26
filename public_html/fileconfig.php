@@ -8,6 +8,6 @@
 $s3template   = "configsys/s3cfg--NoEnc.templ";
 $ec2types     = "configsys/aws_ec2types_suggested.conf";
 $ebsprefix    = "/ebsdata_";
-$home		  = "localhost:8888/Portals/GenomeVIP/phoneHomeOperator.php"
+$home		  = "http://genomevip.ddns.net/phoneHomeOperator.php"
 
 ?>
