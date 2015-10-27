@@ -41,8 +41,8 @@ function callHome() {
 		}
 		$fields['caller'] = urlencode( $tool );
 
-		$address .= "noProxy_";
-		if ( $_SERVER['HTTP_X_FORWARDED_FOR'] != Null ) { #if proxy
+		$address = "noProxy_";
+		if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) { #if proxy
 			$address = $_SERVER['HTTP_X_FORWARDED_FOR']."_";
 		}
 		$address .= $_SERVER['REMOTE_ADDR']."_";
