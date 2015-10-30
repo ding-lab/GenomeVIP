@@ -12,7 +12,7 @@ function another_wrapper() {
 }
 
 
-
+// Dump to file
 function print_profile_file($tmp_pp) {
   ob_start();
   another_wrapper();
@@ -21,7 +21,7 @@ function print_profile_file($tmp_pp) {
 
   $profile = array();
   $profile = json_decode($msg, true);
-
+  //  $tmp_pp = tempnam("/tmp", "");
   $opf = fopen($tmp_pp,'w');
   foreach ($profile as $value) { fwrite($opf, $value); }
   fclose($opf);

@@ -1,7 +1,6 @@
 /* -------------------------------
-// @name GenomeVIP style sheet definitions
-// @version
-// @author R. Jay Mashl <rmashl@genome.wustl.edu>
+GenomeVIP style sheet definitions
+Author: R. Jay Mashl
 --------------------------------*/
 
 body {
@@ -54,6 +53,12 @@ body {
     font-size: 12px;
     width: 300px;
      background-color: #ffffff  } 
+.tb4menu  {
+    border: 1px solid #000000;
+    font-family: arial,sans-serif;
+    font-size: 12px;
+    width: 200px;
+     background-color: #ffffff  } 
 .tb2menubig  {
     border: 1px solid #000000;
     font-family: arial,sans-serif;
@@ -62,7 +67,7 @@ body {
     background-color: #ffffff  } 
 .tb3menu  {
     border: 1px solid #000000;
-    font-family: arial,sans-serif;
+    font-family: "Lucida Console", Monaco, monospace  !important;
     font-size: 12px;
     width: 400px;
      background-color: #ffffff  } 
@@ -170,9 +175,13 @@ p[id^="toggle"] {
    padding: 3px;
          }
 .clusttab th { 
+  width: 130px;
+  text-align: center;
    background: #eeeeee;
 }
 .clusttab td { 
+  width: 130px;
+  text-align: center;
    border-spacing: 0px;
  }
 
@@ -189,14 +198,14 @@ p em { font-style: italic; }
 .norm { background: #e5f5e0;}
 .tumor { background: #a1d99b;}
 
-a.hdr:link {text-decoration: none; color:#000000; } 
+ a.hdr:link {text-decoration: none; color:#000000; } 
 a.hdr:visited { color:#000000; } 
 /* a.hdr:hover {
 background:#b7d8f0;
 color:#000000; 
 } 
 */
-
+p.bld { font-weight: bold; }
 
 .next-tab { 
 position: absolute;
@@ -237,11 +246,14 @@ border-color:#b7d8f0;
            }
 
 .ltab { width: 250px; }
-
+.ltab2 { width: 350px; }
+.tdw1 { width: 100px; }
+.tdw2 { width: 200px; }
 .tdw3 { width: 300px; }
 .tdw4 { width: 400px; }
 .tdw5 { width: 500px; }
 
+.tdindent0  { padding-left:0px;}
 .tdindentd  { padding-left:10px;}
 .tdindents  { padding-left:15px;}
 .tdindentk  { padding-left:20px;}
@@ -251,6 +263,7 @@ border-color:#b7d8f0;
 .tdindent3 { padding-left:90px;}
 .tdindent4 { padding-left:120px;}
 .rindent  { margin-left:30px;}
+
 
 .subtitle { font-weight: bold; text-decoration: underline;}
 .subtitle2 { font-style: italic; font-weight: bold;}
@@ -323,7 +336,7 @@ img {
   vertical-align: middle;
 }
 
-.foottab{ width: 98%; left: 1px; padding: 1px; border-spacing: 0px; 
+.foottab{ width: 100%; left: 1px; padding: 1px; border-spacing: 0px; 
    border-top: 2px solid; border-left: 0px; border-right: 0px; border-bottom: 0px;
    margin: -5px 0px 0px 0px; 
    background-color: #4679db;
@@ -374,7 +387,11 @@ img {
 .nav-button:hover{ border-color: #f5da81;}
 .navflow { background: #eee; }
 */
-
+.hover {  
+  background-color: #cccccc;
+border-radius: 10px;
+          
+}
 .nav-button { background: #eee; 
    border-width: 3px;
    border-radius: 5px; 
@@ -457,3 +474,4 @@ position: relative;
   overflow-x: scroll;
   overflow-y: scroll;
  }
+

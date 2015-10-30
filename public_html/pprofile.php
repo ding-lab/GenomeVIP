@@ -201,24 +201,24 @@ if (isset($_POST['vs_cmd'])) {
     } else {
       array_push($pp, "varscan.apply_dbsnp_filter = \"true\"\n");
       
-
-
-
+      //      $prefix = "varscan.dbsnp";
+      //      $key = "dbsnp_version";
+      //      array_push($pp, "$prefix.$key = ".$_POST[$key]."\n");
     }
     array_push($pp, "\n");
 
 
-    // (VarScan as global) false positives filter
+    // VarScan false positives filter
     if( ! isset($_POST['vs_apply_false_positives_filter']) ) {
         array_push($pp, "varscan.apply_false_positives_filter = \"false\"\n");
       } else {
         array_push($pp, "varscan.apply_false_positives_filter = \"true\"\n");
 
-
-
-
-
-
+	//	$prefix = "varscan.fpfilter";
+	//	foreach ($vs_opts_fpfilter as $value) {
+	//	  $key = "vs_fp_$value";
+	//	  array_push($pp, "$prefix.$value = ".$_POST[$key]."\n");
+	//	}
       
     }
     array_push($pp, "\n");
@@ -336,7 +336,7 @@ if (isset($_POST['vs_cmd'])) {
     array_push($pp, "\n");
 
 
-    // BreakDancer filtering (currently only somatic or trio) 
+    // BreakDancer filtering (basically, somatic or trio only) 
     $prefix = "breakdancer";
     foreach ($bd_opts_f as $tmpkey => $value) {
       $key = "bd_$tmpkey";
@@ -402,7 +402,7 @@ if (isset($_POST['vs_cmd'])) {
 
 
     // Pindel Filters - method to avoid dependency issues
-
+    // print_pindel_common_filter();
     include realpath(dirname(__FILE__)."/"."write_filter.php");
     
     array_push($pp, "\n");
@@ -497,7 +497,7 @@ if (isset($_POST['vs_cmd'])) {
 
   // ------------------------------------------------------------
 
-
+  // Need only if tools specify
   // Using varscan opts as global
   if( isset($_POST['vs_apply_false_positives_filter']) || isset($_POST['strlk_apply_false_positives_filter']) ) {
     array_push($pp, "[ false_positives_filter ]\n"); 
@@ -514,7 +514,7 @@ if (isset($_POST['vs_cmd'])) {
 
   // ------------------------------------------------------------
 
-
+  // Need only if tools specify
   if( isset($_POST['vs_apply_dbsnp_filter']) ||  isset($_POST['strlk_apply_dbsnp_filter']) ) {
     array_push($pp, "[ dbsnp ]\n"); 
     $prefix = "dbsnp";

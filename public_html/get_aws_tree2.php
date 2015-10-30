@@ -12,7 +12,6 @@ include realpath(dirname(__FILE__)."/"."populate.php");
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
-  // Use with processed lists
   $mymap=array(1=>"1000G.pilot_phase.lst.processed",
 	       2=>"1000G.phase1.low_cov.lst.processed",
 	       3=>"1000G.phase1.exome.lst.processed",

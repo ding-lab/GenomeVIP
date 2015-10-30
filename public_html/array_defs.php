@@ -46,7 +46,7 @@ $vs_gl_opts_gen_f = array(
  );
 
 
-// use varscan-tagged fpfilter options as global
+// use varscan-tagged fpfilter options as global 
 $vs_opts_fpfilter = array(
  "min_mapping_qual",
  "min_base_qual",
@@ -160,7 +160,7 @@ $bd_bamcfg_opts = array(
  "create_insert_size_histo"   => " -h ",
  "min_mapping_qual"           => " -q ",
  "use_mapping_qual"           => " -m ",
- "insert_size"                => " -s ",   // note: current systemwide TGI script complains on options s or v but warning is safe
+ "insert_size"                => " -s ",   // note: our institutional script complains on options s or v but warning is safe
  "system_type"                => " -C ",
  "stdev_cutoff"               => " -c ",
  "coeffs_variation_cutoff"    => " -v ",
@@ -251,7 +251,7 @@ $pindel_gen_opts_f = array(
 
 // ----------------------------------------
 
-// gs_opts from parse_real.php, generate_gs_config()
+
 $gs_opts = array(
  "genotyping_modules",
  "split_genotypingModel",

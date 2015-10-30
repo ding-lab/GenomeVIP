@@ -1,0 +1,5 @@
+# GenomeVIP - Genome Variant Investigation Platform
+
+* Copyright (c) 2014,2015. All rights reserved. 
+* The source code of GenomeVIP is made freely available for academic use.
+* The terms of usage of the included jQuery library packages are governed their respective licenses.

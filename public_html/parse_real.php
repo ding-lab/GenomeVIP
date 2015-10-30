@@ -12,32 +12,28 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 //$nobsub="#";
 $nobsub="";
+
 $do_timing=1;
-//$s3cmd_public="";
-$s3cmd_public=" "."--acl-public"." ";
 $dlay=0;
 $wc="*";
 $qq="\"";
-$SC="starcluster"; 
 
-// Monitor SGE memory
-$do_sgemem=1;
-$sgemem_cmd="qstat -j \\\$JOB_ID >> qstat.\\\$JOB_ID";
+// make files transferred to S3 public
+//$s3cmd_public=" "."--acl-public"." ";
+$s3cmd_public="";
+
+// Monitor SGE jobs
+$sgemem_cmd="if [[ ! -z \\\$JOB_ID ]] ; then qstat -j \\\$JOB_ID >> qstat.\\\$JOB_ID ; fi";
 
 // Functions
 include realpath(dirname(__FILE__)."/"."resources_util.php");
 include realpath(dirname(__FILE__)."/"."array_defs.php");
-
-
-
-
 include realpath(dirname(__FILE__)."/"."pprofile_wrapper.php");
 include realpath(dirname(__FILE__)."/"."bam_util.php");
 
 
 function write_bamlist($fp,$list,$thefile)   {
   fwrite($fp, "cat > ./$thefile << EOF\n");
-
   foreach ($list as $i) { fwrite($fp, "\$RUNDIR/genomes/$i\n"); }
   fwrite($fp,"EOF\n");
 }
@@ -92,12 +88,8 @@ function write_vs_preamble($fp, $toolsinfo_h) {
 
 function check_sam($fp) {
   global $toolsinfo_h, $bNoSam;
-
   if ($bNoSam) {
-
-
     fwrite($fp, "export SAMTOOLS_DIR=".$toolsinfo_h['samtools']['path']."\n");
-
     $bNoSam=0;
   }
 }
@@ -105,8 +97,6 @@ function check_sam($fp) {
 
 function create_fai($fp, $mylabel) {
   global $toolsinfo_h;
-
-
   check_sam($fp);
   $SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
   fwrite($fp, "if [[ ! -e \$".$mylabel."_fai ]] ; then\n");
@@ -114,8 +104,6 @@ function create_fai($fp, $mylabel) {
   fwrite($fp, "   \$SAMTOOLS_DIR/$SAMTOOLS_EXE faidx  \$".$mylabel."\n");
   fwrite($fp, "   echo Creating fai...done\n");
   fwrite($fp, "fi\n");
-
-
 }
 
 function write_fai($fp, $myref, $mylabel, $pathid, $action) {
@@ -140,11 +128,8 @@ function write_fai($fp, $myref, $mylabel, $pathid, $action) {
 
 function handle_fai($fp,$hasfai, $myref, $mylabel, $pathid, $action) {
   if ($hasfai) {  //     use it
-
     write_fai($fp, $myref, $mylabel, $pathid, $action);
   } else {  //   create it
-
-
     create_fai($fp, $mylabel);
   }
 }
@@ -157,7 +142,7 @@ function gen_mem_str($compute_target, $size) {
   case "AWS":
     $tmp="-l h_vmem=".$size."M";
     break;
-  case "tgi":
+  case "local":
     $tmp="-R 'select[mem>$size] rusage[mem=$size] span[hosts=1]' -M ".($size*1000);
   }
   return $tmp;
@@ -249,9 +234,6 @@ function generate_gs_config($fp) {
   global $gs_opts;
 
   fwrite($fp, "cat > ./genomestrip.input <<EOF\n");
-
-
-
   foreach ($gs_opts as $value) {
     $gs_value = str_replace('_', '.', $value);
     $key="gs_".$value;
@@ -277,17 +259,6 @@ function generate_gs_config($fp) {
   fwrite($fp,"EOF\n");
 }
 
-
-
-
-
-
-
-
-
-
-
-
 // Globals
 $DNAM_VAR = array();
 $DNAM_use = array();
@@ -301,16 +272,55 @@ $bNoSam=1;
 $notify=array();
 $randlen=8;
 
+$L_FA    =  1;
+$L_FASTA =  2;
+$L_FAI   =  4;
+$L_GZ    =  8;
+$L_BZ2   = 16;
+
+$IS_FA        = $L_FA;
+$IS_FASTA     = $L_FASTA;
+$IS_FA_FAI    = $L_FA     | $L_FAI;
+$IS_FASTA_FAI = $L_FASTA  | $L_FAI;
+
+$IS_FA_GZ        = $L_FA    | $L_GZ;
+$IS_FASTA_GZ     = $L_FASTA | $L_GZ;
+$IS_FA_GZ_FAI    = $L_FA    | $L_GZ | $L_FAI;
+$IS_FASTA_GZ_FAI = $L_FASTA | $L_GZ | $L_FAI;
+
+$IS_FA_BZ2        = $L_FA    | $L_BZ2;
+$IS_FASTA_BZ2     = $L_FASTA | $L_BZ2;
+$IS_FA_BZ2_FAI    = $L_FA    | $L_BZ2 | $L_FAI;
+$IS_FASTA_BZ2_FAI = $L_FASTA | $L_BZ2 | $L_FAI;
 
 
 
+function get_ref_type($ref) {
+  global $IS_FA_FAI, $IS_FASTA_FAI, $IS_FA_GZ_FAI, $IS_FASTA_GZ_FAI, $IS_FA_BZ2_FAI, $IS_FASTA_BZ2_FAI;
+  global $IS_FA, $IS_FASTA, $IS_FA_GZ, $IS_FASTA_GZ, $IS_FA_BZ2, $IS_FASTA_BZ2;
+  if(preg_match('/\.fai$/', $ref)) {
+    if(      preg_match('/\.fa\.fai$/',        $ref)) {return $IS_FA_FAI;
+    } elseif(preg_match('/\.fasta\.fai$/',     $ref)) {return $IS_FASTA_FAI;
+    } elseif(preg_match('/\.fa\.gz\.fai$/',    $ref)) {return $IS_FA_GZ_FAI;
+    } elseif(preg_match('/\.fasta\.gz\.fai$/', $ref)) {return $IS_FASTA_GZ_FAI;
+    } elseif(preg_match('/\.fa\.bz2\.fai$/',   $ref)) {return $IS_FA_BZ2_FAI;
+    } elseif(preg_match('/\.fasta\.bz2\.fai$/',$ref)) {return $IS_FASTA_BZ2_FAI;
+    } else {
+      echo "ERROR: *.fai type not found.<br>\n";
+      return 0;
+    }
+  } elseif (preg_match('/\.fa$/',        $ref)) {return $IS_FA;
+  } elseif (preg_match('/\.fasta$/',     $ref)) {return $IS_FASTA;
+  } elseif (preg_match('/\.fa\.gz$/',    $ref)) {return $IS_FA_GZ;
+  } elseif (preg_match('/\.fasta\.gz$/', $ref)) {return $IS_FASTA_GZ;
+  } elseif (preg_match('/\.fa\.bz2$/',   $ref)) {return $IS_FA_BZ2;
+  } elseif (preg_match('/\.fasta\.bz2$/',$ref)) {return $IS_FASTA_BZ2;
+  } else {
+    echo "ERROR: *.fa type not found.<br>\n";
+    return 0;
+  }
 
-
-
-
-
-
-
+}
 
 
 function gen_strelka_ini($fp, $fn, $strlk_opts) {
@@ -332,38 +342,6 @@ function gen_strelka_ini($fp, $fn, $strlk_opts) {
     }
     fwrite($fp,"EOF\n");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Improved version: no explicit tests needed for filter inclusion
 function write_vs_gl_merge ($fp, $vs_bMap, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix) {
@@ -455,25 +433,23 @@ function write_vep_input_common($fp, $prefix) {
 
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-	include "et.php";
-	$_POST['bam_count'] = count( $list_of_sorted_bams );
-	$ok = callHome();
+  include "et.php";
 
   //  if($do_html==1) {
   //  }
 
   // --------------------------------------------------------------------------------
   // SETUP ENVIRONMENT
-
+  // Read pre-determined software paths on target machine
   $compute_target = $_POST['compute_target'];
   switch ($compute_target) {
   case 'AWS':
     $workdir    = generateRandomString($randlen);
     $myjob      = $workdir;
-    $resultsdir = $workdir;
-    $scconf     = $_POST['scconf'];
 
-    $toolsinfo_h = parse_ini_file('configsys/tools.info.AWS', true);
+
+
+    $toolsinfo_h      = parse_ini_file('configsys/tools.info.AWS', true);
     
     $s3_cmd = $toolsinfo_h['s3cmd']['path']."/".$toolsinfo_h['s3cmd']['exe'];
     $put_cmd = "\"\$s3_cmd $s3cmd_public put\"";
@@ -493,7 +469,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     break;
 
-  case 'tgi':
+  case 'local':
     $workdir    = trim($_POST['workdir']);
     // Add explicit homedir if needed; we remove it later when transferring files
     if ($workdir=="") {
@@ -503,23 +479,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $workdir = "~/$workdir"; // assume homedir
     }
     
-
-
-
-
     // Generated jobname
     $myjob = generateRandomString($randlen);
-    
-    
 
 
 
-
-    // Leave this hardcoded?
-    $resultsdir="$workdir/results";  // default
     
     
-    $toolsinfo_h = parse_ini_file('configsys/tools.info.tgi', true);
+    $toolsinfo_h = parse_ini_file('configsys/tools.info.local', true);
     
     $put_cmd = "\"ln -s\"";
     $del_cmd = "\"rm -f\"";
@@ -545,19 +512,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   $toolmem_h = parse_ini_file('configsys/tools.mem', true);
   $GENOMEVIP_SCRIPTS=$toolsinfo_h['genomevip_scripts']['path'];
   
-
-
-  
-  
-
-
-
-
-
-  
-
-
-  
   //--------------------------------------------------------------------------------
   // SETUP BINARIES MACROS and PATHS
   
@@ -569,45 +523,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   system("touch $tmpjob.main && chmod 0600 $tmpjob.main");
   $fp = fopen("$tmpjob.main", 'w');
 
-
-  
   // Bam and reference paths
   $paths_h = $_POST['pathdb'];
-
   
   foreach ($paths_h as $key => $value) {
-
-
     $DNAM_use[$key] = 0;
     $DNAM = "DIR".$key;
     $DNAM_VAR[$key] = $DNAM;
-
-
-
-
-
-
-
-    
   }
   // Cluster-specific path stuff
   switch ($compute_target) {
   case "AWS":
-
-
-
-
-
-
-
-
-
-    // NOTE: Assumed for now that an EBS volume is a required work disk
-    // $RUNDIR = "/mnt/$workdir";
-    $RUNDIR = $ebsprefix.$_POST['awsworkvols']."/$workdir";
-
-
-    $RESULTSDIR = "s3://".$_POST['s3buckets']."/".$resultsdir;
+    // TODO:
+    //$RUNDIR = $ebsprefix.$_POST['awsworkmenu']."/$workdir";  // work disk
+    $RUNDIR = "/mnt/$workdir";  // work disk
+    $RWORKDIR   = "s3://".$_POST['s3buckets']."/$workdir";
+    $RESULTSDIR = "s3://".$_POST['s3buckets']."/$workdir/results";
+    $STATUSDIR  = "s3://".$_POST['s3buckets']."/$workdir/status";
     
     fwrite($fp, "s3_cmd=$s3_cmd\n");
     fwrite($fp, "get_cmd=$get_cmd\n");
@@ -615,21 +547,26 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $action="ln -s";
     break;
     
-  case "tgi":
-    $RUNDIR = $workdir;
-    $RESULTSDIR = $resultsdir;
+  case "local":
+    $RUNDIR     = "$workdir";
+    $RESULTSDIR = "$workdir/results";
+    $STATUSDIR  = "$workdir/status";
     $action="ln -s";
+    break;
   }
+
   fwrite($fp, "put_cmd=$put_cmd\n");
   fwrite($fp, "del_cmd=$del_cmd\n");
   fwrite($fp, "del_local=$del_local\n");
   fwrite($fp, "RUNDIR=$RUNDIR\n");
   fwrite($fp, "mkdir -p \$RUNDIR/{genomes,reference,status}\n");
-  fwrite($fp, "touch \$RUNDIR/status/LOG\n");
+  fwrite($fp, "touch \$RUNDIR/status/Tasks_left\n");
 
+  fwrite($fp, "RWORKDIR=$RWORKDIR\n");
   fwrite($fp, "RESULTSDIR=$RESULTSDIR\n");
-  if ($compute_target=="tgi") {
-    fwrite($fp, "mkdir -p \$RESULTSDIR/status\n");
+  fwrite($fp, "STATUSDIR=$STATUSDIR\n");
+  if ($compute_target=="local") {
+    fwrite($fp, "mkdir -p \$STATUSDIR\n");
   }
   
   
@@ -642,6 +579,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     write_check_aws_file_int($fp);
   }
 
+
   // --------------------------------------------------------------------------------
   // Set up genomes
   // --------------------------------------------------------------------------------
@@ -653,7 +591,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   $list_of_sorted_bams=array();
   $baipath_h = array();
 
-
   $prepare_bam=array();
   if (isset($_POST['baipath'])) {
     $tmp_h = $_POST['baipath'];
@@ -664,17 +601,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
   $tmp_h = $_POST['bamfiles'];   // this is subset of $bamlist_arr 
   
-
-
-
-  
   foreach ($tmp_h as $kk) {    // bams
-
+           file_put_contents("testout", "bamfile=".$kk."\n", FILE_APPEND);
     
-
     // Multiple dir version
     list($sid, $pathid, $i, $hasbai) = preg_split('/\|/', $kk);   // encoding: selectid, pathid, file, bai match
-    array_push($list_of_sorted_bams, $i);    // put this here for expected n-t order
+    array_push($list_of_sorted_bams, $i);
     
     // Adding bam check in case of discrepancies between filesystem and current tree file, particularly useful for S3
     if ($hasbai) {
@@ -771,7 +703,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       
       array_push($prepare_bam, $kk);
    }
-  }
+  } // bams
+
+  $_POST['bam_count'] = count( $list_of_sorted_bams );
+  $ok = callHome();
 
   // Update output
   if (count($prepare_bam) > 0 ) {
@@ -791,7 +726,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "cat > prepare_bam.lst <<EOF\n");
     foreach ($prepare_bam as $kk) {
       list($sid, $pathid, $i, $hasbai) = preg_split('/\|/', $kk);  
-
       fwrite($fp, basename($i,".bam").".orig.bam\n");
       $DNAM_use[$pathid] = 1;
     }
@@ -801,10 +735,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "done\n");
 
   }
-
-
-
-
   fwrite($fp, "echo Preparing genomes...done\n");
   fwrite($fp, "\n");
 
@@ -822,23 +752,799 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
   list($sid, $pathid, $REF, $hasfai) = preg_split('/\|/', $_POST['refgenome']);   // encoding: selectid, pathid, file, has fai
 
-  // NEW CODE //////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Get basename
+  if (preg_match('/\.gz$/', $REF)) {
+    $baseref = preg_replace('/\.gz$/','',$REF);
+  } elseif (preg_match('/\.bz2$/', $REF)) {
+    $baseref = preg_replace('/\.bz2$/','',$REF);
+  } else {
+    $baseref = $REF;
+  }
+  if (preg_match('/\.fa$/', $baseref)) {
+    $stemref = preg_replace('/\.fa$/','',$baseref);
+  } elseif (preg_match('/\.fasta$/', $baseref)) {
+    $stemref = preg_replace('/\.fasta$/','',$baseref);
+  } else {
+    echo "ERROR: Reference $REF appears not to be in FASTA format.<br>\n";
+  }
+  $reffiles_h = $_POST['reffiles'];
+
+  // gather all info for this ref stem
+  $refmatch = array();
+  foreach ($reffiles_h as $kk) { 
+    list($pathid, $availref, $hasfai) = preg_split('/\|/', $kk);
+    if (preg_match("/^$stemref\.fa/", $availref)) {
+      $tmp = get_ref_type($availref);
+      $availref_type_h[$availref] = $tmp;
+      $typematch[$tmp] = $kk;
+    }
+  }
+  
+  // Consider rewriting the huge section below
+  
+  // for varscan
+  if(isset($_POST['vs_cmd'])) {
+    fwrite($fp, "# Check avail refs for varscan ref\n");
+    $bFound=0;
+    foreach ($typematch as $key => $value) {
+      switch ($key) {
+      case $IS_FA_GZ:    // "$stemref.fa.gz":
+      case $IS_FASTA_GZ: //"$stemref.fasta.gz":
+	$bFound=1;
+	list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	fwrite($fp, "VS_REF=$availref\n");
+	fwrite($fp, "if [[ ! -e  \$VS_REF ]]; then\n");
+	fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$VS_REF  .\n");
+	fwrite($fp, "fi\n");
+	$DNAM_use[$pathid] = 1;
+	$retrieved[$availref] = $availref_type_h[$availref];
+	$retrieved_pathid[$availref] = $pathid;
+	fwrite($fp, "VS_REF_fai=\${VS_REF}.fai\n");
+	$VS_REF = $availref;
+	$VS_REF_fai = "$VS_REF.fai";
+	handle_fai($fp, $hasfai, $VS_REF_fai, "VS_REF", $pathid, $action);
+	$retrieved[$VS_REF_fai] = get_ref_type($VS_REF_fai);
+	break 2;
+      }
+    }
+
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA_BZ2:    //"$stemref.fa.bz2"
+	case $IS_FASTA_BZ2: //"$stemref.fasta.bz2"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "$action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+	  fwrite($fp, "echo Converting reference format...\n");
+	  fwrite($fp, "bunzip2 -c ./$availref > ./$baseref\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "VS_REF=$baseref\n");
+	  fwrite($fp, "VS_REF_fai=\${VS_REF}.fai\n");
+	  $VS_REF = $baseref;
+	  $VS_REF_fai = "$VS_REF.fai";
+	  
+	  if( array_key_exists($IS_FA_FAI, $typematch))  {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$VS_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } elseif ( array_key_exists($IS_FASTA_FAI, $typematch)) {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FASTA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$VS_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } else { // create fai
+	    create_fai($fp, "VS_REF");
+	  }
+	  $retrieved[$VS_REF_fai] = $availref_type_h[$VS_REF_fai] = get_ref_type($VS_REF_fai);
+	  break 2;
+	}
+      }
+    }
+      
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA:    //"$stemref.fa"
+	case $IS_FASTA: //"$stemref.fasta"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "VS_REF=$availref\n");
+	  fwrite($fp, "$action \$$DNAM_VAR[$pathid]/\$VS_REF  .\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+	  fwrite($fp, "VS_REF_fai=\${VS_REF}.fai\n");
+	  $VS_REF = $availref;
+	  $VS_REF_fai = "$VS_REF.fai";
+	  handle_fai($fp, $hasfai, $VS_REF_fai, "VS_REF", $pathid, $action);
+	  $retrieved[$VS_REF_fai] = get_ref_type($VS_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      fwrite($fp, "\nexit\n");
+      fwrite($fp, "# ERROR:  No compatible reference for varscan found.\n");
+      echo "ERROR:  No compatible reference for varscan found.<br>\n";
+    }
+  } // end vs ref
+
+
+
+  // for strelka
+  if(isset($_POST['strlk_cmd'])) {
+    fwrite($fp, "# Check retrieved for strelka ref\n");
+    $bFound=0;
+
+    // check retrieved first
+    foreach ($retrieved as $key => $value) { // key is ref; value is type
+      if ( ($value & $L_FAI) != $L_FAI) { // is a ref
+	fwrite($fp, "# found retrieved ref\n");
+	if ( ($value & $L_GZ)!=$L_GZ && ($value & $L_BZ2)!=$L_BZ2) { // fa or fasta
+	  $bFound=1;
+	  fwrite($fp, "STRELKA_REF=$key\n");
+	  fwrite($fp, "STRELKA_REF_fai=\${STRELKA_REF}.fai\n");
+	  $STRELKA_REF     = $key;
+	  $STRELKA_REF_fai = "$STRELKA_REF.fai";
+	  break;
+	
+	} else { // should be fa(sta)?.(bz2|gz)
+	  $bFound=1;
+	  fwrite($fp, "STRELKA_REF=$baseref\n");
+
+	  fwrite($fp, "if [[ ! -e \$STRELKA_REF ]] ; then\n");
+	  fwrite($fp, "   echo Converting reference format...\n");
+	  if (preg_match('/\.gz$/', $key)) {
+	    fwrite($fp, "   gunzip -c ./$key > ./\$STRELKA_REF\n");
+	  } else {
+	    fwrite($fp, "   bunzip2 -c ./$key > ./\$STRELKA_REF\n");
+	  }
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "STRELKA_REF_fai=\${STRELKA_REF}.fai\n");
+	  $STRELKA_REF = $baseref;
+	  $STRELKA_REF_fai = "$STRELKA_REF.fai";
+	  // We could also check if compatible fai exists and simply rename it
+	  if (! array_key_exists($STRELKA_REF_fai, $retrieved)) {
+	    create_fai($fp, "STRELKA_REF");
+	    $retrieved[$STRELKA_REF_fai] = $availref_type_h[$STRELKA_REF_fai] = get_ref_type($STRELKA_REF_fai);
+	  }
+	  break;
+	}
+      }
+    }
+
+    // check available references instead
+    if(!$bFound) {  
+      fwrite($fp, "# Checking avail refs instead for strelka ref\n");
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA:    //"$stemref.fa"
+	case $IS_FASTA: //"$stemref.fasta"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "STRELKA_REF=$availref\n");
+	  fwrite($fp, "$action \$$DNAM_VAR[$pathid]/\$STRELKA_REF  .\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+          fwrite($fp, "STRELKA_REF_fai=\${STRELKA_REF}.fai\n");
+          $STRELKA_REF = $availref;
+          $STRELKA_REF_fai = "$STRELKA_REF.fai";
+          handle_fai($fp, $hasfai, $STRELKA_REF_fai, "STRELKA_REF", $pathid, $action);
+	  $retrieved[$STRELKA_REF_fai] = get_ref_type($STRELKA_REF_fai);
+          break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {  
+	switch ($key) {
+	case $IS_FA_GZ: // "$stemref.fa.gz":
+	case $IS_FASTA_GZ: // "$stemref.fasta.gz":
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  fwrite($fp, "fi\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = get_ref_type($availref);
+	  fwrite($fp, "echo Converting reference format...\n");
+	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
+	  fwrite($fp, "   gunzip -c ./$availref > ./$baseref\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "STRELKA_REF=$baseref\n");
+	  fwrite($fp, "STRELKA_REF_fai=\${STRELKA_REF}.fai\n");
+	  $STRELKA_REF = $baseref;
+	  $STRELKA_REF_fai = "$STRELKA_REF.fai";
+
+	  if ( array_key_exists($IS_FA_FAI, $typematch)) {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$STRELKA_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } elseif ( array_key_exists($IS_FASTA_FAI, $typematch))  {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FASTA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$STRELKA_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } else { // create fai
+	    create_fai($fp, "STRELKA_REF");
+	  }
+	  $retrieved[$STRELKA_REF_fai] = $availref_type_h[$STRELKA_REF_fai] = get_ref_type($STRELKA_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      fwrite($fp, "\nexit\n");
+      fwrite($fp, "# ERROR:  No compatible reference for strelka found.\n");
+      echo "ERROR:  No compatible reference for strelka found.<br>\n";
+    }
+
+  } // end strelka ref
+
+
+
+  // for pindel
+  if(isset($_POST['pin_cmd'])) {
+    fwrite($fp, "# Checking retrieved for pindel ref\n");
+    $bFound=0;
+    
+    // check retrieved first
+    foreach ($retrieved as $key => $value) { // key is ref; value is type
+      if ( ($value & $L_FAI) != $L_FAI) { // is a ref
+	fwrite($fp, "# found retrieved ref\n");
+	if ( ($value & $L_GZ)!=$L_GZ && ($value & $L_BZ2)!=$L_BZ2) { // fa or fasta
+	  $bFound=1;
+	  fwrite($fp, "PINDEL_REF=$key\n");
+	  fwrite($fp, "PINDEL_REF_fai=\${PINDEL_REF}.fai\n");
+	  $PINDEL_REF     = $key;
+	  $PINDEL_REF_fai = "$PINDEL_REF.fai";
+	  break;
+	
+	} else { // should be fa(sta)?.(bz2|gz)
+	  $bFound=1;
+	  fwrite($fp, "PINDEL_REF=$baseref\n");
+
+	  fwrite($fp, "if [[ ! -e \$PINDEL_REF ]] ; then\n");
+	  fwrite($fp, "   echo Converting reference format...\n");
+	  if (preg_match('/\.gz$/', $key)) {
+	    fwrite($fp, "   gunzip -c ./$key > ./\$PINDEL_REF\n");
+	  } else {
+	    fwrite($fp, "   bunzip2 -c ./$key > ./\$PINDEL_REF\n");
+	  }
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "PINDEL_REF_fai=\${PINDEL_REF}.fai\n");
+	  $PINDEL_REF = $baseref;
+	  $PINDEL_REF_fai = "$PINDEL_REF.fai";
+	  // We could also check if compatible fai exists and simply rename it
+	  if (! array_key_exists($PINDEL_REF_fai, $retrieved)) {
+	    create_fai($fp, "PINDEL_REF");
+	    $retrieved[$PINDEL_REF_fai] = $availref_type_h[$PINDEL_REF_fai] = get_ref_type($PINDEL_REF_fai);
+	  }
+	  break;
+	}
+      }
+    }
+
+
+    // check available references instead
+    if(!$bFound) {  
+      fwrite($fp, "# Checking avail refs instead for pindel ref\n");
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA:    //"$stemref.fa"
+	case $IS_FASTA: //"$stemref.fasta"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "PINDEL_REF=$availref\n");
+	  fwrite($fp, "$action \$$DNAM_VAR[$pathid]/\$PINDEL_REF  .\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+          fwrite($fp, "PINDEL_REF_fai=\${PINDEL_REF}.fai\n");
+          $PINDEL_REF = $availref;
+          $PINDEL_REF_fai = "$PINDEL_REF.fai";
+          handle_fai($fp, $hasfai, $PINDEL_REF_fai, "PINDEL_REF", $pathid, $action);
+	  $retrieved[$PINDEL_REF_fai] = get_ref_type($PINDEL_REF_fai);
+          break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA_BZ2: // "$stemref.fa.bz2"
+	case $IS_FASTA_BZ2: // "$stemref.fasta.bz2"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
+	  fwrite($fp, "$action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  fwrite($fp, "fi\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = get_ref_type($availref);
+	  fwrite($fp, "echo Converting reference format...\n");
+	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
+	  fwrite($fp, "   bunzip2 -c ./$availref > ./$baseref\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "PINDEL_REF=$baseref\n");
+	  fwrite($fp, "PINDEL_REF_fai=\${PINDEL_REF}.fai\n");
+	  $PINDEL_REF = $baseref;
+	  $PINDEL_REF_fai = "$PINDEL_REF.fai";
+
+	  if ( array_key_exists($IS_FA_FAI, $typematch)) {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$PINDEL_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } elseif ( array_key_exists($IS_FASTA_FAI, $typematch))  {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FASTA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$PINDEL_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } else { // create fai
+	    create_fai($fp, "PINDEL_REF");
+	  }
+	  $retrieved[$PINDEL_REF_fai] = $availref_type_h[$PINDEL_REF_fai] = get_ref_type($PINDEL_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {  
+	switch ($key) {
+	case $IS_FA_GZ: // "$stemref.fa.gz":
+	case $IS_FASTA_GZ: // "$stemref.fasta.gz":
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  fwrite($fp, "fi\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = get_ref_type($availref);
+	  fwrite($fp, "echo Converting reference format...\n");
+	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
+	  fwrite($fp, "   gunzip -c ./$availref > ./$baseref\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "PINDEL_REF=$baseref\n");
+	  fwrite($fp, "PINDEL_REF_fai=\${PINDEL_REF}.fai\n");
+	  $PINDEL_REF = $baseref;
+	  $PINDEL_REF_fai = "$PINDEL_REF.fai";
+
+	  if ( array_key_exists($IS_FA_FAI, $typematch)) {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$PINDEL_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } elseif ( array_key_exists($IS_FASTA_FAI, $typematch))  {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FASTA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$PINDEL_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } else { // create fai
+	    create_fai($fp, "PINDEL_REF");
+	  }
+	  $retrieved[$PINDEL_REF_fai] = $availref_type_h[$PINDEL_REF_fai] = get_ref_type($PINDEL_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      fwrite($fp, "\nexit\n");
+      fwrite($fp, "# ERROR:  No compatible reference for pindel found.\n");
+      echo "ERROR:  No compatible reference for pindel found.<br>\n";
+    }
+  } // end pindel ref
+
+
+
+
+  // for breakdancer:  uses fai if regions not specified
+  if(isset($_POST['bd_cmd']) ) {
+    fwrite($fp, "# Working on breakdancer ref fai\n");
+    $bFound=0;
+
+    // Re-use fai if already prepared
+    if (isset($_POST['vs_cmd'])) {
+      fwrite($fp, "# Using vs ref fai\n");
+      $BREAKDANCER_REF_fai=$VS_REF_fai;
+      fwrite($fp, "BREAKDANCER_REF_fai=$BREAKDANCER_REF_fai\n");
+      $retrieved[$BREAKDANCER_REF_fai] = get_ref_type($VS_REF_fai);
+      $bFound=1;
+    } elseif (isset($_POST['pin_cmd'])) {
+      fwrite($fp, "# Using pindel ref fai\n");
+      $BREAKDANCER_REF_fai=$PINDEL_REF_fai;
+      fwrite($fp, "BREAKDANCER_REF_fai=$BREAKDANCER_REF_fai\n");
+      $retrieved[$BREAKDANCER_REF_fai] = get_ref_type($PINDEL_REF_fai);
+      $bFound=1;
+    }
+
+    // Instead try to find (any) existing fai
+    if(!$bFound) {
+      fwrite($fp, "# Checking avail refs for fai for bd\n");
+      foreach ($typematch as $key => $value) {
+	if ( ($key & $L_FAI) != $L_FAI) {  // is a ref
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  if ($hasfai) {
+	    $bFound=1;
+	    fwrite($fp, "BREAKDANCER_REF_fai=$availref.fai\n");
+	    $BREAKDANCER_REF_fai="$availref.fai";
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF_fai .\n");
+	    $DNAM_use[$pathid] = 1;
+	    $retrieved[$BREAKDANCER_REF_fai] = get_ref_type($BREAKDANCER_REF_fai);
+
+	  }
+	}
+      }
+    }
+
+    // Create fai from a ref
+    if (!$bFound) {  // create fai in likely or preferred order
+
+      foreach ($typematch as $key => $value)  {
+	switch ($key) {
+	case $IS_FA_GZ: // "$stemref.fa.gz":
+	case $IS_FASTA_GZ: //"$stemref.fasta.gz":
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "BREAKDANCER_REF=$availref\n");
+	  fwrite($fp, "if [[ ! -e \$BREAKDANCER_REF ]] ; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF  .\n");
+	  fwrite($fp, "fi\n");
+	  $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+	  fwrite($fp, "BREAKDANCER_REF_fai=\${BREAKDANCER_REF}.fai\n");
+	  $BREAKDANCER_REF = $availref;
+	  $BREAKDANCER_REF_fai = "$BREAKDANCER_REF.fai";
+	  create_fai($fp, "BREAKDANCER_REF");
+	  $retrieved[$BREAKDANCER_REF_fai] = get_ref_type($BREAKDANCER_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA_BZ2: //"$stemref.fa.bz2":
+	case $IS_FASTA_BZ2:  //"$stemref.fasta.bz2":
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  fwrite($fp, "fi\n");
+	  $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+	  fwrite($fp, "echo Converting reference format...\n");
+	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
+	  fwrite($fp, "   bunzip2 -c ./$availref > ./$baseref\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "BREAKDANCER_REF=$baseref\n");
+	  fwrite($fp, "BREAKDANCER_REF_fai=\${BREAKDANCER_REF}.fai\n");
+	  $BREAKDANCER_REF=$baseref;
+	  $BREAKDANCER_REF_fai="$BREAKDANCER_REF.fai";
+	  create_fai($fp, "BREAKDANCER_REF");
+	  $retrieved[$BREAKDANCER_REF_fai] = get_ref_type($BREAKDANCER_REF_fai);
+	  break 2;
+	}
+      }
+    }
+    
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA: // "$stemref.fa":
+	case $IS_FASTA: //"$stemref.fasta":
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "BREAKDANCER_REF=$availref\n");
+	  fwrite($fp, "if [[ ! -e \$BREAKDANCER_REF ]] ; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF  .\n");
+	  fwrite($fp, "fi\n");
+	  $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+	  fwrite($fp, "BREAKDANCER_REF_fai=\${BREAKDANCER_REF}.fai\n");
+	  $BREAKDANCER_REF=$availref;
+	  $BREAKDANCER_REF_fai="$BREAKDANCER_REF.fai";
+	  create_fai($fp, "BREAKDANCER_REF");
+	  $retrieved[$BREAKDANCER_REF_fai] = get_ref_type($BREAKDANCER_REF_fai);
+	  break 2;
+	}
+      }
+    }
+    
+    if(!$bFound) {
+      fwrite($fp, "\nexit\n");
+      fwrite($fp, "# ERROR:  No compatible reference for breakdancer found.\n");
+      echo "ERROR:  No compatible reference for breakdancer found.<br>\n";
+    }
+      
+  }  // end bd fai check
+
+
+  // GenomeSTRiP 
+  if(isset($_POST['gs_cmd'])) {
+
+    // handle gender map
+    list($sid, $pathid, $gendermapfile) = preg_split('/\|/', $_POST['gs_gendermap']);
+    fwrite($fp, "GENOMESTRIP_GENDER_MAP=$gendermapfile\n");
+    fwrite($fp, "if [[ ! -e \$GENOMESTRIP_GENDER_MAP ]] ; then\n");
+    fwrite($fp, "    $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_GENDER_MAP .\n");
+    fwrite($fp, "fi\n");
+    $DNAM_use[$pathid] = 1;
+    $GENOMESTRIP_GENDER_MAP=$gendermapfile;
+ 
+    // handle ploidy map
+    list($sid, $pathid, $ploidymap) = preg_split('/\|/', $_POST['gs_ploidymap']);
+    fwrite($fp, "GENOMESTRIP_PLOIDY_MAP=$ploidymap\n");
+    fwrite($fp, "if [[ ! -e \$GENOMESTRIP_PLOIDY_MAP ]] ; then\n");
+    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_PLOIDY_MAP .\n");
+    fwrite($fp, "fi\n");
+    $DNAM_use[$pathid] = 1;
+    $GENOMESTRIP_PLOIDY_MAP=$ploidymap;
+    fwrite($fp, "if [[ ! -e \$GENOMESTRIP_PLOIDY_MAP.autosome ]] ; then\n");
+    fwrite($fp, "   grep -v '^[XY]' \$GENOMESTRIP_PLOIDY_MAP > \$GENOMESTRIP_PLOIDY_MAP.autosome\n");
+    fwrite($fp, "fi\n");
+
+
+    // handle ref. mask. For GS, matching fai is usually provided alongside of mask
+    // change to: uncompressed preferred for softlinks
+    list($sid, $pathid, $maskfile_orig, $hasfai) = preg_split('/\|/', $_POST['gs_sel_svmask']);
+    $maskfile = $maskfile_orig;
+    fwrite($fp, "if [[ ! -e  $maskfile_orig ]] ; then\n");
+    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$maskfile_orig .\n");
+    fwrite($fp, "fi\n");
+    $DNAM_use[$pathid] = 1;
+    if (preg_match("/\.gz\z/", $maskfile_orig)) {
+      $maskfile = basename($maskfile_orig,".gz");
+      fwrite($fp, "if [[ ! -e  $maskfile ]] ; then\n");
+      fwrite($fp, "   gzip -dc $maskfile_orig > $maskfile\n");
+      fwrite($fp, "fi\n");
+    }
+    $GENOMESTRIP_SV_MASK=$maskfile;
+    $GENOMESTRIP_SV_MASK_fai=$GENOMESTRIP_SV_MASK.".fai";
+    fwrite($fp, "GENOMESTRIP_SV_MASK=$GENOMESTRIP_SV_MASK\n");
+    fwrite($fp, "GENOMESTRIP_SV_MASK_fai=\$GENOMESTRIP_SV_MASK.fai\n");
+
+    if ($compute_target != "AWS") {
+      fwrite($fp, "if [[ ! -e  \$GENOMESTRIP_SV_MASK_fai  ]] ; then\n");
+      fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_SV_MASK_fai .\n");
+      fwrite($fp, "else\n");
+    } else {
+      fwrite($fp, "msg=`$action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_SV_MASK_fai 2>&1`\n");
+      fwrite($fp, "result=`check_aws_file_int  \$msg `\n");
+      fwrite($fp, "if [[ \$result -ne 0 ]] ; then \n");
+    }
+      fwrite($fp, "   if [[ ! -e \$GENOMESTRIP_SV_MASK_fai ]] ; then\n");
+      fwrite($fp, "      echo Creating SV mask fai...\n");
+      fwrite($fp, "      ( SAMTOOLS_DIR=".$toolsinfo_h['samtools']['path']."\n");
+      fwrite($fp, "        SAMTOOLS_EXE=".$toolsinfo_h['samtools']['exe']."\n");
+      fwrite($fp, "        \$SAMTOOLS_DIR/\$SAMTOOLS_EXE faidx  \$GENOMESTRIP_SV_MASK ) \n");
+      fwrite($fp, "        echo Creating SV mask fai...done\n");
+      fwrite($fp, "      fi\n");
+      fwrite($fp, "   fi\n");
+  
+
+    // handle CN mask. For GS, matching fai is usually provided alongside of mask
+    if ($_POST['gs_depth_useGCNormalization'] == "true") {
+
+      list($sid, $pathid, $maskfile_orig, $hasfai) = preg_split('/\|/', $_POST['gs_sel_cnmask']);
+      $maskfile = $maskfile_orig;
+      fwrite($fp, "if [[ ! -e  $maskfile_orig ]] ; then\n");
+      fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$maskfile_orig .\n");
+      fwrite($fp, "fi\n");
+      $DNAM_use[$pathid] = 1;
+      if (preg_match("/\.gz\z/", $maskfile_orig)) {
+	$maskfile = basename($maskfile_orig, ".gz");
+	fwrite($fp, "if [[ ! -e  $maskfile ]] ; then\n");
+	fwrite($fp, "   gzip -dc $maskfile_orig > $maskfile\n");
+	fwrite($fp, "fi\n");
+      }
+      $GENOMESTRIP_CN_MASK=$maskfile;
+      $GENOMESTRIP_CN_MASK_fai=$GENOMESTRIP_CN_MASK.".fai";
+      fwrite($fp, "GENOMESTRIP_CN_MASK=$GENOMESTRIP_CN_MASK\n");
+      fwrite($fp, "GENOMESTRIP_CN_MASK_fai=\$GENOMESTRIP_CN_MASK.fai\n");
+      
+      if ($compute_target != "AWS") {
+	fwrite($fp, "if [[ ! -e  \$GENOMESTRIP_CN_MASK_fai ]] ; then\n");
+	fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_CN_MASK_fai .\n");
+	fwrite($fp, " else\n");
+      } else {
+	fwrite($fp, "msg=`$action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_CN_MASK_fai 2>&1`\n");
+	fwrite($fp, "result=`check_aws_file_int  \$msg `\n");
+	fwrite($fp, "if [[ \$result -ne 0 ]] ; then \n");
+      }
+      fwrite($fp, "   if [[ ! -e \$GENOMESTRIP_CN_MASK_fai ]] ; then\n");
+      fwrite($fp, "      echo Creating CN mask fai...\n");
+      fwrite($fp, "      ( SAMTOOLS_DIR=".$toolsinfo_h['samtools']['path']."\n");
+      fwrite($fp, "        SAMTOOLS_EXE=".$toolsinfo_h['samtools']['exe']."\n");
+      fwrite($fp, "        \$SAMTOOLS_DIR/\$SAMTOOLS_EXE faidx  \$GENOMESTRIP_CN_MASK ) \n");
+      fwrite($fp, "      echo Creating CN mask fai...done\n");
+      fwrite($fp, "   fi\n");
+      fwrite($fp, "fi\n");
+      
+      
+    }
+    
+
+    // handle gs reference & fai
+    fwrite($fp, "# Checking retrieved for genomestrip ref\n");
+    $bFound=0;
+    
+    // check retrieved first
+    foreach ($retrieved as $key => $value) { // key is ref; value is type
+      if ( ($value & $L_FAI) != $L_FAI)  { // is a ref
+	fwrite($fp, "#found retreieved ref\n");
+	if ( ($value & $L_GZ)!=$L_GZ && ($value & $L_BZ2)!=$L_BZ2) { // fa or fasta
+	  $bFound=1;
+	  fwrite($fp, "GENOMESTRIP_REF=$key\n");
+	  fwrite($fp, "GENOMESTRIP_REF_fai=\${GENOMESTRIP_REF}.fai\n");
+	  $GENOMESTRIP_REF     = $key;
+	  $GENOMESTRIP_REF_fai = "$GENOMESTRIP_REF.fai";
+	  break;
+	  
+	} else { // should be fa(sta)?.(bz2|gz)
+	  $bFound=1;
+	  fwrite($fp, "GENOMESTRIP_REF=$baseref\n");
+	  
+	  fwrite($fp, "if [[ ! -e \$GENOMESTRIP_REF ]] ; then\n");
+	  fwrite($fp, "   echo Converting reference format...\n");
+	  if (preg_match('/\.gz$/', $key)) {
+	    fwrite($fp, "   gunzip -c ./$key > ./\$GENOMESTRIP_REF\n");
+	  } else {
+	    fwrite($fp, "   bunzip2 -c ./$key > ./\$GENOMESTRIP_REF\n");
+	  }
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "GENOMESTRIP_REF_fai=\${GENOMESTRIP_REF}.fai\n");
+	  $GENOMESTRIP_REF = $baseref;
+	  $GENOMESTRIP_REF_fai = "$GENOMESTRIP_REF.fai";
+	  // We could also check if compatible fai exists and simply rename it
+	  if (! array_key_exists($GENOMESTRIP_REF_fai, $retrieved)) {
+	    create_fai($fp, "GENOMESTRIP_REF");
+	    $retrieved[$GENOMESTRIP_REF_fai] = $availref_type_h[$GENOMESTRIP_REF_fai] = get_ref_type($GENOMESTRIP_REF_fai);
+	  }
+	  break;
+	}
+      }
+    }
+    
+    // check available references instead
+    if(!$bFound) {  
+      fwrite($fp, "# Checking avail refs instead for genomestrip ref\n");
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA:    //"$stemref.fa"
+	case $IS_FASTA: //"$stemref.fasta"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "GENOMESTRIP_REF=$availref\n");
+	  fwrite($fp, "$action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_REF  .\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+          fwrite($fp, "GENOMESTRIP_REF_fai=\${GENOMESTRIP_REF}.fai\n");
+          $GENOMESTRIP_REF = $availref;
+          $GENOMESTRIP_REF_fai = "$GENOMESTRIP_REF.fai";
+          handle_fai($fp, $hasfai, $GENOMESTRIP_REF_fai, "GENOMESTRIP_REF", $pathid, $action);
+	  $retrieved[$GENOMESTRIP_REF_fai] = get_ref_type($GENOMESTRIP_REF_fai);
+          break 2;
+	}
+      }
+    }
+
+
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {  
+	switch ($key) {
+	case $IS_FA_GZ: // "$stemref.fa.gz":
+	case $IS_FASTA_GZ: // "$stemref.fasta.gz":
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  fwrite($fp, "fi\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = get_ref_type($availref);
+	  fwrite($fp, "echo Converting reference format...\n");
+	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
+	  fwrite($fp, "   gunzip -c ./$availref > ./$baseref\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "GENOMESTRIP_REF=$baseref\n");
+	  fwrite($fp, "GENOMESTRIP_REF_fai=\${GENOMESTRIP_REF}.fai\n");
+	  $GENOMESTRIP_REF = $baseref;
+	  $GENOMESTRIP_REF_fai = "$GENOMESTRIP_REF.fai";
+
+	  if ( array_key_exists($IS_FA_FAI, $typematch)) {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$GENOMESTRIP_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } elseif ( array_key_exists($IS_FASTA_FAI, $typematch))  {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FASTA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$GENOMESTRIP_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } else { // create fai
+
+	    create_fai($fp, "GENOMESTRIP_REF");
+	  }
+	  $retrieved[$GENOMESTRIP_REF_fai] = $availref_type_h[$GENOMESTRIP_REF_fai] = get_ref_type($GENOMESTRIP_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    if($bFound) {  // search for dict file
+      fwrite($fp, "echo Searching for dictionary file...\n");
+      $bDictFound=0;
+      $dict_h = $_POST['dictfiles'];
+      foreach ($dict_h as $key => $value) {
+	list($pathid, $availfile) = preg_split('/\|/', $value);
+	if ($stemref.".dict" == $availfile) {
+	  $bDictFound=1;
+	  fwrite($fp, "if [[ ! -e $availfile ]] ; then\n");
+	  if ($compute_target!="AWS") {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availfile .\n");
+	  } else {
+	    fwrite($fp, "   msg=`$action \$$DNAM_VAR[$pathid]/$availfile 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg $availfile\n");
+	  }
+	  fwrite($fp, "fi\n");
+	  break;
+	}
+      }
+      if (!$bDictFound) { // create dict
+	fwrite($fp, "if [[ ! -e \$stemref.dict  ]] ; then\n");
+	fwrite($fp, "   echo Dictionary file not found...\n");
+	fwrite($fp, "   echo Creating new dictionary file...\n");
+	fwrite($fp, "   ( PICARD_DIR=".$toolsinfo_h['picard']['path']."\n");
+	fwrite($fp, "   java -jar \$PICARD_DIR/CreateSequenceDictionary.jar R= $baseref  O= $stemref.dict ) \n");
+	fwrite($fp, "   echo Creating new dictionary file...done\n");
+	fwrite($fp, "fi\n"); 
+      }
+
+    }
+
+    if(!$bFound) {
+      fwrite($fp, "\nexit\n");
+      fwrite($fp, "# ERROR:  No compatible reference for genomestrip found.\n");
+      echo "ERROR:  No compatible reference for genomestrip found.<br>\n";
+    } 
+    
+
+  }  // if gs_cmd
 
   fwrite($fp, "\n");
 
+
   // Last chance to define samtools
-  check_sam($fp);  // writing samtools_dir not really needed here
+  check_sam($fp);
   
   // Save log
-  fwrite($fp, "\$put_cmd  \$RUNDIR/status/LOG  \$RESULTSDIR/status/LOG\n");
-
-
-
-
-
-
-    
-  
+  fwrite($fp, "\$put_cmd  \$RUNDIR/status/Tasks_left  \$STATUSDIR/\n");
   
   fwrite($fp, "echo Preparing references...done\n");
   fwrite($fp, "\n");
@@ -857,33 +1563,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		     );
   foreach ($prog_cmds as $key => $value) {
     if(isset($_POST[$key])) {
-
-
       fwrite($fp, "mkdir -p $value\n");
     }
   }
   fwrite($fp, "\n");
   
   // Save profile
-  fwrite($fp, "\$put_cmd  `pwd`/*.ep \$RESULTSDIR/\n");
+  fwrite($fp, "\$put_cmd  ./*.sh \$RWORKDIR/\n");
+  fwrite($fp, "\$put_cmd  ./*.ep \$RWORKDIR/\n");
   
     
   // --------------------------------------------------------------------------------
   // RUN VARSCAN
   // --------------------------------------------------------------------------------
-
   if (isset($_POST['vs_cmd'])) {
-
-
-
     fwrite($fp, "#------------------------------\n");
 
-
-
-    
-
     if ($_POST['vs_call_mode'] == "germline" ) {
-
       $vs_opts = array("vs_gl_min_avg_base_qual"           => " --min-avg-qual ",     
 		       "vs_gl_homozyg_min_var_allele_freq" => " --min-freq-for-hom ",  
 		       "vs_gl_apply_strand_filter"         => " --strand-filter ",     
@@ -902,16 +1598,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 					     )
 			    );
 
-
-
-
       $vs_bMap = array("snv"   => (($_POST['vs_gl_calltype'] == "both" || $_POST['vs_gl_calltype'] == "snv"  )?(1):(0)),
 		       "indel" => (($_POST['vs_gl_calltype'] == "both" || $_POST['vs_gl_calltype'] == "indel")?(1):(0))
 		       );
       
-
-
-
       $sam_opts_cmd="";
       foreach ($vs_samtools_opts as $tmpkey => $value) { 
 	$key = "vs_gl_$tmpkey";
@@ -934,19 +1624,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // Chromosome
       write_chromosomes($fp,$_POST['vs_chrdef'], "VS_REF_fai", $_POST['vs_chrdef_str'] );
 
-
-
       fwrite($fp,"# varscan germline\n");
       fwrite($fp,"cd \$RUNDIR/varscan\n");
       fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
       if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/varscan/group\$gp\n"); }
-      fwrite($fp, "   \$put_cmd  \$RUNDIR/varscan/group\$gp/bamfilelist.inp \$RESULTSDIR/varscan/group\$gp/bamfilelist.group\$gp.inp\n");
       
 
       fwrite($fp, "   statfile_gl_g=incomplete.vs_postrun.group\$gp\n");
       fwrite($fp, "   localstatus_gl_g=\$RUNDIR/status/\$statfile_gl_g\n");
-      fwrite($fp, "   remotestatus_gl_g=\$RESULTSDIR/\$statfile_gl_g\n");
+      fwrite($fp, "   remotestatus_gl_g=\$STATUSDIR/\$statfile_gl_g\n");
       fwrite($fp, "   touch \$localstatus_gl_g\n");
       fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_gl_g  \$remotestatus_gl_g\n");
 
@@ -962,17 +1649,20 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "export VARSCAN_DIR=".$toolsinfo_h[$_POST['vs_version']]['path']."\n");
       fwrite($fp, "RUNDIR=\$RUNDIR\n");
+      fwrite($fp, "myRUNDIR=\$RUNDIR/varscan/group\$gp\n");
+      fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+      fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
+      fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
       fwrite($fp, "VS_REF=\\\$RUNDIR/reference/$VS_REF\n");
       fwrite($fp, "statfile=incomplete.varscan.group\$gp.chr\$chralt\n");
       fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-      fwrite($fp, "remotestatus=\\\$RESULTSDIR/\\\$statfile\n");
+      fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
       fwrite($fp, "touch \\\$localstatus\n");
       fwrite($fp, "\$put_cmd \\\$localstatus  \\\$remotestatus\n");
       
       fwrite($fp, "cd \\\$RUNDIR/varscan/\$dir\n");
       $SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
-      
       
       // Set up calcs
       foreach ($vs_bMap as $vartype => $vartype_bool) {
@@ -1005,12 +1695,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$out  ./\\\${out/%orig.vcf/gvip.vcf}\n");
 	  fwrite($fp, "\$del_local ./\\\$out\n");
 
-	  fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
-	  if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-	  //	  fwrite($fp, "\$put_cmd  \`pwd\`/$vs_mpileup_out.group\$gp.chr\$chralt.gvip.vcf  \`pwd\`/$vs_mpileup_log.group\$gp.chr\$chralt \\\$tgt/\n");
-	  fwrite($fp, "\$put_cmd   \`pwd\`/\\\$log  \\\$tgt/\n");
-	}
-      }
+	  // store raw results
+	  if ($compute_target=="AWS") { 
+      	    fwrite($fp, "\$put_cmd  ./\\\$log  ./\\\${out/%orig.vcf/gvip.vcf}    \\\$myRWORKDIR/\n");
+	    fwrite($fp, "\$put_cmd  \\\$myRUNDIR/bamfilelist.inp \\\$myRWORKDIR/bamfilelist.group\$gp.inp\n");
+	  }
+	} 
+      } // run type
+
+
 
       if($do_timing) {
 	fwrite($fp, "scr_tf=\`date +%s\`\n"); 
@@ -1026,7 +1719,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $vs_hc_filter_prefix['snv']['fail']   = "";
       $vs_hc_filter_prefix['indel']['pass'] = "";
       $vs_hc_filter_prefix['indel']['fail'] = "";
-      if (isset($_POST['vs_apply_high_confidence_filter'])) {         // TODO: break out into separate script like trio case
+      if (isset($_POST['vs_apply_high_confidence_filter'])) {         // TODO: break out into separate script like trio casermy
 	foreach( $vs_bMap as $vartype => $vartype_bool) {
 	  if ( $vartype_bool ) {
 	    $vs_hc_filter_prefix[$vartype]['pass'] = "hc_pass.";
@@ -1041,7 +1734,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." filter  ./\\\$myorig  $vs_opts_cmd  --output-file \\\$mypass   2>> ./varscan.log.gl_$vartype.group\$gp.chr\$chralt\n");
 	    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/extract_fail.sh  ./\\\$myorig  ./\\\$mypass  ./\\\$myfail\n");
 	    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/set_vcf_filter_label.sh  ./\\\$myfail  hc_fail\n");
-	    fwrite($fp, "# \$del_local  \\\$myorig\n");  // Keep original
+
 	  }
 	}
       }
@@ -1058,7 +1751,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    $vs_dbsnp_filter_prefix[$vartype]['fail'] = "dbsnp_present.";
 	    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/dbsnp_filter.pl  ./vs_dbsnp_filter.$vartype.input\n");
 	    if( $vs_hc_filter_prefix[$vartype]['pass'] != "" ) {
-	      fwrite($fp, "\$del_local  ./varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
+	      fwrite($fp, "# \$del_local  ./varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	    }
 	  }
 	}
@@ -1076,16 +1769,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $vs_fpfilter_prefix[$vartype]['fail'] = "fp_fail.";
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/snv_filter.pl  ./vs_fpfilter.$vartype.input\n");
 	  if ($vs_dbsnp_filter_prefix[$vartype]['pass'] != "") { 
-	    fwrite($fp, "\$del_local  ./varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n"); 
+	    fwrite($fp, "# \$del_local  ./varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n"); 
 	  } elseif ($vs_hc_filter_prefix[$vartype]['pass'] != "") {
-	    fwrite($fp, "\$del_local  ./varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n"); 
+	    fwrite($fp, "# \$del_local  ./varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n"); 
 	  }
 	}
       }
       
-
       fwrite($fp, "\$del_cmd  \\\$remotestatus\n");
       fwrite($fp, "\$del_local \\\$localstatus\n");
+
+      // store results 
+      if ($compute_target=="AWS") {
+	fwrite($fp, "\$put_cmd  ./varscan.log.* ./varscan.*.vcf  ./*.input \\\$myRWORKDIR/\n");
+      }
+
+
       if($do_timing) {
 	fwrite($fp, "scr_tf=\`date +%s\`\n"); 
 	fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
@@ -1130,51 +1829,56 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       }
 
       fwrite($fp, "cd \$RUNDIR/varscan/\$dir ; chmod +x ./varscan.sh\n");
-
+      // configure memory
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['varscan']['mem_default']);
-
       $job_name = $batch['name_opt']." "."\$tag_vs.vs_gl.group\$gp.chr";
       $ERRARG = "-e ./stderr.varscan.group\$gp.chr\$chralt";
       $OUTARG = "-o ./stdout.varscan.group\$gp.chr\$chralt";
       $EXEARG = "./varscan.sh";
       fwrite($fp,"$nobsub"." ".$batch['cmd']." ".$batch['limitgr']." ".$job_name." ".$batch['q_opt']." "."$ERRARG $OUTARG $mem_opt $EXEARG\n");
       fwrite($fp,"sleep $dlay\n");
-
-
       fwrite($fp,"# done chr\n"); 
       fwrite($fp,"   done\n");  //chr
 	  
-
       // Gather group results and annotate
       fwrite($fp, " cat > \$RUNDIR/varscan/group\$gp/varscan_postrun.sh <<EOF\n");
       fwrite($fp, "#!/bin/bash\n");
       check_aws_shell($fp);
       if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
       fwrite($fp, "RUNDIR=\$RUNDIR\n");
+      fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+      fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
+      fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/varscan/group\$gp\n");
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
-      //TODO:  if AWS
-      //      fwrite($fp, "S3CMD=$s3cmd\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
       fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
       fwrite($fp, "statfile_gl_g=incomplete.vs_postrun.group\$gp\n");
       fwrite($fp, "localstatus_gl_g=\\\$RUNDIR/status/\\\$statfile_gl_g\n");
-      fwrite($fp, "remotestatus_gl_g=\\\$RESULTSDIR/\\\$statfile_gl_g\n");
+      fwrite($fp, "remotestatus_gl_g=\\\$STATUSDIR/\\\$statfile_gl_g\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n");
       fwrite($fp, "outlist=varscan.out.gl_all.group\$gp.all.filelist\n");
       write_vs_gl_merge($fp, $vs_bMap, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
+      // Results, possibly with annotation
       if (isset($_POST['vep_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
+	fwrite($fp, "\$put_cmd  ./varscan.out.gl_all.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
 	fwrite($fp, "\$del_local ./varscan.out.gl_all.group\$gp.all.current_final.gvip.vcf\n");
+      } else {
+	fwrite($fp, "\$put_cmd  ./varscan.out.gl_all.group\$gp.all.current_final.gvip.vcf  \\\$myRESULTSDIR/\n");
       }
-      // TODO
-      //      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_g\n");
-      //      fwrite($fp, "\$del_local \\\$localstatus_gl_g\n");
+      fwrite($fp, "\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+
+
+      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_g\n");
+      fwrite($fp, "\$del_local \\\$localstatus_gl_g\n");
 
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -1196,6 +1900,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
+      // configure memory
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_vs.vs_gl.group\$gp.$wc".$batch['dep_opt_post'];
       $job_name = $batch['name_opt']." "."vs_postrun.group\$gp";
@@ -1219,10 +1924,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     elseif ($_POST['vs_call_mode'] == "somatic" ) { // somatic 
 
-
-
-
-      
       $sam_som_opts_cmd="";
       foreach ($vs_samtools_opts as $tmpkey => $value) { 
 	$key = "vs_som_$tmpkey";
@@ -1235,12 +1936,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
       }
       
-
-      
       $vs_som_opts_extra = array("output_vcf" => " --output-vcf ",);
-
       $vs_som_opts_cmd="";
-
       foreach ( ($vs_som_opts + $vs_som_opts_extra) as $tmpkey => $value)  {
 	$key = "vs_som_$tmpkey";
 	switch ($key) {
@@ -1258,35 +1955,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
       }
       
-
-
-
-
-
-
-
-
-
 	// --------------------------------------------------------------------------------
 	// Set up dirs and samples
-
 	write_sample_tuples($fp, $list_of_sorted_bams, "varscan", 2);
 	
 	// Chromosome
 	write_chromosomes($fp,$_POST['vs_chrdef'], "VS_REF_fai", $_POST['vs_chrdef_str'] );
-
-
 
 	fwrite($fp,"# varscan somatic snvindels\n");
 	fwrite($fp,"cd \$RUNDIR/varscan\n");
 	fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
 	if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/varscan/group\$gp\n"); }
-	fwrite($fp, "   \$put_cmd  \$RUNDIR/varscan/group\$gp/bamfilelist.inp \$RESULTSDIR/varscan/group\$gp/bamfilelist.group\$gp.inp\n");
 	
 	fwrite($fp, "   statfile_gl_g=incomplete.vs_postrun.group\$gp\n");
 	fwrite($fp, "   localstatus_gl_g=\$RUNDIR/status/\$statfile_gl_g\n");
-	fwrite($fp, "   remotestatus_gl_g=\$RESULTSDIR/\$statfile_gl_g\n");
+	fwrite($fp, "   remotestatus_gl_g=\$STATUSDIR/\$statfile_gl_g\n");
 	fwrite($fp, "   touch \$localstatus_gl_g\n");
 	fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_gl_g  \$remotestatus_gl_g\n");
 	
@@ -1300,11 +1984,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
 	fwrite($fp, "export VARSCAN_DIR=".$toolsinfo_h[$_POST['vs_version']]['path']."\n");
 	fwrite($fp, "RUNDIR=\$RUNDIR\n");
+	fwrite($fp, "myRUNDIR=\$RUNDIR/varscan/group\$gp\n");
+	fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+	fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
+	fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
 	fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
 	fwrite($fp, "VS_REF=\\\$RUNDIR/reference/$VS_REF\n");
 	fwrite($fp, "statfile=incomplete.vs_som_snvindels.group\$gp.chr\$chralt\n");
 	fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-	fwrite($fp, "remotestatus=\\\$RESULTSDIR/\\\$statfile\n");
+	fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
 	fwrite($fp, "touch \\\$localstatus\n");
 	fwrite($fp, "\$put_cmd \\\$localstatus  \\\$remotestatus\n");
 
@@ -1325,6 +2013,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	fwrite($fp, "\$del_local ./\\\$snvoutbase.vcf  ./\\\$indeloutbase.vcf\n");
 	
 
+
 	// TODO: while validation is useful, we disabled it in the interface; need to check whether including it overrides expected output filenames
 	if ($_POST['vs_som_report_validation']=="true") { 
 	  fwrite($fp, "validoutbase=\\\${TMPBASE}.group\$gp.chr\$chralt.validation\n");
@@ -1334,10 +2023,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 	fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
 	if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$tgt \n"); }
-	fwrite($fp, "\$put_cmd  \`pwd\`/\\\${TMPBASE}_{snv,indel}.group\$gp.chr\$chralt.vcf  \`pwd\`/\\\$TMPBASE.group\$gp.chr\$chralt.log \\\$tgt/\n");
-	fwrite($fp, "\$put_cmd  \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp \\\$tgt/bamfilelist.varscan_somatic.group\$gp.chr\$chralt.inp\n");
+	// store raw results
+	if ($compute_target=="AWS") { 
+	  fwrite($fp, "\$put_cmd  ./varscan.out.{som_snv,som_indel}.*.gvip.vcf  \\\$myRWORKDIR/\n");
+	  fwrite($fp, "\$put_cmd  \\\$myRUNDIR/bamfilelist.inp \\\$myRWORKDIR/bamfilelist.group\$gp.inp\n");
+	}
+
+
 	if ($_POST['vs_som_report_validation']=="true") {
-	  fwrite($fp, "\$put_cmd  \`pwd\`/\\\$TMPBASE.chr\$chralt.validation \\\$tgt/\n");
+	  fwrite($fp, "\$put_cmd  ./\\\$TMPBASE.chr\$chralt.validation \\\$tgt/\n");
 	}
 
 
@@ -1373,7 +2067,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "myindelorig=./\\\$indeloutbase.gvip.vcf\n");
 	  fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." processSomatic \\\$myindelorig $vs_opts_cmd &>> \\\$LOG\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/extract_somatic_other.pl <  \\\$myindelorig  >  \\\${myindelorig/%vcf/other.vcf}\n");
-	  // Note: Whereas the raw snv was deleted, keep the original raw pindel since it is needed in somatic filter
+	  // Note: Whereas the raw snv could be deleted, keep the original raw indel for somatic filter
 
 	  // TODO: possibly merge this part into above
 	  fwrite($fp, "for kk in Somatic Germline LOH ; do\n");
@@ -1410,7 +2104,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." somaticFilter  ./\\\$thissnvorig   $vs_opts_cmd  --indel-file  ./\\\$myindelorig --output-file  ./\\\$thissnvpass  &>> \\\$LOG\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/extract_fail.sh          ./\\\$thissnvorig  ./\\\$thissnvpass   ./\\\$thissnvfail\n"); 
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/set_vcf_filter_label.sh  ./\\\$thissnvfail   somfilter_fail\n");
-	  fwrite($fp, "\$del_local  ./\\\$thissnvorig\n");
+	  fwrite($fp, "#\$del_local  ./\\\$thissnvorig\n");
 	  fwrite($fp, "# \$del_local  ./\\\$myindelorig\n");    // can remove orig indel now if desired
 
 	} else {
@@ -1420,6 +2114,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "# \$del_local  ./\\\$snvoutbase.gvip.vcf\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/split_vs_somatic.pl ./\\\$indeloutbase.gvip.vcf\n"); 	
 	  fwrite($fp, "# \$del_local  ./\\\$indeloutbase.gvip.vcf\n");
+
 
 
 	  if($do_timing) {
@@ -1444,9 +2139,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    $vs_dbsnp_filter_prefix[$vartype]['fail']   = "dbsnp_present.";
 	    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/dbsnp_filter.pl  \\\$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input\n"); 
 	    if( $vs_hc_filter_prefix[$vartype]['pass'] != "") {
-	      fwrite($fp, "\$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n"); 
+	      fwrite($fp, "# \$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n"); 
 	    } else {
-	      fwrite($fp, "\$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
+	      fwrite($fp, "# \$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
 	    }
 	  }
 	  
@@ -1464,17 +2159,20 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $vs_fpfilter_prefix[$vartype]['fail'] = "fp_fail.";
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/snv_filter.pl  \\\$RUNDIR/varscan/group\$gp/\$chralt/vs_fpfilter.somatic.$vartype.input\n");
 	  if( $vs_dbsnp_filter_prefix[$vartype]['pass'] != "" ) {
-	    fwrite($fp, "\$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	    fwrite($fp, "# \$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
 	  } elseif ( $vs_hc_filter_prefix[$vartype]['pass'] != "") {
-	    fwrite($fp, "\$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
+	    fwrite($fp, "# \$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	  } else {
-	    fwrite($fp, "\$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
+	    fwrite($fp, "# \$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
 	  }
 	}
 
-	// TODO
-	//	fwrite($fp, "\$del_cmd \\\$remotestatus\n");
-	//	fwrite($fp, "\$del_local \\\$localstatus\n");
+	// store results
+	if ($compute_target=="AWS") {
+	  fwrite($fp, "\$put_cmd  ./varscan.out.* ./*.input \\\$myRWORKDIR/\n");
+	}
+
+
 	if($do_timing) {
 	  fwrite($fp, "scr_tf=\`date +%s\`\n");
 	  fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
@@ -1517,7 +2215,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
 	fwrite($fp, "cd \$RUNDIR/varscan/\$dir ; chmod +x ./varscan.sh\n");
-	//	$tmp_mem = $toolmem_h['varscan']['mem_default'];
+
+	// configure memory
 	if ($_POST['vs_som_report_validation']=="true") {
 	  $mem_opt = gen_mem_str($compute_target, $toolmem_h['varscan_som_validation']['mem_default']);
 	} else {
@@ -1544,7 +2243,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       check_aws_shell($fp);
       if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
       fwrite($fp, "RUNDIR=\$RUNDIR\n");
+      fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+      fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
+      fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/varscan/group\$gp\n");
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
@@ -1554,20 +2257,26 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
       fwrite($fp, "statfile_gl_s=incomplete.vs_postrun.group\$gp\n");
       fwrite($fp, "localstatus_gl_s=\\\$RUNDIR/status/\\\$statfile_gl_s\n");
-      fwrite($fp, "remotestatus_gl_s=\\\$RESULTSDIR/\\\$statfile_gl_s\n");
+      fwrite($fp, "remotestatus_gl_s=\\\$STATUSDIR/\\\$statfile_gl_s\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n");
       fwrite($fp, "outlist=varscan.out.som_all.group\$gp.all.filelist\n");
       write_vs_som_merge($fp,  $vs_som_prefix, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
+      // Results, possibly with annotation
       if (isset($_POST['vep_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
+	fwrite($fp, "\$put_cmd  ./varscan.out.som_all.group\$gp.all.current_final.gvip.*.VEP.vcf  \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
 	fwrite($fp, "\$del_local ./varscan.out.som_all.group\$gp.all.current_final.gvip.Somatic.vcf\n");
+      } else {
+	fwrite($fp, "\$put_cmd  ./varscan.out.som_all.group\$gp.all.current_final.gvip.*.vcf  \\\$myRESULTSDIR/\n");
       }
+      fwrite($fp, "\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+      
 
-      // TODO
-      //fwrite($fp, "\$del_local \\\$tmplist \\\$tmpunsorted\n");
-      //fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_s\n");
-      //fwrite($fp, "\$del_local \\\$localstatus_gl_s\n");
+      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_s\n");
+      fwrite($fp, "\$del_local \\\$localstatus_gl_s\n");
+
 
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -1590,6 +2299,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
+      // configure memory
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_vs.vs_som.group\$gp".$batch['dep_opt_post'];
       $job_name = $batch['name_opt']." "."vs_postrun.group\$gp";
@@ -1612,8 +2322,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     else {  // trio
       
-
-      
       $sam_trio_opts_cmd="";
       foreach ($vs_samtools_opts as $tmpkey => $value) { 
 	$key = "vs_trio_$tmpkey";
@@ -1626,8 +2334,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
       }
       
-
-
       // Note: VarScan automatically forces output in VCF format.
       $vs_trio_opts_cmd="";
       foreach ($vs_trio_opts as $tmpkey => $value) { 
@@ -1647,11 +2353,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       
       // Chromosome
       write_chromosomes($fp,$_POST['vs_chrdef'], "VS_REF_fai", $_POST['vs_chrdef_str'] );
-
       
       fwrite($fp,"# varscan de novo\n");
       fwrite($fp,"cd \$RUNDIR/varscan\n");
       fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
+
+      if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/varscan/group\$gp\n"); }
+      
+      fwrite($fp, "   statfile_gl_t=incomplete.vs_postrun.group\$gp\n");
+      fwrite($fp, "   localstatus_gl_t=\$RUNDIR/status/\$statfile_gl_t\n");
+      fwrite($fp, "   remotestatus_gl_t=\$STATUSDIR/\$statfile_gl_t\n");
+      fwrite($fp, "   touch \$localstatus_gl_t\n");
+      fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_gl_t  \$remotestatus_gl_t\n");
+
+
+
       fwrite($fp, "   tag_vs=\$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 6 | head -n 1)\n");
       fwrite($fp, "   for chr in \$SEQS; do\n");
       fwrite($fp,"    chralt=\${chr/:/_}\n");
@@ -1659,15 +2375,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "      mkdir -p \$RUNDIR/varscan/\$dir\n");
       fwrite($fp, "      cat > \$RUNDIR/varscan/\$dir/varscan.sh <<EOF\n");
       write_vs_preamble($fp, $toolsinfo_h);
-
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "export VARSCAN_DIR=".$toolsinfo_h[$_POST['vs_version']]['path']."\n");
       fwrite($fp, "RUNDIR=\$RUNDIR\n");
+      fwrite($fp, "myRUNDIR=\$RUNDIR/varscan/group\$gp\n");
+      fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+      fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
+      fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
       fwrite($fp, "VS_REF=\\\$RUNDIR/reference/$VS_REF\n");
       fwrite($fp, "statfile=incomplete.varscan.group\$gp.chr\$chralt\n");
       fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-      fwrite($fp, "remotestatus=\\\$RESULTSDIR/\\\$statfile\n");
+      fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
       fwrite($fp, "touch \\\$localstatus\n");
       fwrite($fp, "\$put_cmd \\\$localstatus  \\\$remotestatus\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/\$dir\n");
@@ -1676,6 +2395,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       $SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
       fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_trio_opts_cmd  -f \\\$VS_REF -r \$chr -b \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." trio  -  ./\\\$TMPBASE   $vs_trio_opts_cmd  &> \\\$LOG\n");
+
+      fwrite($fp, "exit\n");
 
       $vartype='snv';
       fwrite($fp, "cat ./\\\$TMPBASE.snp.vcf  > ./\\\$TMPBASE.$vartype.vcf\n");
@@ -1692,7 +2413,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
       if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$tgt \n"); }
-      fwrite($fp, "\$put_cmd  \`pwd\`/\\\$TMPBASE.chr\${chralt}.{snv,indel,snv.denovo_pass}.vcf  \`pwd\`/\\\$TMPBASE.log.chr{\$chralt,\$chralt.log} \\\$tgt/\n");
+      fwrite($fp, "\$put_cmd  ./\\\$TMPBASE.chr\${chralt}.{snv,indel,snv.denovo_pass}.vcf  ./\\\$TMPBASE.log.chr{\$chralt,\$chralt.log} \\\$tgt/\n");
       fwrite($fp, "\$put_cmd  \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp \\\$tgt/bamfilelist.varscan.group\$gp.chr\$chralt.inp\n");
 
       if($do_timing) {
@@ -1807,7 +2528,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
       fwrite($fp, "cd \$RUNDIR/varscan/\$dir ; chmod +x ./varscan.sh\n");
-
+      // configure memory
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['varscan']['mem_default']);
 
       fwrite($fp, "chralt=\${chr/:/_}\n");
@@ -1831,7 +2552,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       check_aws_shell($fp);
       if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
       fwrite($fp, "RUNDIR=\$RUNDIR\n");
+      fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+      fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
+      fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/varscan/group\$gp\n");
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
@@ -1839,22 +2564,31 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
       fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
-      fwrite($fp, "statfile_gl_s=incomplete.vs_postrun.group\$gp\n");
-      fwrite($fp, "localstatus_gl_s=\\\$RUNDIR/status/\\\$statfile_gl_s\n");
-      fwrite($fp, "remotestatus_gl_s=\\\$RESULTSDIR/\\\$statfile_gl_s\n");
+      fwrite($fp, "statfile_gl_t=incomplete.vs_postrun.group\$gp\n");
+      fwrite($fp, "localstatus_gl_t=\\\$RUNDIR/status/\\\$statfile_gl_t\n");
+      fwrite($fp, "remotestatus_gl_t=\\\$STATUSDIR/\\\$statfile_gl_t\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n");
       fwrite($fp, "outlist=varscan.out.trio_all.group\$gp.all.filelist\n");
       write_vs_trio_merge ($fp, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
       if (isset($_POST['vep_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
+	
+	// put
+
+	fwrite($fp, "\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
+
 	fwrite($fp, "\$del_local ./varscan.out.trio_all.group\$gp.all.current_final.gvip.denovo.vcf\n");
+
+      } else {
+
       }
+
 
       // TODO
       //fwrite($fp, "\$del_local \\\$tmplist \\\$tmpunsorted\n");
-      //fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_s\n");
-      //fwrite($fp, "\$del_local \\\$localstatus_gl_s\n");
+      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_t\n");
+      fwrite($fp, "\$del_local \\\$localstatus_gl_t\n");
 
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -1877,6 +2611,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
+      // configure memory
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_vs.vs_trio.group\$gp".$batch['dep_opt_post'];
       $job_name = $batch['name_opt']." "."vs_postrun.group\$gp";
@@ -1904,14 +2639,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
   // ---------------------------------------------------------------------------
   // RUN STRELKA
+  // Strelka automatically runs by subchromosome bins
   // --------------------------------------------------------------------------------
   if (isset($_POST['strlk_cmd'])) {
 
     write_sample_tuples($fp, $list_of_sorted_bams, "strelka", 2);
-
-    // Strelka automatically runs by subchromosome bins
-
-
 
     fwrite($fp, "# strelka somatic\n");
     fwrite($fp, "cd \$RUNDIR/strelka\n");
@@ -1922,7 +2654,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "   mkdir -p \$RESULTSDIR/strelka/group\$gp\n");
     fwrite($fp, "   statfile_g=incomplete.strelka.group\$gp\n");
     fwrite($fp, "   localstatus_g=\$RUNDIR/status/\$statfile_g\n");
-    fwrite($fp, "   remotestatus_g=\$RESULTSDIR/\$statfile_g\n");
+    fwrite($fp, "   remotestatus_g=\$STATUSDIR/\$statfile_g\n");
     fwrite($fp, "   touch \$localstatus_g\n");
     fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_g \$remotestatus_g\n");
 
@@ -1946,7 +2678,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "STRELKA_REF=\\\$RUNDIR/reference/$STRELKA_REF\n");
     fwrite($fp, "statfile=incomplete.strelka.group\$gp\n");
     fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-    fwrite($fp, "remotestatus=\\\$RESULTSDIR/\\\$statfile\n");
+    fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
     fwrite($fp, "touch \\\$localstatus\n");
     fwrite($fp, "\$put_cmd \\\$localstatus \\\$remotestatus\n");
     fwrite($fp, "SG_DIR=\\\$RUNDIR/strelka/group\$gp\n");
@@ -1969,8 +2701,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // TODO
     //    fwrite($fp, "tgt=\\\$RESULTSDIR/pindel/group\$gp\n");
     //    if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-    //    fwrite($fp, "\$put_cmd \`pwd\`/{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
-    //    fwrite($fp, "\$put_cmd \`pwd\`/pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
+    //    fwrite($fp, "\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
+    //    fwrite($fp, "\$put_cmd ./pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
     //    fwrite($fp, "\$del_cmd \\\$remotestatus\n");
     //    fwrite($fp, "\$del_local \\\$localstatus\n");
 
@@ -2076,10 +2808,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp,"\n");
     
 
-
-
-
-
     // Gather results and annotate
       fwrite($fp, " cat > \$RUNDIR/strelka/group\$gp/strelka_postrun.sh <<EOF\n");
       fwrite($fp, "#!/bin/bash\n");
@@ -2090,15 +2818,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
-      //TODO:  if AWS
-      //      fwrite($fp, "S3CMD=$s3cmd\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
       fwrite($fp, "tgt=\\\$RESULTSDIR/strelka/group\$gp\n");
       fwrite($fp, "statfile_gl_g=incomplete.strlk_postrun.group\$gp\n");
       fwrite($fp, "localstatus_gl_g=\\\$RUNDIR/status/\\\$statfile_gl_g\n");
-      fwrite($fp, "remotestatus_gl_g=\\\$RESULTSDIR/\\\$statfile_gl_g\n");
+      fwrite($fp, "remotestatus_gl_g=\\\$STATUSDIR/\\\$statfile_gl_g\n");
       fwrite($fp, "cd \\\$RUNDIR/strelka/group\$gp\n");
       fwrite($fp, "outlist=strelka.out.somatic_all.group\$gp.filelist\n");
       write_strlk_merge($fp, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix);
@@ -2158,7 +2884,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // RUN BREAKDANCER
   // --------------------------------------------------------------------------------
 
-
   if (isset($_POST['bd_cmd'])) {
     fwrite($fp, "#------------------------------\n");
     $BREAKDANCER_DIR1=$toolsinfo_h[$_POST['bd_version']."_1"]['path'];
@@ -2171,8 +2896,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $BDEXE_2=$toolsinfo_h[$_POST['bd_version'].'_2']['exe'];
    
     // Set up bam2cfg
-
-
     $working_cmd_cfg="";
     foreach ($bd_bamcfg_opts as $tmpkey => $value) { 
       $key = "bd_bamcfg_$tmpkey";
@@ -2242,7 +2965,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "   cat > ./bd_prepare.group\$gp.sh <<EOF\n");
     fwrite($fp, "#!/bin/bash\n");
     check_aws_shell($fp);
-    if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }                                         
+    if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
     fwrite($fp, "SAMTOOLS_DIR=".$toolsinfo_h['samtools']['path']."\n");
     fwrite($fp, "export PATH=\\\${SAMTOOLS_DIR}:\\\${PATH}\n");
     fwrite($fp, "BREAKDANCER_DIR1=\$BREAKDANCER_DIR1\n");
@@ -2250,7 +2973,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
     fwrite($fp, "statfile_p=incomplete.breakdancer.prepare.group\$gp\n");
     fwrite($fp, "localstatus_p=\\\$RUNDIR/status/\\\$statfile_p\n");
-    fwrite($fp, "remotestatus_p=\\\$RESULTSDIR/\\\$statfile_p\n");
+    fwrite($fp, "remotestatus_p=\\\$STATUSDIR/\\\$statfile_p\n");
     fwrite($fp, "touch \\\$localstatus_p\n");
     fwrite($fp, "\$put_cmd \\\$localstatus_p  \\\$remotestatus_p\n");
     fwrite($fp, "cd \\\$RUNDIR/breakdancer/group\$gp\n");
@@ -2259,7 +2982,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if ($_POST['bd_translocation_calltype'] != "ctx") {
     fwrite($fp, "statfile_g=incomplete.breakdancer.gather.group\$gp\n");
     fwrite($fp, "localstatus_g=\\\$RUNDIR/status/\\\$statfile_g\n");
-    fwrite($fp, "remotestatus_g=\\\$RESULTSDIR/\\\$statfile_g\n");
+    fwrite($fp, "remotestatus_g=\\\$STATUSDIR/\\\$statfile_g\n");
     fwrite($fp, "touch \\\$localstatus_g\n");
     fwrite($fp, "\$put_cmd \\\$localstatus_g  \\\$remotestatus_g\n");
     }
@@ -2273,8 +2996,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "tgt=\\\$RESULTSDIR/breakdancer/group\$gp\n");
     if ($compute_target != "AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-    fwrite($fp, "\$put_cmd  \`pwd\`/breakdancer.group\$gp.cfg \\\$tgt/\n");
-    fwrite($fp, "\$put_cmd  \`pwd\`/bamfilelist.inp   \\\$tgt/bamfilelist.group\$gp.inp\n");
+    fwrite($fp, "\$put_cmd  ./breakdancer.group\$gp.cfg \\\$tgt/\n");
+    fwrite($fp, "\$put_cmd  ./bamfilelist.inp   \\\$tgt/bamfilelist.group\$gp.inp\n");
     fwrite($fp, "\$del_cmd \\\$remotestatus_p\n");
     fwrite($fp, "\$del_local \\\$localstatus_p\n");
     if($do_timing) {
@@ -2325,7 +3048,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "cd \\\$RUNDIR/breakdancer/group\$gp/\$dir\n");
       fwrite($fp, "statfile_ctx=incomplete.breakdancer.group\$gp.ctx\n");
       fwrite($fp, "localstatus_ctx=\\\$RUNDIR/status/\\\$statfile_ctx\n");
-      fwrite($fp, "remotestatus_ctx=\\\$RESULTSDIR/\\\$statfile_ctx\n");
+      fwrite($fp, "remotestatus_ctx=\\\$STATUSDIR/\\\$statfile_ctx\n");
       fwrite($fp, "touch \\\$localstatus_ctx\n");
       fwrite($fp, "\$put_cmd \\\$localstatus_ctx \\\$remotestatus_ctx\n");
 
@@ -2333,11 +3056,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "tgt=\\\$RESULTSDIR/breakdancer/group\$gp\n");
       if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-      fwrite($fp, "\$put_cmd \`pwd\`/breakdancer.group\$gp.ctx \\\$tgt/\n");
+      fwrite($fp, "\$put_cmd ./breakdancer.group\$gp.ctx \\\$tgt/\n");
 
       if (trim($_POST['bd_fastq_outfile_prefix_of_supporting_reads']) != "") {
 	fwrite($fp, "for j in \`ls ".trim($_POST['bd_fastq_outfile_prefix_of_supporting_reads']).".*.fastq\` ; do\n");
-	fwrite($fp, "   \$put_cmd  \`pwd\`/\\\$j \\\$tgt/\\\${j/%fastq/ctx.fastq}\n");
+	fwrite($fp, "   \$put_cmd  ./\\\$j \\\$tgt/\\\${j/%fastq/ctx.fastq}\n");
 	fwrite($fp, "done\n");
       }
 
@@ -2352,7 +3075,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "EOF\n");
       fwrite($fp, "   chmod +x ./bd_ctx.group\$gp.sh\n");
 
-
+      // configure memory
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['breakdancer']['mem_ctx_min']);
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."$tag_bd.bdcfg.group\$gp".$batch['dep_opt_post'];
 
@@ -2373,7 +3096,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       // Chromosome
       write_chromosomes($fp,$_POST['bd_chrdef'], "BREAKDANCER_REF_fai", $_POST['bd_chrdef_str'] );
-
 
       $working_itx_cmd = $working_cmd_bd;
       
@@ -2399,7 +3121,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "statfile_itx=incomplete.breakdancer.group\$gp.chr\$chralt.itx\n");
       fwrite($fp, "localstatus_itx=\\\$RUNDIR/status/\\\$statfile_itx\n");
-      fwrite($fp, "remotestatus_itx=\\\$RESULTSDIR/\\\$statfile_itx\n");
+      fwrite($fp, "remotestatus_itx=\\\$STATUSDIR/\\\$statfile_itx\n");
       fwrite($fp, "touch \\\$localstatus_itx\n");
       fwrite($fp, "\$put_cmd \\\$localstatus_itx \\\$remotestatus_itx\n");
 
@@ -2409,7 +3131,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       if (trim($_POST['bd_fastq_outfile_prefix_of_supporting_reads']) != "") {
 	fwrite($fp, "for j in \`ls ".trim($_POST['bd_fastq_outfile_prefix_of_supporting_reads']).".*.fastq\` ; do\n");
-	fwrite($fp, "   \$put_cmd \`pwd\`/\\\$j \\\$RESULTSDIR/breakdancer/group\$gp/\\\${j/%fastq/chr\$chralt.itx.fastq}\n");
+	fwrite($fp, "   \$put_cmd ./\\\$j \\\$RESULTSDIR/breakdancer/group\$gp/\\\${j/%fastq/chr\$chralt.itx.fastq}\n");
 	fwrite($fp, "done\n");
       }
       fwrite($fp, "\$del_cmd  \\\$remotestatus_itx\n");
@@ -2423,9 +3145,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "EOF\n");
       fwrite($fp, "      cd \$dir ; chmod +x ./bd_itx.group\$gp.chr\$chralt.sh\n");
 
-
-
-
+      // configure memory
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['breakdancer']['mem_itx_min']);
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."$tag_bd.bdcfg.group\$gp".$batch['dep_opt_post'];
 
@@ -2454,7 +3174,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
     fwrite($fp, "statfile_g=incomplete.breakdancer.postrun.group\$gp\n");
     fwrite($fp, "localstatus_g=\\\$RUNDIR/status/\\\$statfile_g\n");
-    fwrite($fp, "remotestatus_g=\\\$RESULTSDIR/\\\$statfile_g\n");
+    fwrite($fp, "remotestatus_g=\\\$STATUSDIR/\\\$statfile_g\n");
     // Gather
     if ($_POST['bd_translocation_calltype'] != "ctx") { // has ITX
       fwrite($fp, "cd \\\$RUNDIR/breakdancer/group\$gp/ITX\n");
@@ -2463,7 +3183,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/gather_itx.sh  \\\$RUNDIR/breakdancer/group\$gp/ITX  breakdancer.group\$gp.all.itx.filelist \\\$gather_out\n");
       fwrite($fp, "tgt=\\\$RESULTSDIR/breakdancer/group\$gp\n");
       if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-      fwrite($fp, "\$put_cmd  \`pwd\`/ITX/\\\$gather_out  \\\$tgt/\n");
+      fwrite($fp, "\$put_cmd  ./ITX/\\\$gather_out  \\\$tgt/\n");
+      // TODO
       //fwrite($fp, "\$del_cmd \\\$remotestatus_g\n");
       //fwrite($fp, "\$del_local \\\$localstatus_g\n");
     }
@@ -2524,9 +3245,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   
   // ---------------------------------------------------------------------------
   // RUN PINDEL
-  // There are new outputs going from 0.2.4 to 0.2.5
   // --------------------------------------------------------------------------------
-
   if (isset($_POST['pin_cmd'])) {
     fwrite($fp, "#------------------------------\n");
     $PINDEL_DIR=$toolsinfo_h[$_POST['pin_version']]['path'];
@@ -2598,8 +3317,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // Chromosomes
     write_chromosomes($fp,$_POST['pin_chrdef'], "PINDEL_REF_fai", $_POST['pin_chrdef_str'] );
 
-    
-
     fwrite($fp, "# pindel\n");
     fwrite($fp, "cd \$RUNDIR/pindel\n");
     fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
@@ -2609,7 +3326,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "   statfile_g=incomplete.pindel_postrun.group\$gp\n");
     fwrite($fp, "   localstatus_g=\$RUNDIR/status/\$statfile_g\n");
-    fwrite($fp, "   remotestatus_g=\$RESULTSDIR/\$statfile_g\n");
+    fwrite($fp, "   remotestatus_g=\$STATUSDIR/\$statfile_g\n");
     fwrite($fp, "   touch \$localstatus_g\n");
     fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_g \$remotestatus_g\n");
 
@@ -2630,7 +3347,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "PINDEL_REF=\\\$RUNDIR/reference/\$PINDEL_REF\n");
     fwrite($fp, "statfile=incomplete.pindel.group\$gp.chr\$chralt\n");
     fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-    fwrite($fp, "remotestatus=\\\$RESULTSDIR/\\\$statfile\n");
+    fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
     fwrite($fp, "touch \\\$localstatus\n");
     fwrite($fp, "\$put_cmd \\\$localstatus \\\$remotestatus\n");
 
@@ -2655,14 +3372,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "\\\$PINDEL_DIR/$PINDEL_EXE  ".$pindel_opts_more['pindel_chr']." \$chr $pindel_cmd  -f \\\$PINDEL_REF -i \\\$RUNDIR/pindel/group\$gp/pindel.bam.inp\n");
 
-
-
-
-
     fwrite($fp, "tgt=\\\$RESULTSDIR/pindel/group\$gp\n");
     if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-    fwrite($fp, "\$put_cmd \`pwd\`/{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
-    fwrite($fp, "\$put_cmd \`pwd\`/pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
+    fwrite($fp, "\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
+    fwrite($fp, "\$put_cmd ./pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
 
     fwrite($fp, "\$del_cmd \\\$remotestatus\n");
     fwrite($fp, "\$del_local \\\$localstatus\n");
@@ -2677,9 +3390,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "      cd \$RUNDIR/pindel/\$dir ; chmod +x ./pindel.sh\n");
 
-
+    // configure memory
     if ($compute_target=="AWS") { 
-
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['pindel']['mem_min'] );
       $ncpu    = $batch['nproc']." "."1";
 
@@ -2695,7 +3407,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     $jobdeps="";
     if (isset($_POST['bd_cmd'])  &&  $_POST['pin_include_breakdancer'] == "true") {
-
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."$tag_bd.bdtx.group\$gp.itx.chr\$chralt".$batch['dep_opt_post'];
     }
     fwrite($fp, "chralt=\${chr/:/_}\n");
@@ -2721,7 +3432,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "$prefix.date = 000000\n");
     // Omitting $prefix.output since it is computed by filter
 
-
     $pp = array();
     include realpath(dirname(__FILE__)."/"."write_filter.php");
     foreach($pp as $value) { fwrite($fp, $value); }
@@ -2743,7 +3453,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
     fwrite($fp, "statfile=incomplete.pindel.group\$gp.postrun\n");
     fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-    fwrite($fp, "remotestatus=\\\$RESULTSDIR/\\\$statfile\n");
+    fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
     fwrite($fp, "touch \\\$localstatus\n");
     fwrite($fp, "\$put_cmd \\\$localstatus \\\$remotestatus\n");
     fwrite($fp, "cd \\\$RUNDIR/pindel/group\$gp\n"); 
@@ -2795,8 +3505,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // TODO
     //    fwrite($fp, "tgt=\\\$RESULTSDIR/pindel/group\$gp\n");
     //    if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-    //    fwrite($fp, "\$put_cmd \`pwd\`/{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
-    //    fwrite($fp, "\$put_cmd \`pwd\`/pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
+    //    fwrite($fp, "\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
+    //    fwrite($fp, "\$put_cmd ./pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
     fwrite($fp, "\$del_cmd \\\$remotestatus\n");
     fwrite($fp, "\$del_local \\\$localstatus\n");
     if($do_timing) {
@@ -2861,14 +3571,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   if (isset($_POST['gs_cmd'])) {
     fwrite($fp, "#------------------------------\n");
     $GENOMESTRIP_DIR=$toolsinfo_h[$_POST['version_gs']]['path'];
-
-
-    // Checkboxes
     $gs_conf_list = array ("gs_genotyping_depth" => "depth",
 			   "gs_genotyping_pairs" => "pairs",
 			   "gs_genotyping_split" => "split",
 			   );
-
     // set up dirs and samples
     if ($_POST['gs_samples'] == "single") { // individual
 	write_sample_tuples($fp, $list_of_sorted_bams, "genomestrip", 1);
@@ -2876,12 +3582,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     } else {                              // pooled
 	write_sample_tuples($fp, $list_of_sorted_bams, "genomestrip", 0);
     }
-
   
     // Chromosome 
       write_chromosomes($fp,$_POST['gs_chrdef'], "GENOMESTRIP_REF_fai", $_POST['gs_chrdef_str'] );
-
-
 
     $tag_gs = generateRandomString($randlen);
     fwrite($fp, "# genomestrip\n");
@@ -2891,19 +3594,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
-    // TODO: generalize from  precomputed metadata
-    $metadatafile="metadata.22_36.13-36.70M.tar.gz";
-    fwrite($fp, "       metadatafile=$metadatafile\n");
-    if ($_POST['compute_target'] != "AWS") { 
-      fwrite($fp, "      ( cd  \$RUNDIR/genomestrip/group\$gp\n");
-      fwrite($fp, "        tar zxf  /gscmnt/gc2525/dinglab/rmashl/\$metadatafile  ) \n");
-    } else {
-      fwrite($fp, "      ( cd  \$RUNDIR/genomestrip/group\$gp\n");
-      fwrite($fp, "        if [[ ! -e \$metadatafile ]] ; then \n");
-      fwrite($fp, "            \$get_cmd s3://washu_ashg_demo/genomestrip_support/\$metadatafile\n");
-      fwrite($fp, "            tar zxf  \$metadatafile \n");
-      fwrite($fp, "        fi )\n");
-    }
+    // TODO: generalize from  precomputed metadata,
+    //$metadatafile="metadata.22_36.13-36.70M.tar.gz";
+    //fwrite($fp, "       metadatafile=$metadatafile\n");
+    //if ($_POST['compute_target'] != "AWS") { 
+    // fwrite($fp, "      ( cd  \$RUNDIR/genomestrip/group\$gp\n");
+    //  fwrite($fp, "        tar zxf  /gscmnt/gc2525/dinglab/rmashl/\$metadatafile  ) \n");
+    //} else {
+    //  fwrite($fp, "      ( cd  \$RUNDIR/genomestrip/group\$gp\n");
+    //  fwrite($fp, "        if [[ ! -e \$metadatafile ]] ; then \n");
+    //  fwrite($fp, "            \$get_cmd s3://washu_ashg_demo/genomestrip_support/\$metadatafile\n");
+    //  fwrite($fp, "            tar zxf  \$metadatafile \n");
+    //  fwrite($fp, "        fi )\n");
+    //}
 
 
     fwrite($fp, "   for chr in \$SEQS; do\n");
@@ -2925,24 +3628,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if ($_POST['gs_depth_useGCNormalization'] == "true") {
     fwrite($fp, "GS_CN_MASK=\\\$RUNDIR/reference/\$GENOMESTRIP_CN_MASK\n");
     }
-
+    // TODO
     //    fwrite($fp, "statfile=incomplete.genomestrip.group\$gp.chr\$chralt\n");
     //    fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-    //    fwrite($fp, "remotestatus=\\\$RESULTSDIR/\\\$statfile\n");
+    //    fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
     //    fwrite($fp, "touch \\\$localstatus\n");
     //    fwrite($fp, "\$put_cmd \\\$localstatus \\\$remotestatus\n");
     fwrite($fp, "cd \\\$RUNDIR/genomestrip/\$dir\n"); 
     fwrite($fp, "export SV_DIR=$GENOMESTRIP_DIR\n");
 
-
-
     fwrite($fp, "export PATH=\\\${SV_DIR}/bwa:\\\${PATH}\n");
     fwrite($fp, "export LD_LIBRARY_PATH=\\\${SV_DIR}/bwa:\\\${LD_LIBRARY_PATH}\n");
     fwrite($fp, "export SV_CLASSPATH=\\\${SV_DIR}/lib/SVToolkit.jar:\\\${SV_DIR}/lib/gatk/GenomeAnalysisTK.jar:\\\${SV_DIR}/lib/gatk/Queue.jar\n");
-
-
     fwrite($fp, "export SV_CONF=\\\${RUNDIR}/genomestrip/genomestrip.input\n");
-
 
     fwrite($fp, "mkdir -p ./tmpdir ./logs \n");
 
@@ -3005,12 +3703,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "$GS_GTYP_CMD\n");
     }
 
+    // TODO
        //      fwrite($fp, "tgt=\\\$RESULTSDIR/genomestrip/group\$gp\n");
     //if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
 
-      //      fwrite($fp, "\$put_cmd  \`pwd\`/$vs_mpileup_out.group\$gp.chr\$chralt  \\\$tgt/\n");
+      //      fwrite($fp, "\$put_cmd  ./$vs_mpileup_out.group\$gp.chr\$chralt  \\\$tgt/\n");
       //      fwrite($fp, "cd \\\$RUNDIR/genomestrip/group\$gp\n"); 
-      //      fwrite($fp, "\$put_cmd  \`pwd\`/bamfilelist.inp \\\$tgt/bamfilelist.group\$gp.inp\n");
+      //      fwrite($fp, "\$put_cmd  ./bamfilelist.inp \\\$tgt/bamfilelist.group\$gp.inp\n");
       //      fwrite($fp, "\$del_cmd  \\\$remotestatus\n");
       //      fwrite($fp, "\$del_local \\\$localstatus\n");
 
@@ -3066,7 +3765,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       // convert and save
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl GenomeSTRiP ./\\\$out  ./\\\${out/%orig.vcf/gvip.vcf}\n");
-      fwrite($fp, "\$put_cmd  \`pwd\`/\\\${out/%orig.vcf/gvip.vcf}  \\\$tgt/\n");
+      fwrite($fp, "\$put_cmd  ./\\\${out/%orig.vcf/gvip.vcf}  \\\$tgt/\n");
+      // TODO
       // fwrite($fp, "\$del_cmd  \\\$remotestatus\n");
 
       if($do_timing) {
@@ -3127,141 +3827,69 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
   // Merge dirs with main
   $main_content = file_get_contents("$tmpjob.main");
+  // Not a debug statement!  
   file_put_contents($tmpjob, $main_content, FILE_APPEND);
   system("rm -f $tmpjob.main");
 
   // --------------------------------------------------------------------------------
   
   
-  //if($do_html==1) {
-  //  echo "</body></html>";
-  //}
-  //echo "Setting up output<br>";
+
+
+
+
   
-  // print execution profile to separate file
+
 
   print_profile_file($tmp_ep);
 
 
 switch ($compute_target) {
 case 'AWS':
-  $new_cl=$_POST['clusters'];
+  $toolsinfo_server = parse_ini_file('configsys/tools.info.server', true);
+  $sc_cmd = $toolsinfo_server['starcluster']['path']."/".$toolsinfo_server['starcluster']['exe'];
+  // AWS config and cluster setups now done elsewhere.
+  $scconf = "/tmp/".$_POST['gvip_sid_conf'].".sc";
+  $s3cfg  = "/tmp/".$_POST['gvip_sid_conf'].".s3cfg";
+  $real_cluster = $_POST['real_cluster'];
 
-  // TODO: future upgrade pending
-  //  $old_cl=$_POST['clusters_l'];
-  $old_cl="nada";
+  echo "Transmitting files to cluster '".$real_cluster."'...<br>";
 
-  $the_cluster="";
-  if($new_cl!="nada" && $old_cl!="nada") {
-    echo "Error: Choice of AWS compute cluster is not well defined. Aborting.<br>";
-    exit;
-  }
-  $output="";
-  if($old_cl!="nada") { // existing  (TODO)
-    //    echo "Resuming cluster ".$the_cluster."...<br>";
-    echo "Error:  Resuming clusters is not currently supported. Aborting.<br>";
-    $the_cluster = $old_cl;
-    $cmd = "$SC -c $scconf start -x ".$the_cluster;
-    //$output = shell_exec($cmd);
-    //echo $output;
-    exit;
-  } elseif ($new_cl!="nada") { // new 
-    $tmp_c = array();
-    $tmp_c = json_decode($_POST['clustdb'], true);
-    $the_cluster = $tmp_c[$new_cl];
-
-
-    // ----------------------------------------
-    // Control operations -- I have ideas for improving this
-    $normal_ops = 1;
-    //$normal_ops = 0;
-
-    if($normal_ops) { // NORMAL OPERATION
-      $real_cluster = $the_cluster."_".generateRandomString(4);
-      //$real_cluster = $the_cluster."_"."0000";
-      echo "Creating cluster '".$real_cluster."'...<br>";
-      $cmd = "$SC -c $scconf start -c $the_cluster $real_cluster 2>&1";
-      file_put_contents("testout", "$cmd\n", FILE_APPEND);
-      $myoutput = shell_exec($cmd);
-      
-    } else {  // DEBUG
-
-    $real_cluster = $the_cluster."_"."0000";    // Add string manually
-    echo "Re-using cluster '".$real_cluster."'...<br>";
-    $myoutput = "Overriding cluster creation. ready to use";
-    }
-    // ----------------------------------------
-    // (rjm) possibly just stop here
-    //       exit;
-
-
-
-    if(preg_match('/already exists/', $myoutput)) {
-      $output .= "Error: A cluster named '".$real_cluster."' already exists. GenomeVIP currently requires you to terminate the cluster before resubmitting.<br/>";
-      echo $output;
-      exit;
-    } else {
-      $output .= $myoutput."<br/>";
-      file_put_contents("testout", "**Start of new cluster log**\n", FILE_APPEND);
-      file_put_contents("testout", "$output\n", FILE_APPEND);
-      file_put_contents("testout", "**End of new cluster log**\n", FILE_APPEND);
-      // echo $output;
-    }
-  }
-
-  // Check
-  if(preg_match('/must specify the filesystem type/', $output)) {
-    echo "Error: filesystem type unknown (has a disk not yet been formatted?). Aborting.";
-    exit;
-  }
-  if(! preg_match('/ready to use/', $output)) {
-    echo "Unknown error occurred while starting the cluster. Aborting.";
-    exit;
-  }
-  echo "...created. Cluster is ready to use.<br>";
-
-
-  echo "Transmitting files to cluster...<br>";
-  // set up S3 -- now done elsewhere
-
-  $the_s3cfg = trim($_POST['s3conf']);
-
-  $cmd = "$SC -c $scconf put $real_cluster $the_s3cfg ~/.s3cfg";
+  $cmd = "$sc_cmd -c $scconf put $real_cluster $s3cfg ~/.s3cfg";
   $output = shell_exec($cmd);
-  $cmd = "$SC -c $scconf sshmaster $real_cluster \"chmod 0600 ~/.s3cfg\"";
+  $cmd = "$sc_cmd -c $scconf sshmaster $real_cluster \"chmod 0600 ~/.s3cfg\"";
   $output = shell_exec($cmd);
-  $cmd = "$SC -c $scconf sshmaster $real_cluster \"mkdir -p $RUNDIR\"";  
+  $cmd = "$sc_cmd -c $scconf sshmaster $real_cluster \"mkdir -p $RUNDIR\"";  
   $output = shell_exec($cmd);
-  $cmd = "$SC -c $scconf put  $real_cluster $tmp_ep   $RUNDIR/$myjob.ep"; 
+  $cmd = "$sc_cmd -c $scconf put  $real_cluster $tmp_ep   $RUNDIR/$myjob.ep"; 
   $output = shell_exec($cmd);
-  $cmd = "$SC -c $scconf put  $real_cluster $tmpjob   $RUNDIR/$myjob.sh"; 
+  $cmd = "$sc_cmd -c $scconf put  $real_cluster $tmpjob   $RUNDIR/$myjob.sh"; 
   $output = shell_exec($cmd);
-  $cmd = "$SC -c $scconf sshmaster $real_cluster \"chmod 0755 $RUNDIR/$myjob.sh\""; 
+  $cmd = "$sc_cmd -c $scconf sshmaster $real_cluster \"chmod 0755 $RUNDIR/$myjob.sh\""; 
   $output = shell_exec($cmd);
   echo "...transmitted.<br>";
 
   echo "Launching computations...<br>";
-  $cmd = "$SC -c $scconf sshmaster $real_cluster $RUNDIR/$myjob.sh";
+  $cmd = "$sc_cmd -c $scconf sshmaster $real_cluster $RUNDIR/$myjob.sh";
   $output = shell_exec("$cmd > /dev/null 2>/dev/null &");
   echo "...launched on cluster '".$real_cluster."'.<br>";
   echo "<br>";
 
   // messages
-  $s3path = preg_replace('#^s3://#', '', $RESULTSDIR);
-  $s3addr = "http://s3.amazonaws.com/$s3path";
-  echo "Results and status updates can be found in your Amazon bucket $s3addr or from within your AWS S3 Console under ".preg_replace('/\//', " -> ",  $s3path)."<br>";
+  echo "<pre>###########################################<br>";
+  echo " SUMMARY:<br><br>";
+  echo " JobID................: $myjob <br>";
+  echo " Results AWS S3 bucket: ".$_POST['s3buckets']."<br><br>";
+  echo "###########################################<br></pre><br>";
+  echo "To access the files, log in to your Amazon Web Services Console at https://console.aws.amazon.com
+and navigate to Storage &amp; Content Delivery &#8594; S3 &#8594; ".$_POST['s3buckets']." &#8594; ".$myjob."<br>";
   break;
-
   
-case 'tgi':
-
-
-
+  
+case 'local':
   $usern = trim($_POST['username']);
   $passw = trim($_POST['phrase']);
   $host  = trim($_POST['clust_gw']);
-
-
 
   $conn = ssh2_connect($host, 22);
   $auth = ssh2_auth_password($conn, $usern, $passw);
@@ -3269,9 +3897,7 @@ case 'tgi':
   //  echo "Transferring data...<br>";
   ssh2_exec($conn, "mkdir -m 0755 -p $workdir");
 
-  // scp_send has stopped interpreting initial tilde (~) in path. Employ workaround.
-  // $tmpworkdir = preg_replace('#^~(/)?#','',$workdir);
-  // (rjm): this should solve the cases
+  // (rjm) scp_send has stopped interpreting initial tilde (~) in path. Employ workaround.
   $tmpworkdir = preg_replace('#^~(('.preg_quote($usern).'/|/))?#','',$workdir); 
 
   if(file_exists($tmp_ep)) {
@@ -3285,21 +3911,6 @@ case 'tgi':
     ssh2_scp_send($conn, "$tmpjob", "$tmpworkdir/$myjob.sh", 0755);
     ssh2_exec($conn, "chmod 0755 $workdir/$myjob.sh");
 
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-    
     $job_name = $batch['name_opt']." \"$myjob\"";
     $EXEARG = "$RUNDIR/$myjob.sh";
     $ERRARG = "$RUNDIR/stdout.master";
@@ -3307,20 +3918,6 @@ case 'tgi':
     
     $cmd = "$nobsub"." ".$batch['cmd']." ".$batch['limitgr']." "."$job_name"." ".$batch['q_opt']." "."-e $ERRARG -o $OUTARG $EXEARG";
     
-
-
-
-
-    
-
-
-
-    
-
-
-
-    
-
     // Comment to test the sending of script and not run it
     $bExe=0;
     if(preg_match('/execute/', $_POST['subaction'])) {

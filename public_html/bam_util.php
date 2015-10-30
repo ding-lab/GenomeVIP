@@ -32,7 +32,6 @@ function write_check_aws_file_int($fp) {
 
 function write_check_bai_please($fp, $compute_target) {
   global $toolsinfo_h;
-  // Likely if bai had existed, the bam is sorted already
   fwrite($fp, "check_bai_please () {\n");  
   fwrite($fp, "   if [[ \"$@\" =~ .*Not\ Found*. ]] ; then\n");
   fwrite($fp, "      w=($@)\n");

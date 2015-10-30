@@ -3,6 +3,7 @@
 # @name GenomeVIP dbSNP annotation and filtering script
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
 #
+# @version 0.2 (rjm): workaround for stat on AWS
 # @version 0.1 (rjm): based on approach from Venkata Yellapantula
 #--------------------------------------
 use strict;
@@ -15,12 +16,13 @@ use IO::File;
 use Getopt::Long;
 use POSIX qw( WIFEXITED );
 use File::Temp qw/ tempfile /;
-use File::stat;
+#use File::stat;
 
 
 sub checksize {
     my ($dest,$src) = @_;
-    if (stat($dest)->size == 0){ system("grep ^# $src > $dest"); }
+    my $fs = `wc -l < $dest`;
+    if ( $fs == 0){ system("grep ^# $src > $dest"); }
     return 1;
 }
 

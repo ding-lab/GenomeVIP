@@ -7,7 +7,6 @@
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-//include ('Net/SSH2.php');
 include realpath(dirname(__FILE__)."/"."populate.php");
 include realpath(dirname(__FILE__)."/"."fileconfig.php");
 include realpath(dirname(__FILE__)."/"."resources_util.php");
@@ -18,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   $awsinfo = json_decode($_POST['src'], true);
   $k = count($awsinfo);
 
-  // create map (cf. get_rpathfile2)
+  // create map
   $myc_arr="";
   $realkey_cnt = 0;
   $paths_map = array();

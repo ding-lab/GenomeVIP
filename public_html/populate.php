@@ -23,7 +23,7 @@ function populate(&$data) {
   $h_ploidymap = array();                  $h_ploidymap_p = array();
 
   // Bin file types
-  for ($k=($fline[0]+1) ; $k < count($fline); $k++) {
+  for ($k=($fline[0]+1) ; $k < count($fline); $k++) {       // CHECK INDEX RANGE
     $cols = explode("\t", $fline[$k]);
     if (count($cols)  == 2 ) {  // prevents typeerror undefined
       $idx = $cols[0];
@@ -56,7 +56,7 @@ function populate(&$data) {
 	} else if (preg_match('/(ploidy.*map)|(map.*ploidy)/', $realfile)) {
 	  $h_ploidymap[ $realfile ] = 0; $h_ploidymap_p[ $realfile ] = $idx;
 
-	} else if (preg_match('/\.dict\z/', $realfile)) {
+	} else if (preg_match('/\.dict\z/', $realfile)) {   // assume end of word
 	  $h_dict[ $realfile ] = 0;       $h_dict_p[ $realfile ] = $idx;
 
 
@@ -81,7 +81,7 @@ function populate(&$data) {
     // Process bams
     $iter = 0;
     foreach ($h_bam as $key => $value) {
-      // For multiselect; color code TCGA names
+      // (rjm) Insert using multiselect2side's id instead of our select id
       $tag = $iter . "|" . $h_bam_p[$key] . "|" . $key . "|" . $h_bam[$key];  // selectid, path, name, bai_exists 
       echo "<option class='isbamX " . ( preg_match('/TCGA-\w{2}-\w{4}-0/',$key) ?("tumor "):("")) . (preg_match('/TCGA-\w{2}-\w{4}-1/',$key) ?("norm "):("")) . "' value='" . $tag . "'>" . $key . "</option>\n";  // for $("#searchable").append
       echo "<option class='isbamY " . ( (!$h_bam[$key]) ? ("nobai ") : ("")) . ( preg_match('/TCGA-\w{2}-\w{4}-0/',$key) ?("tumor "):("")) . (preg_match('/TCGA-\w{2}-\w{4}-1/',$key) ?("norm "):("")) . "' value='" . $tag . "'>" . $key . "</option>\n";  // for $("#bamfilesms2side__sx").append

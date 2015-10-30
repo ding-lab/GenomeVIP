@@ -1,7 +1,7 @@
 #!/bin/bash
 # ---------------------
 # @name GenomeVIP utility script to filter BreakDancer ITX calls
-# @author R. Jay Mashl <rmashl@genome.wustl.edu>c
+# @author R. Jay Mashl <rmashl@genome.wustl.edu>
 # @version
 #
 # @syntax bam_filter.sh  mode   bamfilelist   variant_file  

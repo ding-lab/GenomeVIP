@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   if ($c==1) {
     $idx = $dict[ $_POST['fn'] ];
     $ppfn = $result[ $idx ]['path'];
-
+    //    $desc = $result[ $idx ]['desc'];
   }
   if ($c==2) {
     $ppfn = json_decode($_POST['fn']);

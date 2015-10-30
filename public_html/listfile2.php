@@ -11,10 +11,7 @@ include('./populate.php');
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
   $fpath = json_decode($_POST['filepath']);
-
-
   $tmp_data = file_get_contents($fpath);
-
     
   // create map
   $realkey_cnt   = 0;
@@ -32,23 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
   // output map and data
   $myc = $realkey_cnt."\n";
-
   $myc_arr .= $myc;
-
   for ($i=0; $i < $realkey_cnt; $i++) {
-
     $myc = $mymap[$i]."\n";
     $myc_arr .= $myc;
-
   }
   foreach (array_filter(explode("\n", $tmp_data)) as $i ) {
     $dn = dirname($i);
     $bn = basename($i);
     $realkey = $paths_map[$dn];
     $myc = $realkey."\t".$bn."\n";
-
     $myc_arr .= $myc;
-
   }
 
   populate($myc_arr);

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 <!--
-@name GenomeVIP main web browser page
+@name    GenomeVIP main web browser page
 @version
 @author  R. Jay Mashl <rmashl@genome.wustl.edu>
 -->
@@ -27,6 +27,7 @@ $(function() {
 
 });
 
+
 $(document).ajaxStart(function() { $('.spinner').show(); });
 $(document).ajaxStop(function() {  $('.spinner').hide(); });
 
@@ -35,7 +36,40 @@ $(function() {
     $("#content-panel").width(winw-120);
 });
 function mysetup() {
-    document.getElementById('login_none').checked=true;     document.getElementById('subactionR').checked=true;     $('#rpath').val("");     $('#workdir').val("");     $('#jobname').val("");     $('#upfile').val("");     $('#awsvoldb').val(""); upd_global_dbsnp(); upd_global_fpfilter(); clear_chr(5);
+    document.getElementById('subactionR').checked=true;
+    $('#rpath').val("");     $('#workdir').val("");     $('#jobname').val("");
+    $('#upfile').val(""); upd_global_dbsnp(); 
+    upd_global_fpfilter(); clear_chr(5); $('#results_dir').val("");
+    
+    // Restore
+    $("#awsvoldb").val($("#sh_awsvoldb").val());
+    $("#awszonedb").val($("#sh_awszonedb").val());
+    $("#clustdivh").html($("#sh_clustdivh").val()).addClass('headspc subhead tdindentd');
+    $("#clustdiv").html($("#sh_clustdiv").val());
+    $("#clustdivh_r").html($("#sh_clustdivh_r").val());
+    $("#clustdiv_r").html($("#sh_clustdiv_r").val());
+    $("#workvolh").html( $("#sh_workvolh").val()).addClass('headspc subhead tdindentd');
+    $("#workvol").html( $("#sh_workvol").val());
+    $("#stordivh").html( $("#sh_stordivh").val()).addClass('headspc subhead tdindentd');
+    $("#stordiv").html( $("#sh_stordiv").val());
+    $("#sc_running").html( $("#sh_sc_running").val());
+    //
+    $("#clustdiv2").html( $("#sh_clustdiv2").val());
+
+    // Activate
+    if($("#login_aws").is(":checked")){ 
+	if( $("#awsvoldb").val().match(/volid/)) {
+            $("#ebs_actions_0").hide(); $("#ebs_actions_y").show();
+        } else {
+            $("#ebs_actions_0").hide(); $("#ebs_actions_n").show();
+	}
+	$("#awsinfo_c").show();
+	do_aws_setup();
+    }
+    if($("#login_local").is(":checked")){ 
+	$("#localinfo_c").show();
+	do_local_setup();
+    }
 }
 
 function populate_profiles() { 
@@ -44,11 +78,11 @@ function populate_profiles() {
     cmds[1] = "ep_select";
     var k;
     // using loop construct for expediency
-    for(k=0; k<cmds.length; k++) {
+    for(k=0; k < cmds.length; k++) {
 	var posting = $.ajax({
 	    url: "read_profiles.php",
 	    type: "POST",
-	    async: false,
+	    async: false, 
 	    data: { 'c': 0, 'p':k },
 	    success: function(data) {
 		var data_array = JSON.parse(data);
@@ -60,10 +94,6 @@ function populate_profiles() {
 	});
     }
 }
-
-
-
-
 
 function warn_bd(){
     if( $("input[name='pin_include_breakdancer']:checked").val()=="true") {
@@ -79,16 +109,10 @@ function warn_bd(){
 
 function chr_str_fail(id,loc) {
     // examples: 2,  MT, 1-9, 1-13, 10-20, GL00020.001, GL00020.001:200, GL00020.001:300-4000, MT:100-200, X:1000
-
-
-
-
     // sufficient string so far...
     var re= /\d{1}-\d{1,2}|\d{2}-\d{2}|(\d{1,2}|[A-Z]{1,2}(\d+(\.\d+)?)?)(:\d+(-\d+)?)?/;
-
     var re3   = /[,:\-]/;
     var re3nc = /[:\-]/;
-
     var mystr = $("#"+id).val().trim();
     if ( mystr == "") {
 	alert ("Please specify genomic regions in "+loc+" !"); return true;
@@ -182,6 +206,17 @@ function preview_ep(n) {
     
 }
 
+function check_has_dup() {
+    var tmp = new Array();
+    var c = $("[id^=awsvolmenu]").length;
+    if(c) { for(var i=0; i < c; i++) { v=$("#awsvolmenu"+i).val(); if(v!="none") {tmp.push(v); } } }
+//    tmp.push( $("#awsworkmenu").val() ); // work vol requirement; already checked valid
+    if(tmp.length < 2) { return false; }
+    tmp.sort(); 
+    for(var i=0; i < (tmp.length - 1); i++) { if(tmp[i] == tmp[i+1]) { return true; } }
+    return false;
+}
+
 
 function validateform(){ 
     var numerr = 0;
@@ -191,10 +226,50 @@ function validateform(){
 	alert ("Please specify a computing resource under Accounts in the navigational menu.");
 	numerr++; return false;
     }
-    if ( $("#login_tgi").is(':checked') && ( $("#un").val().length < 1 || $("#pw").val().length < 1 )) {
+    if ( $("#login_local").is(':checked') && ( $("#un").val().length < 1 || $("#pw").val().length < 1 )) {
 	alert ("Please provide username and password.");
 	numerr++; return false;
     }
+
+    var bRunning=0;
+    if ( $("#login_aws").is(':checked')) {
+	// formerly rptclust()
+	var cnam=$("input[type='radio'][name='clusters']:checked").val();
+	var c_lnam=$("input[type='radio'][name='clusters_l']:checked").val();
+	var res;
+	if ((cnam=="nada" && c_lnam=="nada") || (cnam !="nada" && c_lnam !="nada")) {
+	    alert("Please select exactly one of the listed compute resources before submitting!"); 
+	    numerr++; 
+	    return false; 
+	}  
+
+	if (cnam=="nada") {  // use running
+//	    if( $("#awsworkmenu").val() != "none" || $("#newvolsz").val() != "none" ) { alert("Alert: Sorry, the attempted working disk space specification is ignored when configuring to re-use a running compute resource."); }
+	    bRunning = 1;  
+	    res = c_lnam; 
+	} else { // create new
+//	    if( $("#nclust").val() > 1 &&  (  ($("#awsworkmenu").val() == "none" &&  $("#newvolsz").val() == "none")  || ($("#awsworkmenu").val() != "none" &&  $("#newvolsz").val() != "none") ) ) { alert("Error: Please specify exactly one working volume for this new cluster configuration."); numerr++; return false; }
+	    //if( $("#nclust").val() == 1 &&  $("#awsworkmenu").val() != "none" &&  $("#newvolsz").val() != "none" )  { alert("Error: Please specify at most one working volume for this new cluster configuration."); numerr++; return false; }
+	    var tmp=new Array(); 
+	    tmp = JSON.parse( $("#clustdb").val()); 
+	    res = tmp[cnam]; 
+	}
+	var str=$("#newvolname").val();
+	if(/^[a-zA-Z0-9_]*$/.test(str)==false) {
+	    alert("Error: Please modify the name you are giving to the new working volume; it currently has disallowed characters.");
+	    numerr++;
+	    return false;
+	}
+	if( check_has_dup() == true) { alert("Error: An AWS volume has been selected more than once. Please check that any needed AWS volumes are selected only once."); return false; 	}
+	var b=document.getElementsByName('s3buckets');
+	if( !b.length) {
+	    alert("Error: Results are to be sent to AWS S3 storage, but no buckets appear to be available. Please create a bucket my clicking the button below.");
+	    numerr++;
+	    return false;
+	}
+    }
+
+
     if (document.forms.myform.bamfilesms2side__dx.length < 1) {
 	alert ("No samples have been selected. Please check that samples have been loaded and at least one has been selected.");
 	numerr++; return false;
@@ -203,18 +278,6 @@ function validateform(){
 	alert ("No reference genome was found in the directories provided. Please check sample locations.");
 	numerr++; return false;
     }
-    //    if (document.getElementById("workdir").value == "") {
-    //	alert ("Please specify directory for running job");
-    //	return false;
-    //    }
-    //    if (document.getElementById("jobname").value == "") {
-    //	alert ("Please specify a name for the job script");
-    //	return false;
-    //    }
-    //    if (document.getElementById("resultsdir").value == "") {
-    //	alert ("Please specify directory for the results");
-    //	return false;
-    //    }
 
     if ( ! ( $("#vs_cmd").is(':checked') || $("#strlk_cmd").is(':checked') ||  $("#bd_cmd").is(':checked') || $("#pindel_cmd").is(':checked') || $("#gs_cmd").is(':checked')) ) {
 	alert("No tools selected. Please select at least one tool before submitting.");
@@ -274,10 +337,6 @@ function validateform(){
     }
 
     
-
-
-//    }
-    
     // Currently, for pooled VarScan samples we do no offer filtering
     var tmp2 = check_vs_mode();
     if (tmp == false) {
@@ -295,152 +354,80 @@ function validateform(){
     var tmp = warn_bd();
     if (tmp == false ) { numerr++; }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    if ( $("#login_aws").is(':checked')) {
-	var myfound=false;
-	$("input[type='radio'][name='awsworkvols']").each(function() { if( $(this).is(":checked")) myfound = true; } );
-	if( myfound==false) {
-	    alert("Error: Please specify an EBS volume to be used as a temporary working area!");
-	    numerr++;
-	    return false;
+    if( ! numerr) {  
+	msg="Validation tests for user settings: PASSED.";
+	if ( $("#login_aws").is(':checked')) {
+	    if( cnam != "nada") {
+	    msg += "\n\nGenomeVIP is set to use a new compute resource"+((!bRunning)?(" of type '"):(" '"))+ res +"' and to have results stored in S3 bucket '"+ $("input[type='radio'][name='s3buckets']:checked").val()+"'.";
+	    } 
+	    if( c_lnam !="nada") {
+	    msg += "\n\nGenomeVIP is set to re-use compute resource '"+res+"' and to have results stored in S3 bucket '"+ $("input[type='radio'][name='s3buckets']:checked").val()+"'.";
+	    }
 	}
-    }
-
-
-    if (numerr == 0) {  alert ("Validation tests passed"); } 
-    return true;
-}
-
-// Report, verify AWS choices
-function rptclust() {
-    if( $("#login_aws").is(':checked')) {  // check Amazon choices
-	var cnam=$("input[type='radio'][name='clusters']:checked").val();
-	var c_lnam=$("input[type='radio'][name='clusters_l']:checked").val();
-	var res;
-	if (cnam=="nada" && c_lnam=="nada") { alert("Please select one of the compute resources before submitting!"); return false; }  
-	if (cnam=="nada") { res = c_lnam; } else { var tmp=new Array(); tmp = JSON.parse( $("#clustdb").val()); res = tmp[cnam]; }
-    var b=document.getElementsByName('s3buckets');
-	if( !b.length) {
-	    alert("No AWS S3 buckets found for storing results. To create a bucket, sign in to the AWS Console, select S3, and click the Create Bucket button. (This option will upgraded in the future.)");
-	    return false;
-	}
-	if (confirm("Computing is set to be performed on '"+ res +"' with the results to be stored in '"+ $("input[type='radio'][name='s3buckets']:checked").val()+"'.")==true) {
-	    return true;
-	} else {
-	    return false;
-	}
-    } else {
+	alert( msg );
 	return true;
+    } else { 
+	return false;
     }
-}
+}  // validate user
 
-function get_sc_running(n) {
-// n=0: manage mode
-// n=1: display mode
-    if ( $("#login_aws").is(':checked')) {
 
-	switch(n) {
-	case 0:	
-	    $('#sc_running0').empty(); 
-	    $('#sc_running0').append("<p>Manage AWS instances:  <b>Updating ... please wait ...</b></p>");
-	    $('#sc_running0').show(); 
- 	    $('#sc_running').empty(); 
+
+function get_sc_running(n) { // for AWS
+	switch(n) {   
+	case 0:	  // manage mode
+            $('#sc_running_m').hide();
+	    $('#sc_running').html("<p>Manage AWS instances:  <b>Updating ... please wait ...</b></p><br>");
 	    break;
-	case 1: 
- 	    $('#clustdiv0_l').empty(); 
- 	    $('#clustdiv0_l').append("<p class='tdindents'>...or re-use an existing resource (if any): <b>Updating ... please wait ...</b></p>");
- 	    $('#clustdiv_l').empty(); 
+
+	case 1:   // display mode
+
+ 	    $('#clustdivh_r').html("<p class='tdindent3'><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p><br><p class='tdindents'>Re-use an existing running resource (if any): <b>Updating ... please wait ...</b></p>");
+ 	    $('#clustdiv_r').empty(); 
 	    break;
 	}
-
 	var posting = $.ajax({
 	    url: "get_sc_running.php",
 	    type: "POST",
-	    data: {'cfg':$("#scconf").val(), 'mode':n},
+	    async: false,
+	    data: {'cfg':$("#gvip_sid_conf").val(), 'mode':n},
 	    success: function(resp) {
 //		var data = JSON.parse(resp);
 		switch(n) {
-		case 0:
-		    $('#sc_running0').empty(); 
-		    $('#sc_running0').append("<p>Manage AWS instances:</p>");
-		    $('#sc_running0').show();
-		    $('#sc_running').append("<p class='tdindent'><i>This feature may be used to terminate running clusters.</i></p><br/>");
-		    $('#sc_running').append(resp);
-		    $('#sc_running').show();
+		case 0:  // manage
+		    $('#sc_running').html("<p class='tdindent'><i>To terminate a cluster, make a selection below.</i></p>").append(resp).show();
+	            $('#sh_sc_running').val( $('#sc_running').html() );	
 		    break;
-		case 1:
- 		    $('#clustdiv0_l').empty(); 
- 		    $('#clustdiv0_l').append("<p class='tdindents'>...or re-use a running resource (if any):</p>");
- 		    $('#clustdiv_l').empty(); 
-		    $('#clustdiv_l').append(resp);
+
+		case 1:  // display
+		    $('#clustdivh_r').html("<p class='tdindent3'><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p><br><p class='tdindents'>Re-use an existing running resource (if any):</p>");
+	            $('#sh_clustdivh_r').val( $('#clustdivh_r').html() );
+		    $('#clustdiv_r').html(resp);
+	            $('#sh_clustdiv_r').val( $('#clustdiv_r').html() );
 		    break;
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
      	    }
 	});
-	
-    } else if ( $("#login_tgi").is(':checked')) {
-	$('#sc_running0').hide();
-	$('#sc_running').hide();
-
-
-
-
-
-
-
-    }
-};
+}
 
 function do_end_clust(n) {
+    if($("#gvip_sid_conf").val()=="") {
+	alert("Error: To terminate cluster, please first enter or create a sessionID !");
+	return;
+    }
     var rr = confirm("Terminate resource "+n+" ?");
     if (rr == true) {
-	display("Please allow 2 minutes for the resource to shut down.<br><br>After that time, you may close this dialog box and try again to manage AWS instances.","clear");
+	display("Termination request has been sent; it will take a moment for AWS to complete the process.<br><br>After that time, you will be able to click Close.","clear");
 	var posting = $.ajax({
 	    url: "get_sc_running.php",
-// Try omit
-//	   timeout: 120000,
+            // Try omit
+            // timeout: 120000,
 	    type: "POST",
 	    async: false,
-	    data: { 'nm': n, 'mode': 2, 'cfg':$("#scconf").val()},
+	    data: { 'nm': n, 'mode': 2, 'cfg':$("#gvip_sid_conf").val()},
 	    error: function() {
-		alert("The shutdown process has timed out. Click the Refresh button under Manage AWS instances in the Preferences tab to check the resource status.");
+		alert("The shutdown process has timed out. Click the Refresh button under Manage AWS clusters in the Options tab to check the resource status.");
 	    },
 	    success: function(resp) {
 		$("#preview_div").dialog("Close");
@@ -463,69 +450,129 @@ function do_end_clust(n) {
     }
 }
 
-
-
+function create_volume() {
+    var posting = $.ajax({
+	url: "mkvolume.php",
+	type: "POST",
+	async: false,
+        // TODO
+        // data: { 'cfg':$("#gvip_sid_conf").val(), 'name': $(), 'reg': $(); 'sz': $() },
+	data: { 'cfg':$("#gvip_sid_conf").val()},
+	error: function() {
+	    alert("An unknown error occurred while creating EBS volume.");
+	},
+	success: function(data) {
+	    return data;
+	}
+    });
+}
 
 
 function do_sub() {
-    var cmd,name,bErr=0;
-    var bFail=0;
-    var cmsg="";
+    var cmd,type,bErr=0;
+    var bFail = 1;
+    var cmsg = "";
+    var real_cluster="";
+    var mymsg="";
+    var bMadeVol=0;
     if ( $("#login_aws").is(':checked')) {
-	name = $("input[type='radio'][name='clusters']:checked").val();
-	if( name!="nada") { 
-	    cmd="new"; 
+	// Execution type
+	obj = $("input[type='radio'][name='clusters']:checked").val(); // type
+	if( obj != "nada") { 
+	    cmd = "new"; 
+	    mymsg = "Alert: You have requested to create a new compute resource";
+	    //if( $("#newvolsz").val() != "none") { 
+		//mymsg += " and a new working volume.";
+	    //} else { 
+		mymsg += ".";
+	    //}
+	    mymsg += " A few minutes will be needed to complete the process. Click OK to proceed.";
+	    if(confirm(mymsg) == false) { 
+		return false; 
+	    } 
+	    //var res = create_volume();
+	    //if( ! res.match(/^vol/)) {
+	    //alert("Error: Aborting volume and cluster creation.");
+	    //numerr++;
+	    //return false;
+	    //} else {
+	    //bMadeVol=1;
+	    // }
+
 	} else {
-	    name = $("input[type='radio'][name='clusters_l']:checked").val();
-	    cmd="resume";
-	}
-// (rjm) Adds nothing now, may be needed(?)
-//	if( $("#awsvoldb").val()=="") { alert("Notice: No EBS volumes were configured."); }
-// (rjm) Imposition of mutual exclusion of data sources allows us to use number of ebs menus as proxy
-	var awsvolspec = new Array();
-	var menlen = $("[id^=awsvolmenu]").length;
-	var ik=-1;
-	if (menlen) { 
-	    for(var k=0; k < menlen; k++) { 
-		awsvolspec[k] = $('#awsvolmenu'+k).val(); // volume values
-		if( $("#awsworkvol"+k).is(":checked")) { ik = k; } // work volume
+	    
+	    obj = $("input[type='radio'][name='clusters_l']:checked").val();  // specific name
+	    cmd = "reuse";
+	    mymsg = "Alert: You have requested to re-use an existing compute resource. A few minutes will be needed to complete the process. Click OK to proceed.";
+	    if( confirm(mymsg)==false) {
+		return false;
 	    }
 	} 
-	if( ik == -1) { alert("Error: Please select a work volume before submitting!"); return false; }
+	// pass all volumes; more checks later
+	var awsvolspec = new Array();
+        var c = $("[id^=awsvolmenu]").length;
+	// TODO: finish working vol viz. creation
+	if(c) { for(var i=0; i < c; i++) { awsvolspec.push( $("#awsvolmenu"+i).val() ); }}
+//        if( $("#awsworkmenu").val()!="none") { awsvolspec.push( $("#awsworkmenu").val() ); }
 
 	var posting = $.ajax({
 	    url: "setup_sc.php",
-	    timxeout: 600000,  
+	    timeout: 300000,  
 	    type: "POST",
 	    async: false,
-	    data: {'src': $("#scconf").val(), 'cmd': cmd, 'name': name, 'size': $("#nclust").val(), 
-		   'awsinfovol': $("#awsvoldb").val(), 'c': menlen, 'awsvolspec': JSON.stringify(awsvolspec) },
+	    data: {'cfg': $("#gvip_sid_conf").val(), 'cmd': cmd, 'obj': obj, 'size': $("#nclust").val(), 
+		   'awsinfovol': $("#awsvoldb").val(), 'awsvolspec': JSON.stringify(awsvolspec) },
 	    error: function() {
-		alert("An unexpected error occurred while starting Amazon resource '"+name+"'.");
-		bFail=1;
+		alert("Timeout or unexpected error occurred while starting Amazon resource '"+obj+"'.");
 	    },
 	    success: function(resp) {
-		if(resp.match(/Mismatched/)) {
-		    alert("AWS error: Selected volumes are not in the same availability zone!");
-		    bFail=1;
+		var data = JSON.parse(resp);
+		var st="AWS validation error: ";
+		// Errors for new
+		if( data['msg'].match(/FileMissing/)) {
+		    alert("Server validation error: The file(s) used to access the resource are missing. Please start a new cluster.");
 		}
-		else if(! resp.match(/OK/)) {
-		    alert("setup_sc.php resp:"+resp);
-		    alert("Unknown error in setting up cluster configuration!");
-		    bFail=1;
-		} else {
-		    cmsg = "AWS resources configured. ";
+		else if( data['msg'].match(/NoZone/)) {
+		    alert(st + "One or more volume is not associated with an availability zone.");
+		}
+		else if( data['msg'].match(/MismatchedZones/)) {
+		    alert(st + "All selected volumes to be in the same availability zone. Please select different volumes or move/copy data as needed.");
+		}
+		// Errors for start
+		else if( data['msg'].match(/NoFS/)) {
+		    alert(st + "Unknown filesystem (perhaps a disk has not yet been formatted). Aborting.");
+		}
+		else if( data['msg'].match(/InUse/)) {
+		    alert(st + "The requested cluster cannot be launched for the following reason(s):\n\n"+data['txt']+".\n\nIf volumes are not available due to being in use, you may need to terminate the corresponding cluster resources (you may refer to your AWS Console or GenomeVIP Options).");
+		}
+		else if( data['msg'].match(/NotReady/)) {
+		    alert(st + "An unknown error occurred while starting the cluster. Aborting.");
+		}
+		//
+		else if( data['msg'].match(/OK/)) {
+		    bFail=0;
+
+		    $("#real_cluster").val( data['name']);
+		    cmsg = "AWS validation tests: PASSED.\nThe requested compute resource is configured and ready to use. ";
+		}
+		else {
+		    $("#real_cluster").val("");
+		    alert(st + "Unknown error while setting up cluster configuration!");
 		}
 	    }
 	});
 	
     } // aws
+
     if(bFail) {return false;}
 
-    cmsg += "Click OK to submit!";
+    cmsg += "Click OK to continue with the computation !";
     if( confirm( cmsg )==true ) {
-
-	display("Setting up resources (this may require a few minutes)...<br/>", "clear");
+	if($("#real_cluster").val()=="") {
+	    alert("An unexpected error occurred: cluster undefined !");
+	    return false;
+	}
+	display("Attempting to transmit the computation ...<br/>", "clear");
 	var posting = $.post("parse_real.php", $("#myform").serialize(), function(data) {
 	    data  = "...done.<br><br>"+data;
 	    data += "<br/>Click the 'Close' button to close this window and to return to the GenomeVIP interface.";
@@ -536,9 +583,6 @@ function do_sub() {
     } else {
         return false;
     }
-
-
-    
 }
 
 function reset_form(i) {
@@ -570,11 +614,6 @@ function init_selectbox(i) {
     $("#gs_ploidymap").empty();
     
 }
-
-
-
-
-
 
 
 function upload_selector(p) {
@@ -616,60 +655,19 @@ function upload_object(p,opt,i) {
 }
 
 
-
-function clear_results() {
-    $("#resultsbox").empty();
-    $("#results_dir").val("");
-}
-
 function setup_s3() {
+    var err_msg="Unknown error occurred while setting up S3 configuration !";
     var posting = $.ajax({
-	url: "setup_s3.php",
+	url: "prepare_s3.php",
 	type: "POST",
 	async:false,
-	data: {'aws_ak':aws_ak, 'aws_sk':aws_sk, 'src':$("#s3conf").val(), 
-	       'aws_https':$_POST['aws_https'], 'aws_ssenc':$_POST['aws_ssenc'] },
-        error: function() {
-	    alert("Error while setting up S3 information!");
-	},
-	success: function(data) {
-	    $("#s3conf").val( JSON.parse(data) );
-	}
+        data: {'cfg':$("#gvip_sid_conf").val(), 'aws_ak': $("#aws_ak").val(), 'aws_sk':$("#aws_sk").val(),
+               'aws_https': $("#aws_https").val(), 'aws_ssenc':$("#aws_ssenc").val() },
+        error: function() { alert( err_msg ); },
+	success: function(resp) { if( ! resp.match(/ok/) ) { alert( err_msg ); } }
     });
 }
 
-function get_results() {
-    var d = $("#results_dir").val().trim();
-    if (d != "" ) {
-	$("#resultsbox").empty();
-	if($("input[type='radio'][name='compute_target']:checked").val()=="AWS") {
-	    setup_s3(); 
-
-	    var posting = $.ajax({
-		url: "get_aws_results_list.php", 
-		type: "POST",
-		async:false,
-		data: { 'd': JSON.stringify(d), 'cfg': $("#s3conf").val() },
-		error: function() { alert("Error while getting result listing."); },
-		success: function(data) {  populate_results(data); }
-	    });
-
-	} else if ($("input[type='radio'][name='compute_target']:checked").val()=="tgi") {
-
-	    // TODO - YET TO FINISH
-
-
-	} else {
-	    alert("Error: Please provide your credentials under Accounts!");
-
-	}
-
-
-    } else {
-	alert("Error: Results location is empty!");
-    }
-
-}
 
 function gotomytab(i) {
     var myarray=[0,1,2,3,4,5,6,7,8,9,10,11,12];
@@ -747,7 +745,7 @@ function clear_chr(i) {
     case 3: $("#pindel_chrdef_str").val(''); break;
     case 4: $("#gs_chrdef_str").val('');     break;
     case 5: $("#upload_ep_div").empty();  $("#ep_frame").contents().find('#myfile').val('');  break;	
-}
+    }
     return true;
 }
 
@@ -809,7 +807,7 @@ function apply_profile(results) {
 	upd_vs_fpfilter();
 	upd_bd_regions();
 	upd_pin_filters();
-	//
+
 	upd_global_dbsnp();
 	upd_global_fpfilter();
 
@@ -818,35 +816,36 @@ function apply_profile(results) {
 }
 
 function mkbucket  () {
-    var my_bucket=prompt('Enter bucket name (only letters, numerals, and _ allowed)');
+    var my_bucket=prompt('Amazon S3 buckets are unique. Enter a bucket name (only letters, numerals, and _ allowed)');
     var re=/^[0-9a-zA-Z_]+$/;
-    if (re.test(my_bucket)) {
-	var posting = $.ajax({
-	    url: "mkbucket.php",
-	    type: "POST",
-	    data: {'s3conf': $("#s3conf").val(), 'b': my_bucket},
-	    success: function(resp) {
-		if(resp.match(/OK/)) {
-		    get_stores(0);
-		    return true;
-		} else if (resp.match(/INVALID/)){
-		    alert("Error: the server invalidated the name "+my_bucket);
-		    return false;
-		} else if (resp.match(/EXISTS/)){
-		    alert("Sorry, bucket names on Amazon must be unique. Please try another name.");
-		    return false;
-		} else {
-		    alert("An unknown error occurred while creating bucket "+my_bucket);
-		    return false;
+    if(my_bucket.trim()!="") {  
+	if (re.test(my_bucket)) {
+	    var posting = $.ajax({
+		url: "mkbucket.php",
+		type: "POST",
+		data: {'cfg': $("#gvip_sid_conf").val(), 'b': my_bucket},
+		success: function(resp) {
+		    if(resp.match(/OK/)) {
+			get_stores(0);
+			return true;
+		    } else if (resp.match(/INVALID/)){
+			alert("Error: AWS reports the name '"+my_bucket+"' as invalid. Please try another name.");
+			return false;
+		    } else if (resp.match(/EXISTS/)){
+			alert("Sorry, another user has already created a bucket named "+my_bucketb+". Please try another name.");
+			return false;
+		    } else {
+			alert("An unknown error occurred while creating bucket "+my_bucket);
+			return false;
+		    }
 		}
-	    }
-	});
-    } else {
-	alert("Please try again");
-	return false;
+	    });
+	} else {
+	    alert("Please try again");
+	    return false;
+	}
     }
 }
-
 
 
 function quick_setup() {
@@ -956,7 +955,7 @@ function quick_setup() {
     if( ! bSysProf && ! bFile ) {
 	// Apply regions
 	check_glob_cb();
-	if( ! $("#glob_chrdefn").is(":checked")) { // regions                                                                                                          
+	if( ! $("#glob_chrdefn").is(":checked")) { // regions 
             status = "The specified genomic region information has been applied !";
 	}
     }
@@ -1010,7 +1009,7 @@ function download(filename, text) {
       <tr><td><button class="nav-button" type="button" id="nav-button_10" onclick="gotomytab(10);">Results</button></td></tr>
       <tr><td>&nbsp;</td></tr>
       <tr><td>&nbsp;</td></tr>
-      <tr><td><button class="nav-button" type="button" id="nav-button_11" onclick="gotomytab(11);">Preferences</button></td></tr>
+      <tr><td><button class="nav-button" type="button" id="nav-button_11" onclick="gotomytab(11);">Options</button></td></tr>
     </table>
   </div>
   
@@ -1032,42 +1031,87 @@ function download(filename, text) {
 	  <li><a class="tooltip" href="#tabs-12" id="litab-12" title="Configure additional filtering and annotation options">Post-discovery Analysis</a>
 	  <li><a class="tooltip" href="#tabs-9" id="litab-9" title="Provide meta-information about the calculation and submit to run">Submit</a>
 	  <li><a class="tooltip" href="#tabs-10" id="litab-10" title="Results">Results</a>
-	  <li><a class="tooltip" href="#tabs-11"  id="litab-11" title="Maintenance options">Preferences</a>
+	  <li><a class="tooltip" href="#tabs-11"  id="litab-11" title="Maintenance options">Options</a>
 	</ul>
 	
 	<div id="tabs-0" class="ui-tabs-panel"> 
-	  <div class="headspc subhead tdindentd">
-	    <p>Use the Navigation menu at the left to set up your computation.</p>
-	  </div> 
+	  <div class="headspc subhead tdindentd"><p>Use the Navigation menu at the left to set up your computation.</p></div> 
+	  <div> 
+	    <h3>Feature list (current)</h3>
+	    <ul>
+	      <li>Computing: Amazon cloud and local cluster</li>
+	      <li>Tools: VarScan, Strelka, BreakDancer, Pindel</li>
+	      <li>Filtering: quality and false positives filters</li>
+	      <li>Annotation: dbSNP, Variant Effect Predictor (VEP)</li>
+	      <li>Execution profiles: systemwide defaults or uploadable by user</li>
+	      <li>Genomic regions: provided selections or uploadable by user</li>
+	    </ul>
+	    <h3>Under development / testing</h3>
+	    <ul>
+	      <li>Documentation</li> 
+	      <li>All-VCF formatted output</li>
+	      <li>GenomeSTRiP, for general cases</li>
+	      <li>Multi-instance AWS clusters</li>
+	      <li>...</li>
+	    </ul>
+	    <h3>Help / Questions</h3>
+	    <ul>
+	      <li>For tool-specific concerns unrelated to GenomeVIP, we suggest contacting the author(s) of the corresponding tool.</li>
+	      <li>Otherwise, please contact us through <a href="http://github.com/ding-lab">our GitHub site</a> under GenomeVIP &#8594; Issues.</li>
+	    </ul>
+	  </div>
 
 
 	</div>
 	
 	<!-- Login --> 
 	<div id="tabs-1" class="ui-tabs-panel"> 
+	  <div class="spinner" style="display:none;">
+	    <img src="image/loading.gif" width="100" height="100" alt="Loading...">
+	  </div>  
 	  <div class="headspc subhead tdindentd"><p>Select a computational resource:</p></div>
 
 	  <div class="tdindent"> <p><input type="radio" id="login_none" name="compute_target" value="none" hidden="true"/></p></div>
-	  <div class="tdindent"> <p><input type="radio" id="login_aws" name="compute_target" value="AWS" /><label for="login_aws">Amazon AWS cloud</label></p></div>
-          <input type="hidden" id="scconf" name="scconf" value="">
-          <input type="hidden" id="s3conf" name="s3conf" value="">
-        
 
+    <div class="tdindent"> <p><input type="radio" id="login_aws" name="compute_target" value="AWS" /><label for="login_aws">Amazon EC2 / Cloud</label></p></div>
 	  <div id="awsinfo_c" class="tdindent initiallyHidden">
-	    <table class="tdindent">
-	      <tr><td class="ltab">User ID:</td><td><input type="text" class="tb1" id="aws_un" name="aws_un" value=""/></td></tr>
-              <tr><td>Access key:</td><td><input type="password" class="tb1" id="aws_ak" name="aws_ak" value=""/></td></tr>
-	      <tr><td>Secret key:</td><td><input type="password" class="tb1" id="aws_sk" name="aws_sk" value=""/></td></tr>
-	    </table>
-	    <div id="awsinfo"></div> <!-- unused -->
+	    <div class="tdindent">
+	      <table>
+		<tr><td class="ltab2">Current GenomeVIP SessionID:</td><td><input type="text" id="gvip_sid_conf" name="gvip_sid_conf" placeholder="None" readonly/><img class="inline" title="This identifier represents recent AWS resource configurations. The information will be lost upon restarting this GenomeVIP server." src="image/Help.png"></td></tr>
+		<tr><td></td><td><input type="button" id="gvip_sid_rl" name="gvip_sid_rl" value="Reload"/></td></tr>
 
+	      </table>
+	      <p class="tdindent bld">Options:</p>
+	      <table class="tdindent">
+		<tr><td class="ltab2">1. Enter a previous SessionID and gather resources.</td><td class="tdindent"> &#8594; <input type="button" id="chk_sid" name="chk_sid" value="Select"/></td></tr>
+		<tr><td>2. Delete SessionID listed above</td><td class="tdindent"> &#8594; <input type="button" id="del_sid" name="del_sid" value="Select"/></td></tr>
+		<tr><td>3. Generate a new SessionID and gather resources</td><td></td></tr>
+	      </table>
+	      <div id="gen_sid_tab">
+	      <table class="tdindent">
+		<tr><td class="ltab2 tdindent">User ID:</td><td><input type="text" class="tb1" id="aws_un" name="aws_un" value=""/></td></tr>
+		<tr><td class="ltab2 tdindent">Access key:</td><td><input type="password" class="tb1" id="aws_ak" name="aws_ak" value=""/></td></tr>
+		<tr><td class="ltab2 tdindent">Secret key:</td><td><input type="password" class="tb1" id="aws_sk" name="aws_sk" value=""/></td></tr>
+		<tr><td class="ltab2 tdindent0"></td><td> &#8594; <input type="button" id="gen_sid" name="gen_sid" value="Select"/></td></tr>
+	      </table>
+	      </div>
+
+
+
+	      <p><br></p>
+	      
+	      
+	      
+	    </div>
+
+	    
 
 	  </div>
 	    <p><br></p>
 	  
-	  <div class="tdindent" ><p><input type="radio" id="login_tgi" name="compute_target" value="tgi" /><label for="login_tgi">Local cluster</label></p></div>
+	  <div class="tdindent" ><p><input type="radio" id="login_local" name="compute_target" value="local" /><label for="login_local">Local cluster</label></p></div>
 
-	  <div id="tgiinfo_c" class="tdindent initiallyHidden">
+	  <div id="localinfo_c" class="tdindent initiallyHidden">
 	    <table class="tdindent">
 	      <tr><td class="ltab">Username:</td>
 		<td><input type="text" class="tb1" id="un" name="username" value=""></td>
@@ -1119,24 +1163,24 @@ function download(filename, text) {
 	    <div id="inp_lc_preamble" class="subhead tdindentd headspc"><p>Select from the following mutually exclusive options to provide locations of sequence alignment and genomic reference files (and possibly any supporting files):</p></div>
 
      
-    <div id="inp_ebs"><p>&nbsp;&bull; Specify EBS volumes for (i) temporary working area and (ii) any needed input datafiles:</p>
-	     <div id='multivolume' class="tdindent"></div>
-
-    <div id='ebs_actions_0' class="tdindents" style="display:none;"><p><b>Searching...</b></p></div>
-
-    <div id='ebs_actions_y' class="tdindents" style="display:none;">
-	     <p><input type='button' value='Add a volume' id='add_volume'><input type='button' value='Remove all volumes' id='rm_volumes'><input type='button' value='Apply lists' id='apply_vol_lists'></p>
-    </div>
-    <div>
-      <div id='ebs_actions_n' class="tdindents" style="display:none;">
-	<p class="tdindent"><i>There appear to be no volumes associated with your AWS account.</i></p>
-      </div>
-      <p><br/></p>
-      <div><p class="tdindent3"><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p></div>
-    </div>
-	    <p><br/></p>
-	   </div>
-	   <div id="voldb"><input type='hidden' id='awsvoldb' name='awsvoldb' value=''/></div>
+	    <div id="inp_ebs">
+	      <p>&nbsp;&bull; Specify any EBS volumes containing input datafiles:</p>
+	      <div id='multivolume' class="tdindent"></div>
+	      <div id='ebs_actions_0' class="tdindents" style="display:none;"><p><b>Searching...</b></p></div>
+	      <div id='ebs_actions_y' class="tdindents" style="display:none;">
+		<p><input type='button' value='Add a volume' id='add_volume'><input type='button' value='Remove all volumes' id='rm_volumes'><input type='button' value='Apply lists' id='apply_vol_lists'></p>
+	      </div>
+	      <div>
+		<div id='ebs_actions_n' class="tdindents" style="display:none;">
+		  <p class="tdindent"><i>There appears to be no volumes available.</i></p>
+		</div>
+		<p><br/></p>
+		<div><p class="tdindent3"><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p></div>
+	      </div>
+	      <p><br/></p>
+	    </div>
+	    <div id="voldb"><input type='hidden' id='awsvoldb' name='awsvoldb' value=''/></div>
+	    <div id="zonedb"><input type='hidden' id='awszonedb' name='awszonedb' value=''/></div>
 
 
 	    <div id="inp_rfile_opt"><p>&nbsp;&bull; Enter path to file containing list of files:</p>
@@ -1598,7 +1642,7 @@ function download(filename, text) {
        <div class="subhead tdindents"><b>STEP 2: Select genomic regions</b></div>
 
        <table class="tdindents">
-	 <tr><td class="tdw3">Select one:</td>   
+	 <tr><td class="tdw3">Select one:</td>
 
 	   <td><input type="radio" id="vs_chrdef0" name="vs_chrdef" value="standard" checked><label for="vs_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
 	       <input type="radio" id="vs_chrdef1" name="vs_chrdef" value="standard_plus_contigs"><label for="vs_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
@@ -1786,7 +1830,7 @@ function download(filename, text) {
        <br><br>
 
 
-	 <p id="toggle1as" class="tdindent"><img id="image1as" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+	 <p id="toggle1as" class="tdindent"><img id="image1as" src="image/plus.gif" alt="toggle advanced options"><a name="n_vs1as" href="#n_vs1as" class="hdr">&nbsp;<i>ADVANCED OPTIONS</i></a></p>
 
 	 <div class="tdindent"> <div id="panel1as" style="display:none;">
 	     <table class="tdindentd">
@@ -1949,7 +1993,7 @@ function download(filename, text) {
 	 </table>
        <p><br></p>
 	 
-       <p id="toggle2a" class="tdindent"><img id="image2a" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+       <p id="toggle2a" class="tdindent"><img id="image2a" src="image/plus.gif" alt="toggle advanced options"><a name="n_bd1" href="#n_bd1" class="hdr">&nbsp;<i>ADVANCED OPTIONS</i></a></p>
 	 <div class="tdindent">
 	   <div id="panel2a"  style="display:none;">
 	     <table class="rindent">
@@ -2008,12 +2052,13 @@ function download(filename, text) {
        
        
 	 
-       <p id="toggle2b" class="tdindent"><img id="image2b" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+       <p id="toggle2b" class="tdindent"><img id="image2b" src="image/plus.gif" alt="toggle advanced options"><a name="n_bd2" href="#n_bd2" class="hdr">&nbsp;<i>ADVANCED OPTIONS</i></a></p>
 	 <div class="tdindent"><div id="panel2b"  style="display:none;">
 	     <table class="rindent">
 	       <tr>
 		 <td class="tdw4">Dump SVs and supporting reads in BED format for GBrowse (-g):</td>
 		 <td><input type="radio" id="bd_dumpSVsF" name="bd_dump_SVs_and_supporting_reads" value="false" checked><label for="bd_dumpSVsF">False (default)</label> 
+		   <!-- option not available -->
 		     <!-- <input type="radio" id="bd_dumpSVsT" name="bd_dump_SVs_and_suppt_reads" value="true"><label for="bd_dumpSVsT">True (string:</label> <input type="text" id="tb1b"  name="bd_dump_SVs_GBrowse_string" value="">) --> </td>
 	       </tr><tr>
 		 <td>Minimum length of region (-s):</td>
@@ -2040,15 +2085,18 @@ function download(filename, text) {
 
 		 <td>Analyze Illumina long insert (mate-pair) library (-l)?</td>
 		 <td>
+		   <!-- option not available -->
 		   <!--	   <input type="radio" id="bd_long_insertT" name="bd_analyze_long_insert" value="true"><label for="bd_long_insertT">True</label> -->
 		   <input type="radio" id="bd_long_insertF" name="bd_analyze_long_insert" value="false" checked><label for="bd_long_insertF">False (default)</label> </td> 
 	       </tr><tr> 
 		 <td>Print CN and supporting reads per library or per bam? (-a)? </td>
-		 <td> <!-- <input type="radio" id="bd_count_support_modeT" name="bd_count_support_mode" value="library"><label for="bd_count_support_modeT">library</label> -->
+		 <td> <!-- option not available -->
+		   <!-- <input type="radio" id="bd_count_support_modeT" name="bd_count_support_mode" value="library"><label for="bd_count_support_modeT">library</label> -->
 		     <input type="radio" id="bd_count_support_modeF" name="bd_count_support_mode" value="bam" checked><label for="bd_count_support_modeF">bam (default)</label></td>
 	       </tr><tr>
 		 <td>Print allele frequency column (-h)? </td>
-		 <td> <!-- <input type="radio" id="bd_allele_colT" name="bd_print_allele_column" value="true"><label for="bd_allele_colT">True</label> -->
+		 <td>   <!-- option not available -->
+		   <!-- <input type="radio" id="bd_allele_colT" name="bd_print_allele_column" value="true"><label for="bd_allele_colT">True</label> -->
 		     <input type="radio" id="bd_allele_colF" name="bd_print_allele_freq_column" value="false" checked><label for="bd_allele_colF">False (default)</label></td>
 	       </tr><tr>
 		 <td>Minimum score for outputting SVs (-y):</td>
@@ -2187,7 +2235,8 @@ function download(filename, text) {
 	       </tr><tr>
 		 <td>Minimum number of supporting reads per event (-M):</td>
 		 <td><input type="text" class="tb1b" id="pin_min_supptreads"  name="pin_min_num_supporting_reads" value="3"> (default: 3)</td>
-	 <!--      </tr><tr>
+		 <!-- option not available -->
+		 <!-- </tr><tr>
 		 <td>Include search for mobile element insertions (-q):</td>
 		 <td>  <input type="radio" id="pin_mobile_insT" name="pin_do_mobile_insertions"  value="true"><label for="pin_mobile_insT">True</label> 
 		   <input type="radio" id="pin_mobile_insF" name="pin_do_mobile_insertions" value="false" checked><label for="pin_mobile_insF">False (default)</label></td> -->
@@ -2201,7 +2250,8 @@ function download(filename, text) {
 		 <td>Number of threads (-T):</td>
 		 <td><input type="text" class="tb1b" id="pin_numthreads"  name="pin_num_threads" value="1"></td>
 	       </tr>
-<!-- 	       <tr>
+		   <!-- option not available -->
+		   <!-- <tr>
 		 <td>Log file (-L):</td>
 		 <td><input type="text" class="tb1b" id="pin_logfile"  name="pin_logfile_prefix" value="" placeholder="pindel.log"> (default: pindel.log)</td> -->
 	       </tr>
@@ -2216,7 +2266,7 @@ function download(filename, text) {
        </div>
        <table class="mytable tdindents spread"> 
 	 <tr>
-	   <td class="tdw4">Chromosome(s):</td>    
+	   <td class="tdw4">Chromosome(s):</td> 
            <td><input type="radio" id="pindel_chrdef0" name="pin_chrdef" value="standard" checked><label for="pindel_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
              <input type="radio" id="pindel_chrdef1" name="pin_chrdef" value="standard_plus_contigs"><label for="pindel_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
              <input type="radio" id="pindel_chrdef2" name="pin_chrdef" value="user"><label for="pindel_chrdef2">User-defined:</label>&nbsp;
@@ -2411,7 +2461,7 @@ function download(filename, text) {
        
        
 	 
-       <p id="toggle4" class="tdindent"><img id="image4" src="image/plus.gif" alt="toggle advanced options">&nbsp;<i>ADVANCED OPTIONS</i></p>
+       <p id="toggle4" class="tdindent"><img id="image4" src="image/plus.gif" alt="toggle advanced options"><a name="n_gs" href="#n_gs" class="hdr">&nbsp;<i>ADVANCED OPTIONS</i></a></p>
        <div class="tdindent"><div id="panel4" style="display:none;">
 	   <p class="tdindent"><b>Please note: The default values are applicable to 1000 Genomes data</b></p>
 	   
@@ -2609,29 +2659,45 @@ function download(filename, text) {
 
      <!-- submit -->
      <div id="tabs-9" class="ui-tabs-panel"> 
-       <div id="clustdiv0" class="subhead tdindentd"><p>Please select a compute resource under Accounts to allow additional input item to be displayed below.</p></div>
+       <div class="spinner" style="display:none;">
+	 <img src="image/loading.gif" width="100" height="100" alt="Loading...">
+       </div>  
+
+       <div id="clustdivgi" class="subhead tdindentd"><p>Select from the options below:</p></div>
        <p><br></p>
-       <div id="clustdiv"></div>
-       <div id="clustdiv_c"></div>
-       <div id="clustdiv0_l" style="display:none;"></div>
-       <div id="clustdiv_l" style="display:none;"></div>
-       <div id="stordiv0"></div>
-       <div id="stordiv"></div>
-       <div id="clustdb_div"></div>
+
+       <div id="clustdivgih" class="tdindentd"><p><i>To display options, please first provide information in Accounts.</i></p></div>
+
+       <!-- aws/local header: choose resources -->
+       <div id="cr_aws" style="display:none;">
+	 <div id="clustdivh"></div>
+	 <div id="clustdiv"></div>  <!-- cluster types --> 
+	 <div id="clustdivh_r"></div>
+	 <div id="clustdiv_r"></div>  <!-- running -->
+	 <div id="workvolh" style="display:none;"></div>
+	 <div id="workvol" style="display:none;"></div> <!-- working vol -->
+	 <div id="stordivh"></div> 
+	 <div id="stordiv"></div> <!-- buckets -->
+       </div>
+       <!-- local cluster -->
+       <div id="cr_local" style="display:none;">
+	 <div id="clustdiv2"></div>
+       </div>
+       
        <p><br></p>
        
-
+       
        <div id="jobinst" class="initiallyHidden subhead tdindentd fps"><p>Provide any additional necessary information:</p></div>
-
+       
        <div id="titleinfo" class="initiallyHidden fps">
-    <div class="tdindents"><p class="fps">Comment to place into execution profile (OPTIONAL):</p>
+	 <div class="tdindents"><p class="fps">Comment to place into execution profile (OPTIONAL):</p>
 	   <input type="text" class="tb2" id="jobtitle" name="jobtitle" value=""/>
-
+	   
 	 </div>
        </div>
-
+       
        <p><br></p>
-
+       
        <div id="runinfo" class="initiallyHidden fps">
 	 <div class="tdindents"><p>Working directory for running job:&nbsp;<img src="image/Help.png" class="inline" title="This directory will be created at the full path provided or else under your home directory."></p>
 	   <input type="text" class="tb2" id="workdir" name="workdir" value="" placeholder="mydir"/>
@@ -2640,7 +2706,7 @@ function download(filename, text) {
 	 <div class="tdindents"><p>Specify submit action:</p>
 	   <div class="tdindent">
 	   <input type="radio" class="tb1" id="subactionS" name="subaction" value="transmit"/><label for="subactionS">Transmit script only</label><br>
-	   <input type="radio" class="tb1" id="subactionR" name="subaction" value="execute"/><label for="subactionR">Transmit and submit script (default)</label>
+	   <input type="radio" class="tb1" id="subactionR" name="subaction" value="execute" checked/><label for="subactionR">Transmit and execute script (default)</label>
 	   </div>
 	 </div>
        </div>
@@ -2657,17 +2723,17 @@ function download(filename, text) {
 	   <td align="center"><input type="button" id="Preview" name="Preview" value="Preview" onclick="preview_ep(0);"/></td>
     <td>Preview execution profile (or, download <input type='button' value='here' id='do_downbox'>)</td>
 	 </tr><tr>
-	   <td align="center"><input type="button" id="Validate" name="Validate" value="Validate" onclick="var a=validateform();if(a==true){rptclust();}"/></td>
-	   <td>Validate form</td>
+	   <td align="center"><input type="button" id="Validate" name="Validate" value="Validate" onclick="var a=validateform();"/></td>
+	   <td>Validate user settings</td>
 	 </tr><tr>
-	   <td align="center"><input type="button" id="Submit" name="Submit" value="Submit" onclick="var a=validateform();if(a==true){var b=rptclust();if(b==true){do_sub();}}"/></td>
+	   <td align="center"><input type="button" id="Submit" name="Submit" value="Submit" onclick="var a=validateform();if(a==true){do_sub();}"/></td>
 	   <td>Run the current configuration</td>
  	 </tr><tr>
 	   <td><p><br></p></td>
 	   <td></td>
  	 </tr><tr>
 	   <td align="center"><input type="button" onclick="reset_form(1);" value="Reset"></td>
-	   <td>Reset all tabs to their default settings</td>
+	   <td>Reset parameters in all tabs to their default values</td>
 	 </tr>
        </table>
        <p><br></p>
@@ -2676,48 +2742,58 @@ function download(filename, text) {
 
      <!-- results -->
      <div id="tabs-10" class="ui-tabs-panel"> 
-    <div class="subhead tdindentd"><p>Please provide the appropriate results location.</p></div>
+       <div class="subhead tdindentd" style="display:none;"><p></p></div>
        <p><br></p>
-<!--    TODO: AWS results directory 
+       <div id="results_divN" class="tdindentd"> </div>
+       <div id="results_divY" class="tdindentd" style="display:none;"></div>
+       <div>
+	 <h3>Amazon AWS computations</h3>
+	 <p>GenomeVIP saves files to the AWS S3 "bucket" that was selected on the Submit page. To access these files:</p>
+	 <ol>
+	   <li>Log in to your <a href="https://console.aws.amazon.com">Amazon Web Services Console</a>.</li>
+	   <li>Under the header "Storage &amp; Content Delivery," choose S3.</li>
+	   <li>Click on bucket (i.e., folder) you specified when submitting the job, and after the page updates, click on the jobID assigned to the computation.</li>
+	   <li>Click on folder "results" to see a listing of downloadable files.</li>
+	 </ol>
+	 <h3>Local cluster computations</h3>
+	 <ol>
+	   <li>Log in to your account.</li>
+	   <li>Change to the working directory you specified when you submitted the computation.</li>
+	   <li>Change to the directory "results" to access the primary results files.</li>
+	 </ol>
+       </div>
+       
 
 
-
-
--->
-       <p></p>
-       <p></p>
-       <div id="resultsbox"></div>
-       <p><br></p>
-       <p><br></p>
      </div>
-
-
+       
      <!-- setup -->
      <div id="tabs-11" class="ui-tabs-panel"> 
        <div id="aws_settings" class="subhead tdindentd"><p>AWS Settings</p></div>
-	 <table class="tdindent">
-	   <tr><td>Enable secure protocol (HTTPS) for transfers between computing resources and S3:</td>
-	     <td><input type="radio" name="aws_https" id="aws_https" value="True">Yes<input type="radio" name="aws_https" value="False" checked>No</td>
-	   </tr><tr>
-	     <td>Enable S3 server-side encryption:</td>
-	     <td><input type="radio" name="aws_ssenc" id="aws_ssenc" value="True">Yes<input type="radio" name="aws_ssenc" value="False" checked>No</td>
-	   </tr><tr>
-	     <td>File encryption for S3 transfers:</td><td><i>Not currently supported</i></td>
-	   </tr><tr>
-             <td>Mount point prefix for EBS data volumes:</td><td>/ebsdata_</td>
-	   </tr>
-	 </table>
+       <table class="tdindent">
+	 <tr>
+	   <td>Enable secure protocol (HTTPS) for transfers between computing resources and S3:</td>
+	   <td><input type="radio" name="aws_https" id="aws_https" value="True" checked>Yes (default)<input type="radio" name="aws_https" value="False">No</td>
+	 </tr><tr>
+	   <td>Enable S3 server-side encryption:</td>
+	   <td><input type="radio" name="aws_ssenc" id="aws_ssenc" value="True" checked>Yes (default)<input type="radio" name="aws_ssenc" value="False">No</td>
+	 </tr><tr>
+	   <td>File encryption for S3 transfers:</td><td><i>Not currently supported</i></td>
+	 </tr><tr>
+           <td>Mount point prefix for EBS data volumes:</td><td>/ebsdata_</td>
+	 </tr>
+       </table>
        <p><br></p>
-       
-       <div id="sc_running0" class="subhead tdindentd"><p>Launched AWS instances to manage will appear below.</p></div>
-       <p><br></p>
-       <div id="sc_running"></div>
 
+       <div id="sc_running0" class="subhead tdindentd"><p>Manage AWS clusters</p></div>
+       <p><br></p> 
+       <div id="sc_running_m" class="tdindentd"><p class="tdindent"><i>To display all compute resources in your AWS account that were created by GenomeVIP, please provide a GenomeVIP SessionID under Amazon EC2 under Accounts.</i></p></div>
+       <div id="sc_running" class="tdindentd"></div>
 
-
-
-
-
+    <div id="gvip_img0" class="subhead tdindentd"><p>GenomeVIP Amazon Machine Image (AMI)</p></div>
+       <p><br></p> 
+       <div id="gvip_img_div" class="tdindent"></div> 
+    <p class="tdindent">Enter alternative GenomeVIP AMI to use instead:&nbsp;<input type="text" id="gvip_img" name="gvip_img" value=""/></p>
        <p><br></p>
      </div>
      
@@ -2794,10 +2870,14 @@ function download(filename, text) {
 
 
      </div>   <!-- end tabs -->
+
+    <!-- additional form data -->
+    <input type='hidden' id='real_cluster' name='real_cluster' value=''/>
+
    </form> <!-- end myform -->
 
 
-   <form id="downform"><input type="text" id="downname" name="downname" value="profile.ep" style="display:none;">
+   <form id="downform"><input type="text" id="downname" name="downname" value="" style="display:none;">
      <div id="downbox">
        <textarea id='downtextarea' name='downtext' style='display:none;'></textarea>
      </div>
@@ -2818,7 +2898,21 @@ function download(filename, text) {
     </tr>
   </table>
 
-
+  <!-- local storage alternative -->
+  <input type='hidden' id='sh_awsvoldb' value=''/>
+  <input type='hidden' id='clustdb' name='clustdb' value=''/>
+  <input type='hidden' id='sh_clustdivh' value=''/>
+  <input type='hidden' id='sh_clustdiv' value=''/>
+  <input type='hidden' id='sh_clustdivh_r' value=''/>
+  <input type='hidden' id='sh_clustdiv_r' value=''/>
+  <input type='hidden' id='sh_workvolh' value=''/>
+  <input type='hidden' id='sh_workvol' value=''/>
+  <input type='hidden' id='sh_awszonedb' value=''/>
+  <input type='hidden' id='sh_stordivh' value=''/>
+  <input type='hidden' id='sh_stordiv' value=''/>
+  <input type='hidden' id='sh_clustdiv2' value=''/>
+  <input type='hidden' id='sh_sc_running' value=''/>
+  
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -2835,55 +2929,21 @@ $(document).ready(function() {
     else if ($("#vs_isSOM").is(':checked'))  { $("#vs_som_div").show();  }
     else if ($("#vs_isTRIO").is(':checked')) { $("#vs_trio_div").show(); }
 
-
-
-
-
     upd_vs_hcfilters();
     upd_vs_fpfilter();
     upd_strlk_fpfilter();
     upd_bd_regions();
     upd_pin_filters();
 
-    $("body").fadeIn(500);
+    $("body").fadeIn(250);
 
     check_vs_mode();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
  $(document).ready(function() {
-
      $("#tabs").tabs();
-
      $("#searchable").multiselect2side({ search: "Available bams / Search: "});
      $(".allpath").val("");
-	
      // input tab
      $("#inp_warn").show();
      $("#inp_aws_preamble").hide();
@@ -2926,7 +2986,6 @@ $(document).ready(function() {
 });
 
 
-
   /* toggle panels */
 $("[id^=toggle]").click(function(){
     my_id = $(this).attr('id');
@@ -2941,59 +3000,91 @@ $("[id^=toggle]").click(function(){
     }
 });
 
-
-
-
-     // Of the half dozen or so things I tried, this finally works
-
-
-
-     $('input[type=text],input[type=password]').keypress(function(e){
-	 var code=null;
-	 code=(e.keyCode ? e.keyCode : e.which); 
-	 return(code==13)?false:true;
-     });
-
-
-
-
-$("#do_downbox").click(function(){
-    preview_ep(1); download( $("#downname").val(), $("#downtextarea").val());
+$('input[type=text],input[type=password]').keypress(function(e){
+    var code=null;
+    code=(e.keyCode ? e.keyCode : e.which); 
+    return(code==13)?false:true;
 });
 
 
+// Download profile
+$("#do_downbox").click(function(){
+    preview_ep(1); download( "genomevip.ep", $("#downtextarea").val());
+});
 
 
 $("#add_path").click(function () {$("#multipath").append("<p class='fps tdindents'><input type='text' class='tb2 allpath' name='paths[]' value='' placeholder='/path/to/directory' /></p>");  });
 $("#rm_path").click(function () { $("input[name^='paths']").each(function() { $(this).val(""); });  $("#multipath").empty(); });
 
 
-$("#add_volume").click(function () {
-    var posting = $.ajax({
-	url: "addvolume.php",
-	type: "POST",
-	async: false,
-	data: {'c': $("[id^=awsvolmenu]").length, 'voldb': $("#awsvoldb").val() },
-	success: function(data) {
-	    $("#multivolume").append(data.trim());
+function gen_vol_opts() {
+    var data="";
+    var db=new Array();
+    db = JSON.parse( $("#awsvoldb").val() );
+    if(db.length) {
+        for(var i=0; i < db.length; i++) {
+	    data += "<option value='"+ db[i]['volid'] +"'>"+ db[i]['volid'];
+	    if(db[i]['voln']!="") { data += " (name: "+ db[i]['voln'] +")</option>"; }
 	}
-    });
+    } else {
+	data += "<p>No volume information was received.</p>";
+    }
+    return data;
+}
+function gen_zone_opts() {
+    var data="";
+    var db=new Array();
+    db = JSON.parse( $("#awszonedb").val() );
+    data += "<div class='tdindent'><p>Create a new volume with the following settings:</p>";
+    data += "<table class='tdindent'><tr>";
+    data += "<td class='tdw2'>Size:</td><td><select class='tb4menu' id='newvolsz' name='newvolsz'>";
+    data += "<option value='none'>-- No Selection --</option>";
+    for(var i=50; i<=500; i+=50) { data += "<option value='"+i+"'>"+i+" GiB</option>"; }
+    data += "</select></td></tr>";
+    data += "<tr><td>Availability zone:</td><td><select class='tb4menu' id='newvolzn' name='newvolzn'>";
+    data += "<option value='none'>-- No Selection --</option>";
+    if(db.length) {
+        for(var i=0; i < db.length; i++) { 
+	    data += "<option value='"+ db[i]+"'>"+ db[i]+"</option>"; 
+	}
+    }
+    data += "</select></td></tr>";
+    data += "<tr><td>Name:</td><td><input class='tb1c' type='text' id='newvolname' name='newvolname'>&nbsp;<img class='inline' title='Please use only alphanumeric and underscore characters (e.g., my_volume_50gb).' src='image/Help.png'></img>";
+    data += "</table>";
+    data += "</div>";
+    return data;
+}
+
+
+function add_working() {
+//    alert("In add_working where awsvoldb:"+$("#awsvoldb").val());
+    $("#workvolh").html("<b>Working disk space:</b>").addClass('headspc subhead tdindentd');
+    $("#sh_workvolh").val( $("#workvolh").html() );
+    var data = "<div class='tdindent'><i>If you are configuring a new compute resource having more than one instance, you will need to specify a volume to be used as a working disk. If that new compute resource has only one instance, this step is optional.</i></div><p><br></p>";
+    data += gen_zone_opts();
+    data += "<p><br></p>";
+    data += "<p class='tdindent3'><b>&lt;&lt; ---------- OR ---------- &gt;&gt;</b></p><p><br></p>";
+    data += "<div class='tdindent'><table class='tdindent'><tr><td class='tdw2'>Choose an existing volume as a working volume:</td><td><select class='tb3menu' id='awsworkmenu' name='awsworkmenu'>";
+    data += "<option value='none'>-- No Selection --</option>";
+    data += gen_vol_opts();
+    data += "</select></td></tr></table></div><p><br></p>";
+
+    $("#workvol").html(data.trim());
+    $("#sh_workvol").val( $("#workvol").html() );
+}
+
+
+$("#add_volume").click(function () {
+//	Moved from addvolume.php
+    var c = $("[id^=awsvolmenu]").length;
+    var data = "<div class='vspanel'><table class='tdindents'><tr><td class='volw'>Volume ID (name):</td><td><select class='tb3menu' id='awsvolmenu"+ c +"'>";
+    data += "<option value='none'>-- No Selection --</option>";
+    data += gen_vol_opts();
+    data += "</select><td></td></tr><tr><td>File list:</td><td><textarea class='voltb' id='awsvfi"+c+"' name='awsvolfiles[]'/></td><td><iframe class='frame' src='volform.html' id='volform"+c+"'><\/iframe></td></tr></table></div>";
+    $("#multivolume").append(data.trim());
 });
 
 $("#rm_volumes").click(function () { $("#multivolume").empty();});
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 $("#aws_tree_btn").click(function () {
     $('#multivolume').empty();
@@ -3011,20 +3102,6 @@ $("#aws_tree_btn").click(function () {
 	success: function(data) { populate_divs(data); }
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-											
 
 function populate_divs(data) {
     var s=[];
@@ -3056,11 +3133,8 @@ function populate_results(data) {
     var s=[];
     s = data.split("\n");
     $("#resultsbox").empty();
-    $("#resultsbox").append( $.grep(s, function(x) { return /gviplabel/.test(x); }).join(""));
-
+    $("#resultsbox").append( s );
 }
-
-
 
 
 $("#rpath_btn").click(function () {
@@ -3075,7 +3149,7 @@ $("#rpath_btn").click(function () {
     var posting = $.ajax({
 	url: "get_rpathfile2.php",
 	type: "POST",
-	data: { 'username': $('#un').val(), 'phrase':  $('#pw').val(), 'target': $bAS, 'host': $('#clust_gw').val().trim(), 'filepath': JSON.stringify( filepaths ) },
+	data: { 'username': $('#un').val(), 'phrase':  $('#pw').val(), 'target': $bAS, 'host': $('#clust_gw').val().trim(), 'filepath': JSON.stringify( filepaths ), 'cfg': $('#gvip_sid_conf').val() },
 	success: function(data) {
 	    populate_divs(data);
 	    $("#multivolume").empty();	    // Enforce mutual exclusivity of data sources
@@ -3086,7 +3160,6 @@ $("#rpath_btn").click(function () {
 
 
 // Process EBS information
-// TODO: possibly check for changes due to Console activity ?
 $("#apply_vol_lists").click(function () {
     var k=$("select[id^=awsvolmenu]").length; 
     var idx=0; // legacy index
@@ -3096,23 +3169,17 @@ $("#apply_vol_lists").click(function () {
     // Validate
     if (k) {
 	for(var j=0; j < k; j++) {
-
-// Omit check due to scratch disk requirement
-//	    if( $("#awsvfi"+j).val().trim() != "") {
-
-		if( $('#awsvolmenu'+j).val() == "none") {
-		    if( confirm("Alert: A file list without a volume ID has been given. Click OK to ignore that file list or click Cancel to make changes.")==false) {
-			return false;
-		    }
-		} else { // possibly ok
-		    aws_vid[idx] = $('#awsvolmenu'+j).val();
-		    aws_vfi[idx] = $('#awsvfi'+j).val().trim();
-		    idx++;
+	    if( $('#awsvolmenu'+j).val() == "none") {
+		if( confirm("Alert: A file list exists without a corresponding identified volume. Click OK to ignore that file list or click Cancel so you can make any changes.")==false) {
+		    return false;
 		}
-//	    } 
+	    } else { // possibly ok
+		aws_vid[idx] = $('#awsvolmenu'+j).val();
+		aws_vfi[idx] = $('#awsvfi'+j).val().trim();
+		idx++;
+	    }
 	}
     }
-
     if(idx) {   // number of validated
 	var awsvol_sel=new Array();
 	for(var j=0; j < idx; j++) { awsvol_sel[j] = {id: aws_vid[j], files: aws_vfi[j]}; }
@@ -3132,7 +3199,6 @@ $("#apply_vol_lists").click(function () {
 	alert("Notice: No EBS information detected or processed!");
     }
 });
-
 
 
 $("#list_files_btn2").click(function () {
@@ -3155,7 +3221,6 @@ $("#list_files_btn2").click(function () {
 	return false;
     }
 
-    $('.spinner').show(); 
     init_selectbox(1);
     var posting = $.ajax({
 	url: "listfiles_real_json_key2.php",
@@ -3165,199 +3230,84 @@ $("#list_files_btn2").click(function () {
 	    populate_divs(data);
 	}
     });
-    $('.spinner').hide(); 
     
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Get potential instance types
 function get_clust(n) {
-    $('#clustdiv').empty(); 
-    $('#clustdb_div').empty(); 
     var posting = $.ajax({
 	url: "resources2.php",
 	type: "POST",
-	data: { cmd: 'cluster', tgt: n, scconf: $("#scconf").val()},
+	async: false,
+	data: { cmd: 'cluster', tgt: n, cfg: $("#gvip_sid_conf").val()},
 	success: function(resp) {
+	    var bigdat  = JSON.parse(resp);
+	    var ctab    = bigdat['ctab'];
 	    if (n==0) { // aws
-		var bigdat = JSON.parse(resp);
-		var data = bigdat['myresults'];
 		var clustdb = bigdat['clustdb'];
-	    } else {
-		var data = JSON.parse(resp);
-	    }
-
-
-	    $('#clustdiv0').empty(); 
-
-	    if (n==0) {
-		$('#clustdiv0').append("<p>Choose AWS resources:</p>");
-		$('#clustdiv').append("<p class='tdindents'>Launch a new computing resource...</p>");
-	    } else {
-		$('#clustdiv0').append("<p>Choose local resources:</p>");
-		$('#clustdiv').append("<p>Select a compute cluster to use:</p>");
-	    }
-	    $('#clustdiv').append("<div class='tdindents'><table id='clusttab' class='clusttab'><tr><th>Select</th><th>Base Name</th><th>n(VCPU)</th><th>n(ECPU)</th><th>Memory(GB)</th></tr></table></div>");
-	    
-	    
-  	    for (var k=0; k < data.length; k++) {
-		if (n==0) {  // aws
-		    $('#clusttab tr:last').after("<tr><td align='center'><input type='radio' name='clusters' value='" + data[k]['ec2'] + "'/></td>" +
-						 "<td align='center'>" + data[k]['name'] + "</td>" + 
-						 "<td align='center'>" + data[k]['vcpu']+ "</td>" +
-						 "<td align='center'>" + data[k]['ecpu']+ "</td>" +
-						 "<td align='center'>" + data[k]['mem'] + "</td></tr>");
-
-		} else {
-
-		    $('#clusttab tr:last').after("<tr><td align='center'><input type='radio' name='clusters' value='" + data[k]['name'] + "' "+ ((k==0)?"checked='checked'":"")+"/></td>" + 
-						 "<td align='center'>" + data[k]['name'] + "</td>" +
-						 "<td align='center'>" + "n/a" + "</td>" + 
-						 "<td align='center'>" + "n/a" + "</td>" +
-						 "<td align='center'>" + "n/a"  + "</td></tr>");
-		    
-		}
+		var myinst  = bigdat['myinst'];
+	        $('#clustdivgi').removeClass('subhead');
+		$('#clustdivh').html("<b>Select an AWS compute resource:</b>").addClass('headspc subhead tdindentd');
+		$('#sh_clustdivh').val( $('#clustdivh').html() );
+		$('#clustdiv').html("<p class='tdindentd'>Select an instance type for building a compute cluster:</p>").append( ctab ).append( myinst ).show();
+		$('#sh_clustdiv').val( $('#clustdiv').html() );
+		$('#clustdb').val( clustdb );
 		
-	    }
+	    } else if (n==1) {  // local
 
-	    if (n==0) { // aws
-		$('#clusttab tr:last').after("<tr><td align='center'><input type='radio' name='clusters' value='nada' checked/></td>" +
-					     "<td align='center'><i>None</i></td><td></td><td></td><td></td></tr>");
-		$('#clustdiv').append("<p><br></p>");
-		$('#clustdb_div').append("<input type='hidden' id='clustdb' value='"+clustdb+"' name='clustdb'/>");
-
-
-		var mystr="";
-		mystr="<p class='tdindents'>Enter number of instances in cluster:&nbsp;";
-		mystr+="<select id='nclust' name='nclust' class='tb1dmenu'>";
-		for(jj=1;jj<=20;jj++) { mystr+="<option class='menu1' value='"+jj+"'>"+jj+"</option>"; }
-		mystr+="</select></p>";
-		$('#clustdiv').append(mystr);
-
-
-
+		$('#clustdiv2').html("<p class='tdindentd'>Choose a local compute resource:</p>").append(ctab).show();
+		$('#sh_clustdiv2').val( $('#clustdiv2').html() );
 
 	    }
-
-	    $('#clustdiv').append("<p><br></p>");
-	    
-	    
 	}
     });
 
-// (rjm) TODO later -- need to handle attached volumes gracefully
-//    $('#clustdiv0_l').html("<p class='tdindents'>...or re-use a running resource (if any):</p>");
-// But keep nada definition, used by parse_real
-    get_sc_running(1);
-
-
-};
+}
 
 
 function get_stores(n) {
-    if ( n != 0 ) {  // local
-	$('#clustdiv0_l').empty();
-	$('#clustdiv_l').empty();
-//	$('#stordiv').append("<div class='tdindents'><p>Directory into which to place results:</p><p><input type='text' class='tb1' id='resultsdir' name='resultsdir' value='' placeholder='mydir/results'/></p></div>");
-//	$('#stordiv').append("<p><br></p>");
-	$('#stordiv0').empty();
-	$('#stordiv').empty();
-	
-    } else {  // aws
-
-	$('#stordiv0').empty();
-	$('#stordiv0').append("<p><b>Searching for AWS S3 storage buckets...</b></p>");
-	$('#stordiv').empty(); 
-
-	// For general approach, call resources2.php using {cmd=s3bucket, tgt=n, scconf=$("#scconf").val()}
-	var posting = $.ajax({
-	    url: "get_sc_resource.php",
-	    type: "POST",
-	    data: {'cfg': $("#scconf").val(), 'res': "lb"},
-	    success: function(resp) {
-		var data = JSON.parse(resp);
-		$('#stordiv0').empty();
-		$('#stordiv0').append("<p><br></p>");
-		$('#stordiv0').append("<p>Choose an AWS S3 storage bucket into which place results:</p>");
-		
-		if(data.length==0) {
-  		    $('#stordiv').append("<div class='tdindents'><p>None found.</p></div>");
-		} else {
-		    for (var k=0; k < data.length; k++) {
-  			$('#stordiv').append("<div class='tdindents'><input type='radio' class='rindent' name='s3buckets' value='" + 
-					     data[k] + "' "+ ((k==0)?"checked='checked'":"") + "/> "+data[k]+"</div>");
-		    }
-		    $('#stordiv').append("<p><br></p><p class='tdindent1'><input type='button' onclick='mkbucket();' value='Create a new bucket'/></p><p><br></p>");
-		}
-	    }
-
-       	});
-    }
-};
-
-function get_vstores() {
+// AWS (n=0) is used
+    $('#stordivh').html("<p><b>Querying for AWS S3 storage buckets...</b></p>");
+    $('#stordiv').empty(); 
     var posting = $.ajax({
 	url: "get_sc_resource.php",
 	type: "POST",
-	aysnc: false,
-	data: {'cfg': $("#scconf").val(), 'res': "lv"},
+	async: false,
+	data: {'cfg': $("#gvip_sid_conf").val(), 'res': "lb"},
+	error: function() {
+	    alert("An unknown error occurred while getting bucket information !"); 
+	},
+	success: function(resp) {
+	    var data = JSON.parse(resp);
+	    $('#stordivh').html("<b>Choose an AWS S3 storage bucket into which place results:</b>").addClass('headspc subhead tdindentd');
+	    $('#sh_stordivh').val( $('#stordivh').html() );
+	   
+  	    $('#stordiv').html( data );
+  	    $('#sh_stordiv').val( data );
+
+	}
+	
+    });
+}
+
+function get_vstores() {
+    $("#ebs_actions_0").show(); 
+    $("#ebs_actions_y").hide();
+    $("#ebs_actions_n").hide();
+    $("#multivolume").empty();
+    var posting = $.ajax({
+	url: "get_sc_resource.php",
+	type: "POST",
+	async: false,
+	data: {'cfg': $("#gvip_sid_conf").val(), 'res': "lv"},
+	error: function() {
+	    alert("An unknown error occurred while getting volumes information !"); 
+	},
 	success: function(resp) {
 	    $("#awsvoldb").val(resp);
+	    $("#sh_awsvoldb").val(resp);
+
 	    if(resp.match(/volid/)) {
 		$("#ebs_actions_0").hide();
 		$("#ebs_actions_y").show();
@@ -3370,9 +3320,25 @@ function get_vstores() {
     });
 }
 
+function get_zones() {
+    var posting = $.ajax({
+	url: "get_sc_resource.php",
+	type: "POST",
+	async: false, 
+	data: {'cfg': $("#gvip_sid_conf").val(), 'res': "lz"},
+	error: function() {
+	    alert("An unknown error occurred while getting zones information !"); 
+	},
+	success: function(resp) {
+	    $("#awszonedb").val(resp);
+	    $("#sh_awszonedb").val(resp);
+	}
+    });
+}
 
 
-$("#login_aws").click(function () {
+function do_aws_setup() {
+    // Files				      
     $("#inp_warn").hide();
     $("#inp_aws_preamble").show();
     $("#inp_lc_preamble").hide();
@@ -3385,26 +3351,32 @@ $("#login_aws").click(function () {
     $("div#inp_upfile_opt iframe").contents().find("#myfile").val("");
     $("div#inp_regions_opt iframe").contents().find("#myfile").val("");
     $("#rpath").val("");
-
-
+    // Accounts
     $("#awsinfo_c").show();
-    $("#tgiinfo_c").hide();
-
-
-
-
-    $("#jobinst").show();						   
+    $("#localinfo_c").hide();
+    // Submit
+    $("#jobinst").show();
     $("#runinfo").hide();
     $("#titleinfo").show();
+    // Results
+    $("#results_divN").hide();
+    $("#results_divY").show();
+    // Options
+    if($("#gvip_sid_conf").val().trim()=="") {
+        $("#sc_running_m").show();
+	$("#sc_running").hide();
+    } else {
+        $("#sc_running_m").hide();
+	$("#sc_running").show();
+    }
+}
 
-
-
-
-
-
+$("#login_aws").click(function () {
+    do_aws_setup();
 });
 
-$("#login_tgi").click(function () {
+function do_local_setup () {
+    // Files				      
     $("#inp_warn").hide();
     $("#inp_aws_preamble").hide();
     $("#inp_lc_preamble").show();
@@ -3417,72 +3389,29 @@ $("#login_tgi").click(function () {
     $("div#inp_upfile_opt iframe").contents().find("#myfile").val("");
     $("div#inp_regions_opt iframe").contents().find("#myfile").val("");
     $("#rpath").val("");
-
-
-
+    // Accounts
     $("#awsinfo_c").hide();
-    $("#tgiinfo_c").show();
-
-
-
-
+    $("#localinfo_c").show();
+    // Submit
     $("#jobinst").show();						   
     $("#runinfo").show();
     $("#titleinfo").show();
+    // Results
+    $("#results_divN").hide();
+    $("#results_divY").show();
+    // Options
+    $("#sc_running_m").show();
+    $("#sc_running").hide();
+}
 
 
-
-
-
-
+$("#login_local").click(function () {
+    get_clust(1); // content
+    do_local_setup(); // panels
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// (rjm) For applying profiles to work
+// (rjm) For applying profile to work
 $("#vs_isGL").change(function() {
     if( $(this).is(':checked')) {
 	$("#vs_gl_div").show();	$("#vs_som_div").hide(); $("#vs_trio_div").hide(); upd_vs_hcfilters();
@@ -3498,20 +3427,6 @@ $("#vs_isTRIO").change(function() {
 	$("#vs_gl_div").hide();	$("#vs_som_div").hide(); $("#vs_trio_div").show(); upd_vs_hcfilters();
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 $("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
@@ -3549,122 +3464,6 @@ function check_glob_cb() {
     }
     var str=$("#glob_chrdef_str").val().trim();
     if( str != "" ) { copy_chr_str(str); }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function enable_resources() {
-    if( $("#login_tgi").is(":checked") ){
-	get_clust(1);
-	get_sc_running(0);
-	get_stores(1);
-
-    } else if( $("#login_aws").is(":checked")){
-	var aws_un = $("#aws_un").val().trim();
-	var aws_ak = $("#aws_ak").val().trim();
-	var aws_sk = $("#aws_sk").val().trim();
-	if( aws_un=="" || aws_ak=="" || aws_sk=="") {
-	    alert("Alert: Please provide your Amazon credentials so we can determine your available resources.");
-	} else {
-	    $("#ebs_actions_y").hide();
-	    $("#ebs_actions_n").hide();
-	    $("#ebs_actions_0").show();
-
-	    $('#sc_running0').empty();
-	    $('#sc_running0').append("<p>Manage AWS instances:  <b>Updating ... please wait ...</b></p>");
-	    $('#sc_running').empty();
-
-	    // Create initial config
-	    if( $("#scconf").val().trim() == "") {
-		var posting = $.ajax({
-		    url: "setup_sc.php",
-		    type: "POST",
-		    async: false, 
-		    data: {'aws_un':aws_un, 'aws_ak':aws_ak, 'aws_sk':aws_sk, 'src': $("#scconf").val(), 'cmd': 'init'},
-		    success: function(resp) {
-			if(resp.match(/AuthFailure/)) {
-			    alert("Error: AWS was not able to validate the provided access credentials. Please try again.");
-			    return false;
-			} else {
-			    resp = JSON.parse(resp);
-			    $("#scconf").val(resp);
-			    $("#s3conf").val(resp.replace(/sc$/,"s3cfg"));
-			}
-		    }
-		});
-	    }
-
-	    var posting = $.ajax({
-		url: "prepare_s3.php",
-		type: "POST",
-		async: false,
-		data: {'s3conf': $("#s3conf").val(), 'aws_ak': aws_ak, 'aws_sk': aws_sk, 'aws_https': $("input[name=aws_https]:checked").val(), 'aws_ssenc': $("input[name=aws_ssenc]:checked").val() },
-//		success: function(resp) {
-//		    $("#s3conf").val( JSON.parse(resp) );
-//		    }
-	    });
-
-	    // Get AWS info
-	    get_vstores();
-	    get_clust(0);
-	    get_sc_running(0);
-	    get_stores(0);
-
-	}
-    }
 }
 
 $("#mode_select").change(function() {
@@ -3718,7 +3517,152 @@ $("#vs_do_dbsnp,#strlk_do_dbsnp").click(function() {  upd_global_dbsnp(); });
 $("#vs_do_fpfilter,#strlk_do_fpfilter").click(function() {  upd_global_fpfilter(); });
 
 
-$("#nav-button_2, #nav-button_9, #nav-button_11").click(function() { $("#scconf").val(""); enable_resources(); });
+
+$("#nav-button_11").click(function() { 
+    $.post("get_img.php", function(data) {
+	$("#gvip_img_div").html(data);
+    });
+});
+
+// Display
+$("#nav-button_9").click(function() { 
+    if( $("#login_aws").is(":checked") ){
+	if( $("#gvip_sid_conf").val().trim()!="" ){
+            $("#clustdivgi").removeClass('subhead'); 		      
+            $("#clustdivgih").hide(); 		      
+	    $("#cr_aws").show();
+	    $("#cr_local").hide();
+	} else {
+            $("#clustdivgih").show(); 		      
+	    $("#cr_aws").hide();
+	    $("#cr_local").hide();
+	}
+
+    }
+    if( $("#login_local").is(":checked") ){
+        $("#clustdivgi").addClass('subhead'); 		      
+        $("#clustdivgih").hide(); 		      
+	$("#cr_aws").hide();
+	$("#cr_local").show();
+    } 
+});
+
+
+$(document).on('mouseover', '.s3f', function() {  $(this).addClass('hover');  });
+$(document).on('mouseout', '.s3f', function() {  $(this).removeClass('hover'); });
+
+$(document).on('click', '.s3f', function() {
+    alert("TODO; insert downloading");
+
+
+});
+
+$("#gen_sid").click(function() {
+    var un = $("#aws_un").val();
+    var ak = $("#aws_ak").val();
+    var sk = $("#aws_sk").val();
+    var aws_https = $("input[name=aws_https]:checked").val();
+    var aws_ssenc = $("input[name=aws_ssenc]:checked").val();
+    if( un=="" || ak=="" || sk=="") {
+        alert("Warning: The AWS credentials are incomplete! Please provide the information and try again.");
+    } else {
+        var posting = $.ajax({
+            url: "sessionid.php",
+            type: "POST",
+            async:false, 
+	    data: {'cmd': "create", 'un':un, 'ak':ak, 'sk':sk, 'proto': aws_https, 'enc': aws_ssenc},
+            success: function(resp) {
+                if(resp.match(/AuthFailure/)) {
+                    alert("Error: AWS was unable to validate the provided credentials. Please try again.");
+		} else if (resp.match(/sess_no_pass/)) {
+                    alert("Error: A session ID could not be generated within the allotted number of attempts. Please try again.");
+		} else {
+		    $("#gvip_sid_conf").val(resp);
+		    // Gather resources
+		    get_vstores();     // volumes
+		    get_clust(0);      // cluster types
+		    get_sc_running(1); // running
+		    get_stores(0);     // buckets
+		    get_sc_running(0); // manage
+		    get_zones();       // zones
+//		    add_working();     // work vol
+		    alert("Success: New SessionID '"+resp+"' has been created. Click OK to continue.");
+		}
+	    }
+        });
+    }
+});
+$("#del_sid").click(function() {
+    var id = $("#gvip_sid_conf").val();
+    if(! id.length) {
+	alert("Alert: There is no current session to delete !");
+    } else {
+	var rr = confirm("WARNING: The current session '"+id+"' is about to be deleted. Clicking OK to remove AWS configurations associated with this session.");
+	if(rr==true) {
+	    var posting = $.ajax({
+		url: "sessionid.php",
+		type: "POST",
+		async: false,
+		data: { 'id': id, 'cmd':'delete' },
+		error: function() { alert("An unknown error occurred while attempting to delete session '"+id+"' !"); },
+		success: function(resp) { 
+		    if(resp.match(/ok/)) {
+		      $("#gvip_sid_conf,#awsvoldb,#sh_awsvoldb,#clustdb").val("");
+		      $("#multivolume").empty();
+		      $("#clustdiv,#clustdivh_r,#clustdiv_r,#stordiv,#stordivh,#sc_running,#workvolh,#workvol").empty();
+		      $("#sh_clustdiv,#sh_clustdivh_r,#sh_clustdiv_r,#sh_stordiv,#sh_stordivh,#sh_sc_running,#sh_workvolh,#sh_workvol").val("");
+ 		      $("#clustdivgi").addClass('subhead');
+		      $("#clustdivgih,#sc_running_m").show();
+		      alert("Success: Session '"+id+"' has been deleted. Click OK to continue."); }
+		}
+	    });
+	} else {
+	    alert("Alert: Session deletion aborted !");
+	}
+    }
+});
+
+$("#chk_sid,#gvip_sid_rl").click(function() {
+    if( this.id == "gvip_sid_rl") {
+        id = $("#gvip_sid_conf").val();		      
+    } else {
+	var id = prompt("Enter previous GenomeVIP SessionID:");
+	id=id.trim(); 
+    } 
+    var bVID=0;
+    var posting = $.ajax({
+	url: "sessionid.php",
+	type: "POST",
+	async: false,
+	data: { 'id': id, 'cmd':'check' },
+	error: function() {
+	    alert("An unknown error occurred while checking session '"+id+"' !");
+	},
+	success: function(resp) {
+	    if(resp.match(/badchar/)) {
+		alert("The provided ID is empty or contains invalid characters. Please try again.");
+	    } else if(resp.match(/err/)) {
+		alert("The session '"+id+"' was not found. Instead, you may wish to generate a new session ID below. Click OK to continue.");
+	    } else if(resp.match(/ok/)) {
+		bVID=1;
+	    } else {
+		alert("An unknown error occurred while processing user-provided sessionID '"+id+"' !");
+	    }
+	}
+    });
+    if( bVID ) {
+	$("#gvip_sid_conf").val(id);
+	// Gather resources
+	get_vstores();     // volumes
+	get_clust(0);      // cluster types
+	get_sc_running(1); // running
+	get_stores(0);     // buckets
+	get_sc_running(0); // manage
+	get_zones();       // zones
+//	add_working();     // work vol
+	alert("Success: Session '"+id+"' was found and is ready to use. Click OK to continue.");
+    }
+
+});
 </script>
 </body></html>
-

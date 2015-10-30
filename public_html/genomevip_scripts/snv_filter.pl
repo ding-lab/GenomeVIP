@@ -4,6 +4,7 @@
 # @author Beifang Niu 
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
 # 
+# @version 0.5 (rjm): workaround for stat on AWS
 # @version 0.4 (rjm): handle zero-input case
 # @version 0.3 (rjm): adjust filenames and parameter names; allow for commented lines
 # @version 0.2 (rjm): added ENV and pass/fail splitter
@@ -19,7 +20,7 @@ use IO::File;
 use Getopt::Long;
 use POSIX qw( WIFEXITED );
 use File::Temp qw/ tempfile /;
-use File::stat;
+#use File::stat;
 
 
 my $cmd;
@@ -45,7 +46,8 @@ map { $read_count_input_fh->print($_."\n") } keys %seen;
 $input_fh->close        || die "Error on closing input variants file";
 
 # Run readcounts
-if( stat( $read_count_input ) -> size  !=  0)  {
+my $fs = `wc -l < $read_count_input`;
+if( $fs !=  0)  {
 
     my ( undef, $read_count_output ) = tempfile();
     my $cmd_run_read_count = "$paras{'bam_readcount'} -w 10 -l $read_count_input -q $paras{'min_mapping_qual'} -b $paras{'min_base_qual'} -f $paras{'REF'}  $paras{'bam_file'}  > $read_count_output"; 
