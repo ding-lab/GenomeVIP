@@ -1,0 +1,7 @@
+[s3cmd]
+path=/usr/local/src/s3cmd-1.5.0-beta1
+exe=s3cmd
+
+[starcluster]
+path=/usr/local/bin
+exe=starcluster
