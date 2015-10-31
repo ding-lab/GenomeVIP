@@ -1,6 +1,23 @@
 # GenomeVIP
 
-## Accounts
+GenomeVIP is a web-based platform for performing variant discovery on Amazon's Web Service (AWS) cloud or on local high-performance computing clusters.
+
+
+
+## Versions
+
+* 0.1 (ac89e21) | initial release (beta) 
+
+
+## Getting Started
+
+With version 0.1, users need to install the GenomeVIP code on their own web server and configure it for their locally installed genomics tools. Preconfigured GenomeVIP images for Amazon are forthcoming.
+
+
+
+## User Guide
+
+### Accounts
 
 Select  either AWS or Local Cluster
 
@@ -14,7 +31,7 @@ Select  either AWS or Local Cluster
 
 		Provide your login credentials to your local cluster
 
-## Select Genomes	
+### Select Genomes	
 
 Select either an EBS volume (only with AWS accounts), user defined, or 1000 Genomes
 
@@ -26,7 +43,7 @@ Choose a reference genome
 
 Select if you want a copy of all sorted .bam and .bai created to storage directory
 
-## Configure Tools
+### Configure Tools
 
 	Execution Profiles
 
@@ -56,7 +73,7 @@ Existing
 
 		For each tool switched on by the run mode selected, fine tune any parameters. If necessary, turn off any tools switched on or turn on any tools not automatically selected.
 	
-## Submit
+### Submit
 
 	If AWS
 
@@ -82,12 +99,12 @@ Existing
 
 	Click “Submit”
 
-## Results
+### Results
 
 	Check out the results by navigating to the location displayed (for both AWS and Local Cluster)
 
 	Enjoy!
 
-## Options
+### Options
 
 	Additional options and accounts management may be configured for AWS
