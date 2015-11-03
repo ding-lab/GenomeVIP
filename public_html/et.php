@@ -7,8 +7,10 @@
 #ini_set('display_errors',1);
 #error_reporting(E_ALL & ~E_DEPRECATED);
 #print "start\n";
-include "fileconfig.php";
+
 function callHome() {
+  # (rjm) make local instead
+  include realpath(dirname(__FILE__)."/"."fileconfig.php");
 	/* Collect only tools (and version) used, whether AWS or local, and ip. */
 	$endline = '<br>';
 	$endl = "\n";
@@ -19,18 +21,19 @@ function callHome() {
 		$fields = array();
 		foreach ( $_POST as $element => $value ) { #collect usage info
 			#if $value is array, then handle differently
-			if ( ( strcmp( $element , 'vs_cmd' ) && isset( $_POST['vs_cmd'] ) ) ||
-				( strcmp( $element , 'vs_version' ) && isset( $_POST['vs_version'] ) ) ||
-				( strcmp( $element , 'strlk_cmd' ) && isset( $_POST['strlk_cmd'] ) ) ||
-				( strcmp( $element , 'bd_cmd' ) && isset( $_POST['bd_cmd'] ) ) ||
-				( strcmp( $element , 'pin_cmd' ) && isset( $_POST['pin_cmd'] ) ) ||
-				( strcmp( $element , 'gs_cmd' ) && isset( $_POST['gs_cmd'] ) ) ||
-				( strcmp( $element , 'strlk_version' ) && isset( $_POST['strlk_version'] ) ) ||
-				( strcmp( $element , 'bd_version' ) && isset( $_POST['bd_version'] ) ) ||
-				( strcmp( $element , 'pin_version' ) && isset( $_POST['pin_version'] ) ) ||
-				( strcmp( $element , 'version_gs' ) && isset( $_POST['version_gs'] ) ) ||
-				( strcmp( $element , 'compute_target' ) ) ||
-				( strcmp( $element , 'bam_count' ) ) ) {
+		        # (rjm) strcmp, if used, should equate to zero
+			if ( ( strcmp( $element , 'vs_cmd' )==0 && isset( $_POST['vs_cmd'] ) ) ||
+				( strcmp( $element , 'vs_version' )==0 && isset( $_POST['vs_version'] ) ) ||
+				( strcmp( $element , 'strlk_cmd' )==0 && isset( $_POST['strlk_cmd'] ) ) ||
+				( strcmp( $element , 'bd_cmd' )==0 && isset( $_POST['bd_cmd'] ) ) ||
+				( strcmp( $element , 'pin_cmd' )==0 && isset( $_POST['pin_cmd'] ) ) ||
+				( strcmp( $element , 'gs_cmd' )==0 && isset( $_POST['gs_cmd'] ) ) ||
+				( strcmp( $element , 'strlk_version' )==0 && isset( $_POST['strlk_version'] ) ) ||
+				( strcmp( $element , 'bd_version' )==0 && isset( $_POST['bd_version'] ) ) ||
+				( strcmp( $element , 'pin_version' )==0 && isset( $_POST['pin_version'] ) ) ||
+				( strcmp( $element , 'version_gs' )==0 && isset( $_POST['version_gs'] ) ) ||
+				( strcmp( $element , 'compute_target' )==0 ) ||
+				( strcmp( $element , 'bam_count' )==0 ) ) {
 				$fields[$element] = urlencode( $value );
 			}
 			#print $element." => ".$value.$endl;
