@@ -562,15 +562,17 @@ function do_sub() {
 	    }
 	});
 	
-    } // aws
+	if(bFail) {return false;}
 
-    if(bFail) {return false;}
+    } // aws
 
     cmsg += "Click OK to continue with the computation !";
     if( confirm( cmsg )==true ) {
-	if($("#real_cluster").val()=="") {
-	    alert("An unexpected error occurred: cluster undefined !");
-	    return false;
+	if ( $("#login_aws").is(':checked') ) {
+	    if( $("#real_cluster").val()=="" ) {
+		alert("An unexpected error occurred: cluster undefined !");
+		return false;
+	    }
 	}
 	display("Attempting to transmit the computation ...<br/>", "clear");
 	var posting = $.post("parse_real.php", $("#myform").serialize(), function(data) {

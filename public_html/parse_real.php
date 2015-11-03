@@ -549,6 +549,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     
   case "local":
     $RUNDIR     = "$workdir";
+    $RWORKDIR   = "$workdir";
     $RESULTSDIR = "$workdir/results";
     $STATUSDIR  = "$workdir/status";
     $action="ln -s";
