@@ -3929,9 +3929,14 @@ case 'local':
 
     unset($conn);
     
-    // Output
-    echo "SUMMARY:<br>";
-    echo "Script $myjob.sh and execution profile $myjob.ep were sent to host $host and placed into the directory $workdir.<br>";
+    // messages
+    echo "<pre>###########################################<br>";
+    echo " SUMMARY:<br><br>";
+    echo " Remote host...............: $host<br>";
+    echo " Working directory.........: $workdir<br>";
+    echo " Master script filename....: $myjob.sh<br>";
+    echo " Execution profile filename: $myjob.ep<br>";
+    echo "###########################################<br></pre><br>";
     echo "The script ".(($bExe)?("was"):("was not"))." submitted to the job scheduler.<br>";
     if(! $bExe) { echo "The script may be run manually from your user account.<br>"; }
   }
