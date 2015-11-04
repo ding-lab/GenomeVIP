@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   } elseif ( $cmd == "check") { // Check previous session
     $id    = $_POST['id'];
 
-    if(! preg_match('/[0-9a-zA-Z]/', $id)) {
+    if(! preg_match('/^[0-9a-zA-Z]+$/', $id)) {
       echo "badchar";
     } else {
       $f1 = "$TMPDIR/$id.sc";

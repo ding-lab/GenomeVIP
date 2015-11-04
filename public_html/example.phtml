@@ -3625,10 +3625,11 @@ $("#del_sid").click(function() {
 });
 
 $("#chk_sid,#gvip_sid_rl").click(function() {
+    var id;
     if( this.id == "gvip_sid_rl") {
         id = $("#gvip_sid_conf").val();		      
     } else {
-	var id = prompt("Enter previous GenomeVIP SessionID:");
+	id = prompt("Enter previous GenomeVIP SessionID:");
 	id=id.trim(); 
     } 
     var bVID=0;
