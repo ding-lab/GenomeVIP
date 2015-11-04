@@ -707,7 +707,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   } // bams
 
   $_POST['bam_count'] = count( $list_of_sorted_bams );
-  $ok = callHome();
+  $how = 'mail';
+  $ok = callHome( $how );
 
   // Update output
   if (count($prepare_bam) > 0 ) {
