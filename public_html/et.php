@@ -10,7 +10,6 @@
 include realpath(dirname(__FILE__)."/"."fileconfig.php");
 
 function callHome( $how ) {
-  # (rjm) make local instead
 	/* Collect only tools (and version) used, whether AWS or local, and ip. */
 	$endline = '<br>';
 	$endl = "\n";
@@ -18,7 +17,7 @@ function callHome( $how ) {
 	#print "check POST\n";
 	if ( isset( $_POST ) ) {
 		#print "good POST\n";
-		$fieldString = $collectUsage();
+		$fieldString = collectUsage();
 
 		$phonedResult = null;
 		if ( strcmp( $how , 'mail' ) == 0 ) {
@@ -31,17 +30,18 @@ function callHome( $how ) {
 	return $phonedResult;
 }
 
-function mailHome( $fields_string ) {
-	global $homemail, $homesubject, $homeheaders;
-	return mail( $homemail , $homesubject , $fields_string , $homeheaders );
+
+function mailHome( $fieldString ) {
+        global $homemail, $homesubject, $homeheaders; // from fileconfig.php
+	return mail( $homemail , $homesubject , $fieldsString , $homeheaders );
 }
 
-function curlHome() {
-	global $homecurl;
+function curlHome( $fieldString ) {
+        global $homecurl; // from fileconfig.php
 	$curl = curl_init();
-	curl_setopt( $curl , CURLOPT_URL , $home );
-	curl_setopt( $curl , CURLOPT_POST , count($fields) );
-	curl_setopt( $curl , CURLOPT_POSTFIELDS , $fields_string );
+	curl_setopt( $curl , CURLOPT_URL , $homecurl );
+	curl_setopt( $curl , CURLOPT_POST , count( explode('&',$fieldString)) );
+	curl_setopt( $curl , CURLOPT_POSTFIELDS , $fieldString );
 	$result = curl_exec( $curl );
 	curl_close( $curl );
 	return $result;
@@ -63,7 +63,7 @@ function collectUsage() {
 			( strcmp( $element , 'pin_version' ) == 0  && isset( $_POST['pin_version'] ) ) ||
 			( strcmp( $element , 'version_gs' ) == 0  && isset( $_POST['version_gs'] ) ) ||
 			( strcmp( $element , 'compute_target' ) == 0  ) ||
-			( strcmp( $element , 'bam_count' ) == 0  ) {
+			( strcmp( $element , 'bam_count' ) == 0  ) ) {
 			$fields[$element] = urlencode( $value );
 		}
 		#print $element." => ".$value.$endl;
