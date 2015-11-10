@@ -106,29 +106,41 @@ function create_fai($fp, $mylabel) {
   fwrite($fp, "fi\n");
 }
 
-function write_fai($fp, $myref, $mylabel, $pathid, $action) {
+function write_fai($fp, $myref, $mylabel, $pathid, $action, $compute_target, $s3_action) {
   global $DNAM_VAR, $faipath_h, $retrieved, $DNAM_use;
+  $paths_h = $_POST['pathdb'];
   if (! array_key_exists( $myref, $retrieved)) {
+
     if (array_key_exists( $myref, $faipath_h)) {
       fwrite($fp, "if [[ ! -e \$".$mylabel."_fai ]] ; then\n");
-      fwrite($fp, "   $action \$".$DNAM_VAR[$faipath_h[ $myref ]]."/\$".$mylabel."_fai  .\n");
+      if ($compute_target=="AWS" && preg_match('#^s3://#', $faipath_h[$myref])) {
+	fwrite($fp, "   msg=`$s3_action \$".$DNAM_VAR[$faipath_h[ $myref ]]."/\$".$mylabel."_fai  2>&1`\n");
+	fwrite($fp, "   check_aws_file \$msg \$".$mylabel."_fai\n");
+      } else {
+	fwrite($fp, "   $action \$".$DNAM_VAR[$faipath_h[ $myref ]]."/\$".$mylabel."_fai .\n");
+      }
       fwrite($fp, "fi\n");
       $DNAM_use[$faipath_h[ $myref ]] = 1;
     } 
     else {
       fwrite($fp, "if [[ ! -e \$".$mylabel."_fai ]] ; then\n");
-      fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$".$mylabel."_fai  .\n");
-      fwrite($fp, "fi\n");
+      if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$".$mylabel."_fai 2>&1`\n");
+	fwrite($fp, "   check_aws_file \$msg \$".$mylabel."_fai\n");
+      } else {
+	fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$".$mylabel."_fai  .\n");
+      }
+       fwrite($fp, "fi\n");
       $DNAM_use[$pathid] = 1;
     }
-
+    
   }
 }
 
 
-function handle_fai($fp,$hasfai, $myref, $mylabel, $pathid, $action) {
+function handle_fai($fp,$hasfai, $myref, $mylabel, $pathid, $action, $compute_target, $s3_action) {
   if ($hasfai) {  //     use it
-    write_fai($fp, $myref, $mylabel, $pathid, $action);
+    write_fai($fp, $myref, $mylabel, $pathid, $action, $compute_target, $s3_action);
   } else {  //   create it
     create_fai($fp, $mylabel);
   }
@@ -433,7 +445,7 @@ function write_vep_input_common($fp, $prefix) {
 
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-  include "et.php";
+  include realpath(dirname(__FILE__)."/"."et.php");
 
   //  if($do_html==1) {
   //  }
@@ -552,6 +564,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $RWORKDIR   = "$workdir";
     $RESULTSDIR = "$workdir/results";
     $STATUSDIR  = "$workdir/status";
+    $s3_action="";
     $action="ln -s";
     break;
   }
@@ -614,21 +627,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       array_push( $fp_buf, "this_bam=\"$i\"\n");
       array_push( $fp_buf, "if [[ ! -e  \"\$this_bam\" ]]; then\n");
       array_push( $fp_buf, "   echo Retrieving \$this_bam ...\n");
-      if ($compute_target!="AWS") {
-	array_push( $fp_buf, "   $action \$$DNAM_VAR[$pathid]/\$this_bam\n");
+      if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	array_push( $fp_buf, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$this_bam 2>&1`\n");
+	array_push( $fp_buf, "   check_aws_file \$msg \$this_bam\n");
       } else {
 
-
-	if(preg_match('#^s3://#', $paths_h[$pathid])){
-	  array_push( $fp_buf, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$this_bam 2>&1`\n");
-	} else {
-	  array_push( $fp_buf, "   msg=`$action \$$DNAM_VAR[$pathid]/\$this_bam 2>&1`\n");
-	}
-	array_push( $fp_buf, "   check_aws_file \$msg \$this_bam\n");
+	array_push( $fp_buf, "   $action \$$DNAM_VAR[$pathid]/\$this_bam .\n");
       }
       array_push( $fp_buf, "fi\n");
       $DNAM_use[$pathid] = 1;
-
+      
       // bai should imply already-sorted bam
       $tmp_bai = "$i.bai";
       if (array_key_exists( $tmp_bai, $baipath_h )) {
@@ -636,79 +644,56 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	array_push( $fp_buf, "this_bai=\$this_bam.bai\n");
 	array_push( $fp_buf, "if [[ ! -e \$this_bai ]]; then\n");
 	array_push( $fp_buf, "   echo Retrieving \$this_bai ...\n");
-
-      if ($compute_target!="AWS") {
-	array_push( $fp_buf, "   $action \$".$DNAM_VAR[$baipath_h[$tmp_bai]]."/\$this_bai\n");
-      } else {
-
-
-	if(preg_match('#^s3://#', $paths_h[$baipath_h[$tmp_bai]])) {
-
+	
+	if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$baipath_h[$tmp_bai]])) {
 	  array_push( $fp_buf, "   msg=`$s3_action \$".$DNAM_VAR[$baipath_h[$tmp_bai]]."/\$this_bai 2>&1`\n");
+	  array_push( $fp_buf, "   check_bai_please \$msg \$this_bai\n");
 	} else {
-	  array_push( $fp_buf, "   msg=`$action \$".$DNAM_VAR[$baipath_h[$tmp_bai]]."/\$this_bai 2>&1`\n");
+	  array_push( $fp_buf, "   $action \$".$DNAM_VAR[$baipath_h[$tmp_bai]]."/\$this_bai .\n");
 	}
 
-	array_push( $fp_buf, "   check_bai_please \$msg \$this_bai\n");
-
-      }
 	array_push( $fp_buf, "fi\n");
-	
 	$DNAM_use[$baipath_h[$tmp_bai]] = 1;
       } else {
 	// link same dir
 	array_push( $fp_buf, "this_bai=\$this_bam.bai\n");
 	array_push( $fp_buf, "if [[ ! -e \$this_bai ]]; then\n");
 	array_push( $fp_buf, "   echo Retrieving \$this_bai ...\n");
-
-      if ($compute_target!="AWS") {
-	array_push( $fp_buf, "   $action \$$DNAM_VAR[$pathid]/\$this_bai\n");
-      } else {
-
-
-
-
-	if(preg_match('#^s3://#', $paths_h[$pathid])){
+	
+	if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
 	  array_push( $fp_buf, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$this_bai 2>&1`\n");
+	  array_push( $fp_buf, "   check_bai_please \$msg \$this_bai\n");
 	} else {
-	  array_push( $fp_buf, "   msg=`$action \$$DNAM_VAR[$pathid]/\$this_bai 2>&1`\n");
+	  array_push( $fp_buf, "   $action \$$DNAM_VAR[$pathid]/\$this_bai .\n");
 	}
-
-        array_push( $fp_buf, "   check_bai_please \$msg \$this_bai\n");
-      }
-
-      array_push( $fp_buf, "fi\n");
       
-      $DNAM_use[$pathid] = 1;
-      }
+	array_push( $fp_buf, "fi\n");
+	
+	$DNAM_use[$pathid] = 1;
+    }
     } else {
-
+      
       // AWS test was not in original ; may be untested
       array_push( $fp_buf, "if [[ ! -e  ".basename($i,".bam").".orig.bam ]]; then\n");
-
-      if ($compute_target!="AWS") {
-	array_push( $fp_buf, "   $action \$$DNAM_VAR[$pathid]/$i ".basename($i,".bam").".orig.bam\n");
+      
+      if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	array_push( $fp_buf, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$i ".basename($i,".bam").".orig.bam 2>&1`\n");
+	array_push( $fp_buf, "   check_aws_file \$msg ".basename($i,".bam").".orig.bam\n");
       } else {
-
-
-
-	if(preg_match('#^s3://#', $paths_h[$pathid])){
-	  array_push( $fp_buf, "   $s3_action \$$DNAM_VAR[$pathid]/$i ".basename($i,".bam").".orig.bam\n");
-	} else {
-	  array_push( $fp_buf, "   $action \$$DNAM_VAR[$pathid]/$i ".basename($i,".bam").".orig.bam\n");
-	}
+	array_push( $fp_buf, "   $action \$$DNAM_VAR[$pathid]/$i ".basename($i,".bam").".orig.bam .\n");
       }
+      
       array_push( $fp_buf, "fi\n");
-
+    
       $DNAM_use[$pathid] = 1;
       
       array_push($prepare_bam, $kk);
-   }
+    }
   } // bams
 
   $_POST['bam_count'] = count( $list_of_sorted_bams );
-  $how = 'mail';
-  $ok = callHome( $how );
+  $how = 'nomail';
+  $ok  = callHome( $how );
 
   // Update output
   if (count($prepare_bam) > 0 ) {
@@ -783,8 +768,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
   }
   
-  // Consider rewriting the huge section below
-  
+  // Consider rewriting the huge section below 
+  // Currently we are being a bit too precise by mentioning individual tool names.
+  // TODO: add check for valid compression format, as the ref in the 1000G tree is problematic.
+
   // for varscan
   if(isset($_POST['vs_cmd'])) {
     fwrite($fp, "# Check avail refs for varscan ref\n");
@@ -795,17 +782,25 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       case $IS_FASTA_GZ: //"$stemref.fasta.gz":
 	$bFound=1;
 	list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+
+	// normal
 	fwrite($fp, "VS_REF=$availref\n");
 	fwrite($fp, "if [[ ! -e  \$VS_REF ]]; then\n");
-	fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$VS_REF  .\n");
+        if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	  fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$VS_REF 2>&1`\n");
+	  fwrite($fp, "   check_aws_file \$msg \$VS_REF\n");
+	} else {
+	  fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$VS_REF  .\n");
+        }
 	fwrite($fp, "fi\n");
+
 	$DNAM_use[$pathid] = 1;
 	$retrieved[$availref] = $availref_type_h[$availref];
 	$retrieved_pathid[$availref] = $pathid;
 	fwrite($fp, "VS_REF_fai=\${VS_REF}.fai\n");
 	$VS_REF = $availref;
 	$VS_REF_fai = "$VS_REF.fai";
-	handle_fai($fp, $hasfai, $VS_REF_fai, "VS_REF", $pathid, $action);
+	handle_fai($fp, $hasfai, $VS_REF_fai, "VS_REF", $pathid, $action, $compute_target, $s3_action);
 	$retrieved[$VS_REF_fai] = get_ref_type($VS_REF_fai);
 	break 2;
       }
@@ -863,7 +858,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "VS_REF_fai=\${VS_REF}.fai\n");
 	  $VS_REF = $availref;
 	  $VS_REF_fai = "$VS_REF.fai";
-	  handle_fai($fp, $hasfai, $VS_REF_fai, "VS_REF", $pathid, $action);
+	  handle_fai($fp, $hasfai, $VS_REF_fai, "VS_REF", $pathid, $action, $compute_target, $s3_action);
 	  $retrieved[$VS_REF_fai] = get_ref_type($VS_REF_fai);
 	  break 2;
 	}
@@ -940,7 +935,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           fwrite($fp, "STRELKA_REF_fai=\${STRELKA_REF}.fai\n");
           $STRELKA_REF = $availref;
           $STRELKA_REF_fai = "$STRELKA_REF.fai";
-          handle_fai($fp, $hasfai, $STRELKA_REF_fai, "STRELKA_REF", $pathid, $action);
+          handle_fai($fp, $hasfai, $STRELKA_REF_fai, "STRELKA_REF", $pathid, $action, $compute_target, $s3_action);
 	  $retrieved[$STRELKA_REF_fai] = get_ref_type($STRELKA_REF_fai);
           break 2;
 	}
@@ -955,9 +950,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $bFound=1;
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
 	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$availref 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg $availref\n");
+	  } else {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  }
+
 	  fwrite($fp, "fi\n");
-	    $DNAM_use[$pathid] = 1;
+	  $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = get_ref_type($availref);
 	  fwrite($fp, "echo Converting reference format...\n");
 	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
@@ -1059,7 +1061,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           fwrite($fp, "PINDEL_REF_fai=\${PINDEL_REF}.fai\n");
           $PINDEL_REF = $availref;
           $PINDEL_REF_fai = "$PINDEL_REF.fai";
-          handle_fai($fp, $hasfai, $PINDEL_REF_fai, "PINDEL_REF", $pathid, $action);
+          handle_fai($fp, $hasfai, $PINDEL_REF_fai, "PINDEL_REF", $pathid, $action, $compute_target, $s3_action);
 	  $retrieved[$PINDEL_REF_fai] = get_ref_type($PINDEL_REF_fai);
           break 2;
 	}
@@ -1074,7 +1076,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $bFound=1;
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
 	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
-	  fwrite($fp, "$action \$$DNAM_VAR[$pathid]/$availref .\n");
+
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$availref 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg $availref\n");
+	  } else {
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  }
+
 	  fwrite($fp, "fi\n");
 	    $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = get_ref_type($availref);
@@ -1114,7 +1123,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $bFound=1;
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
 	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$availref 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg $availref\n");
+	  } else {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  }
+
 	  fwrite($fp, "fi\n");
 	    $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = get_ref_type($availref);
@@ -1206,7 +1222,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
 	  fwrite($fp, "BREAKDANCER_REF=$availref\n");
 	  fwrite($fp, "if [[ ! -e \$BREAKDANCER_REF ]] ; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF  .\n");
+
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg \$BREAKDANCER_REF \n");
+	  } else {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF  .\n");
+	  }
+
 	  fwrite($fp, "fi\n");
 	  $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = $availref_type_h[$availref];
@@ -1230,7 +1253,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $bFound=1;
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
 	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$availref 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg $availref\n");
+	  } else {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  }
+
 	  fwrite($fp, "fi\n");
 	  $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = $availref_type_h[$availref];
@@ -1261,7 +1291,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
 	  fwrite($fp, "BREAKDANCER_REF=$availref\n");
 	  fwrite($fp, "if [[ ! -e \$BREAKDANCER_REF ]] ; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF  .\n");
+
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg \$BREAKDANCER_REF\n");
+	  } else {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$BREAKDANCER_REF  .\n");
+	  }
+
 	  fwrite($fp, "fi\n");
 	  $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = $availref_type_h[$availref];
@@ -1292,7 +1329,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     list($sid, $pathid, $gendermapfile) = preg_split('/\|/', $_POST['gs_gendermap']);
     fwrite($fp, "GENOMESTRIP_GENDER_MAP=$gendermapfile\n");
     fwrite($fp, "if [[ ! -e \$GENOMESTRIP_GENDER_MAP ]] ; then\n");
-    fwrite($fp, "    $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_GENDER_MAP .\n");
+
+    if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+      fwrite($fp, "    msg=`$s3_action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_GENDER_MAP 2>&1`\n");
+      fwrite($fp, "   check_aws_file \$msg \$GENOMESTRIP_GENDER_MAP\n");
+    } else {
+      fwrite($fp, "    $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_GENDER_MAP .\n");
+    }
+    
+
     fwrite($fp, "fi\n");
     $DNAM_use[$pathid] = 1;
     $GENOMESTRIP_GENDER_MAP=$gendermapfile;
@@ -1301,7 +1346,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     list($sid, $pathid, $ploidymap) = preg_split('/\|/', $_POST['gs_ploidymap']);
     fwrite($fp, "GENOMESTRIP_PLOIDY_MAP=$ploidymap\n");
     fwrite($fp, "if [[ ! -e \$GENOMESTRIP_PLOIDY_MAP ]] ; then\n");
-    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_PLOIDY_MAP .\n");
+
+    if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+      fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_PLOIDY_MAP 2>&1`\n");
+      fwrite($fp, "   check_aws_file \$msg \$GENOMESTRIP_PLOIDY_MAP\n");
+    } else {
+      fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_PLOIDY_MAP .\n");
+    }
+
     fwrite($fp, "fi\n");
     $DNAM_use[$pathid] = 1;
     $GENOMESTRIP_PLOIDY_MAP=$ploidymap;
@@ -1315,7 +1367,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     list($sid, $pathid, $maskfile_orig, $hasfai) = preg_split('/\|/', $_POST['gs_sel_svmask']);
     $maskfile = $maskfile_orig;
     fwrite($fp, "if [[ ! -e  $maskfile_orig ]] ; then\n");
-    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$maskfile_orig .\n");
+
+    if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+      fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$maskfile_orig 2>&1`\n");
+      fwrite($fp, "   check_aws_file \$msg $maskfile_orig\n");
+    } else {
+      fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$maskfile_orig .\n");
+    }
+    
     fwrite($fp, "fi\n");
     $DNAM_use[$pathid] = 1;
     if (preg_match("/\.gz\z/", $maskfile_orig)) {
@@ -1330,23 +1389,25 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "GENOMESTRIP_SV_MASK_fai=\$GENOMESTRIP_SV_MASK.fai\n");
 
     if ($compute_target != "AWS") {
-      fwrite($fp, "if [[ ! -e  \$GENOMESTRIP_SV_MASK_fai  ]] ; then\n");
       fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_SV_MASK_fai .\n");
-      fwrite($fp, "else\n");
     } else {
-      fwrite($fp, "msg=`$action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_SV_MASK_fai 2>&1`\n");
+      if (preg_match('#^s3://#', $paths_h[$pathid])) {
+	fwrite($fp, "msg=`$s3_action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_SV_MASK_fai 2>&1`\n");
+      } else {
+	fwrite($fp, "msg=`$action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_SV_MASK_fai 2>&1`\n");
+      }
       fwrite($fp, "result=`check_aws_file_int  \$msg `\n");
       fwrite($fp, "if [[ \$result -ne 0 ]] ; then \n");
     }
-      fwrite($fp, "   if [[ ! -e \$GENOMESTRIP_SV_MASK_fai ]] ; then\n");
-      fwrite($fp, "      echo Creating SV mask fai...\n");
-      fwrite($fp, "      ( SAMTOOLS_DIR=".$toolsinfo_h['samtools']['path']."\n");
-      fwrite($fp, "        SAMTOOLS_EXE=".$toolsinfo_h['samtools']['exe']."\n");
-      fwrite($fp, "        \$SAMTOOLS_DIR/\$SAMTOOLS_EXE faidx  \$GENOMESTRIP_SV_MASK ) \n");
-      fwrite($fp, "        echo Creating SV mask fai...done\n");
-      fwrite($fp, "      fi\n");
-      fwrite($fp, "   fi\n");
-  
+    
+    fwrite($fp, "      echo Creating SV mask fai...\n");
+    fwrite($fp, "      ( SAMTOOLS_DIR=".$toolsinfo_h['samtools']['path']."\n");
+    fwrite($fp, "        SAMTOOLS_EXE=".$toolsinfo_h['samtools']['exe']."\n");
+    fwrite($fp, "        \$SAMTOOLS_DIR/\$SAMTOOLS_EXE faidx  \$GENOMESTRIP_SV_MASK ) \n");
+    fwrite($fp, "        echo Creating SV mask fai...done\n");
+    fwrite($fp, "      fi\n");
+
+
 
     // handle CN mask. For GS, matching fai is usually provided alongside of mask
     if ($_POST['gs_depth_useGCNormalization'] == "true") {
@@ -1354,7 +1415,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       list($sid, $pathid, $maskfile_orig, $hasfai) = preg_split('/\|/', $_POST['gs_sel_cnmask']);
       $maskfile = $maskfile_orig;
       fwrite($fp, "if [[ ! -e  $maskfile_orig ]] ; then\n");
-      fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$maskfile_orig .\n");
+
+      if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$maskfile_orig 2>&1`\n");
+	fwrite($fp, "   check_aws_file \$msg $maskfile_orig\n");
+      } else {
+	fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$maskfile_orig .\n");
+      }
+
       fwrite($fp, "fi\n");
       $DNAM_use[$pathid] = 1;
       if (preg_match("/\.gz\z/", $maskfile_orig)) {
@@ -1369,23 +1437,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "GENOMESTRIP_CN_MASK_fai=\$GENOMESTRIP_CN_MASK.fai\n");
       
       if ($compute_target != "AWS") {
-	fwrite($fp, "if [[ ! -e  \$GENOMESTRIP_CN_MASK_fai ]] ; then\n");
 	fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_CN_MASK_fai .\n");
-	fwrite($fp, " else\n");
       } else {
+	if(preg_match('#^s3://#', $paths_h[$pathid])){
+	fwrite($fp, "msg=`$s3_action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_CN_MASK_fai 2>&1`\n");
+	} else {
 	fwrite($fp, "msg=`$action \$$DNAM_VAR[$pathid]/\$GENOMESTRIP_CN_MASK_fai 2>&1`\n");
+	}
 	fwrite($fp, "result=`check_aws_file_int  \$msg `\n");
 	fwrite($fp, "if [[ \$result -ne 0 ]] ; then \n");
       }
-      fwrite($fp, "   if [[ ! -e \$GENOMESTRIP_CN_MASK_fai ]] ; then\n");
+
       fwrite($fp, "      echo Creating CN mask fai...\n");
       fwrite($fp, "      ( SAMTOOLS_DIR=".$toolsinfo_h['samtools']['path']."\n");
       fwrite($fp, "        SAMTOOLS_EXE=".$toolsinfo_h['samtools']['exe']."\n");
       fwrite($fp, "        \$SAMTOOLS_DIR/\$SAMTOOLS_EXE faidx  \$GENOMESTRIP_CN_MASK ) \n");
       fwrite($fp, "      echo Creating CN mask fai...done\n");
       fwrite($fp, "   fi\n");
-      fwrite($fp, "fi\n");
-      
       
     }
     
@@ -1450,7 +1518,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           fwrite($fp, "GENOMESTRIP_REF_fai=\${GENOMESTRIP_REF}.fai\n");
           $GENOMESTRIP_REF = $availref;
           $GENOMESTRIP_REF_fai = "$GENOMESTRIP_REF.fai";
-          handle_fai($fp, $hasfai, $GENOMESTRIP_REF_fai, "GENOMESTRIP_REF", $pathid, $action);
+          handle_fai($fp, $hasfai, $GENOMESTRIP_REF_fai, "GENOMESTRIP_REF", $pathid, $action, $compute_target, $s3_action);
 	  $retrieved[$GENOMESTRIP_REF_fai] = get_ref_type($GENOMESTRIP_REF_fai);
           break 2;
 	}
@@ -1466,9 +1534,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $bFound=1;
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
 	  fwrite($fp, "if [[ ! -e $availref ]] ; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$availref 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg $availref\n");
+	  } else {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
+	  } 
+
 	  fwrite($fp, "fi\n");
-	    $DNAM_use[$pathid] = 1;
+	  $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = get_ref_type($availref);
 	  fwrite($fp, "echo Converting reference format...\n");
 	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
@@ -1508,12 +1583,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	if ($stemref.".dict" == $availfile) {
 	  $bDictFound=1;
 	  fwrite($fp, "if [[ ! -e $availfile ]] ; then\n");
-	  if ($compute_target!="AWS") {
-	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availfile .\n");
-	  } else {
-	    fwrite($fp, "   msg=`$action \$$DNAM_VAR[$pathid]/$availfile 2>&1`\n");
+	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$availfile 2>&1`\n");
 	    fwrite($fp, "   check_aws_file \$msg $availfile\n");
+	  } else {
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availfile .\n");
 	  }
+
 	  fwrite($fp, "fi\n");
 	  break;
 	}
