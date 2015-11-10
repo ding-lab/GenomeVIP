@@ -1,8 +1,9 @@
 <?php
 /* Calls home with usage info
-	author: Adam D Scott
+	original author: Adam D Scott
 	first created: 2015*10*09
 	borrowed flow from: http://davidwalsh.name/curl-post
+	Production debugging: R. Jay Mashl
 */
 #ini_set('display_errors',1);
 #error_reporting(E_ALL & ~E_DEPRECATED);
@@ -33,7 +34,7 @@ function callHome( $how ) {
 
 function mailHome( $fieldString ) {
         global $homemail, $homesubject, $homeheaders; // from fileconfig.php
-	return mail( $homemail , $homesubject , $fieldsString , $homeheaders );
+	return mail( $homemail , $homesubject , $fieldString , $homeheaders );
 }
 
 function curlHome( $fieldString ) {
@@ -48,8 +49,10 @@ function curlHome( $fieldString ) {
 }
 
 function collectUsage() {
+        global $tool;
 	$fields_string = ""; #returned
 	$fields = array();
+	$fields['caller'] = urlencode($tool);
 	foreach ( $_POST as $element => $value ) { #collect usage info
 		#if $value is array, then handle differently
 		if ( ( strcmp( $element , 'vs_cmd' ) == 0 && isset( $_POST['vs_cmd'] ) ) ||
@@ -76,10 +79,11 @@ function collectUsage() {
 	$address .= $_SERVER['REMOTE_ADDR']."_";
 	$address .= $_SERVER['REQUEST_URI'];
 	$fields['from'] = urlencode( $address );
+	$tmp_arr = array();
 	foreach( $fields as $key => $value ) { #construct message to send
-		$fields_string .= $key.'='.$value.'&';
+	    array_push( $tmp_arr, $key.'='.$value );
 	}
-	rtrim( $fields_string , '&' );
+	$fields_string = implode('&', $tmp_arr );
 
 	#echo $fields_string.'<br>';
 	#echo $message.$endline;
