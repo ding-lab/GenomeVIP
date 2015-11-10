@@ -3,24 +3,66 @@
 GenomeVIP is a web-based platform for performing variant discovery on Amazon's Web Service (AWS) cloud or on local high-performance computing clusters.
 
 
-
 ## Versions
 
-* 1.0 (3a1e935)
-* 0.1 (ac89e21) | initial release
+* v1.0 (3a1e935)
+* 0.1 (ac89e21) | initial release 
 
 
 ## Getting Started
 
-With version 0.1, users need to install the GenomeVIP code on their own web server and configure it for their locally installed genomics tools. Preconfigured GenomeVIP images for Amazon are forthcoming.
-
+With version v1.0, users need to install the GenomeVIP code on their own web server and configure it for their locally installed genomics tools. Preconfigured GenomeVIP images for Amazon are forthcoming.
 
 
 ## User Guide
 
-### Accounts
+### Setting up GenomeVIP in Amazon:
 
-Select  either AWS or Local Cluster
+	Login to your AWS account
+	
+	Choose EC2 from the AWS Console
+	
+	Select Images (AMIs)
+		
+		From the dropdown public AMIs search GenomeVIP
+		
+	Choose a server & runtime images
+	
+		Launch the server (most recent version is recommended) from the Actions menu
+		
+		Select Launch
+			
+		Choose an instance type (m1.medium recommended)
+		
+		Click "Next: Configure Instance Details"
+		
+		Select number of instances (at least 1)
+		
+		Select the network type, EC2 Classic
+		
+			NOTE: The Availability Zone should match the instance zone (and the Volumes Availability Zone should match)
+			
+		Skip the Storage & Tag tabs
+		
+		Go to tab 6, Configure Security Group
+		
+			Add a rule for HTTPS
+		
+		Review selections, and launch
+		
+		Choose the desired keypair (you can proceed without a key pair)
+		
+	Go to your dashboard (orange box)
+	
+		Select EC2 to check its running as many instances as you chose above and *get the public IP*
+		
+	To get to the GenomeVIP homepage, the site is https://publicip/~genomevip (where publicip is the public IP of a running instance, the site is case sensititve).
+
+### From GenomeVIP homepage:
+
+#### Accounts
+
+	Select  either AWS or Local Cluster
 
 	If AWS
 
@@ -32,19 +74,19 @@ Select  either AWS or Local Cluster
 
 		Provide your login credentials to your local cluster
 
-### Select Genomes	
+#### Select Genomes	
 
-Select either an EBS volume (only with AWS accounts), user defined, or 1000 Genomes
+	Select either an EBS volume (only with AWS accounts), user defined, or 1000 Genomes
 
-Click “Load list” to load the data
+	Click “Load list” to load the data
 
-Choose the .bam files to use
+	Choose the .bam files to use
 
-Choose a reference genome
+	Choose a reference genome
 
-Select if you want a copy of all sorted .bam and .bai created to storage directory
+	Select if you want a copy of all sorted .bam and .bai created to storage directory
 
-### Configure Tools
+#### Configure Tools
 
 	Execution Profiles
 
@@ -54,7 +96,7 @@ Select if you want a copy of all sorted .bam and .bai created to storage directo
 
 	Select Paramaters (these can be tuned further in each tool)
 
-Existing
+	Existing
 
 	Upload from file
 
@@ -74,7 +116,7 @@ Existing
 
 		For each tool switched on by the run mode selected, fine tune any parameters. If necessary, turn off any tools switched on or turn on any tools not automatically selected.
 	
-### Submit
+#### Submit
 
 	If AWS
 
@@ -100,12 +142,12 @@ Existing
 
 	Click “Submit”
 
-### Results
+#### Results
 
 	Check out the results by navigating to the location displayed (for both AWS and Local Cluster)
 
 	Enjoy!
 
-### Options
+#### Options
 
 	Additional options and accounts management may be configured for AWS
