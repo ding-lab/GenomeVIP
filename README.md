@@ -7,7 +7,7 @@ GenomeVIP is a web-based platform for performing variant discovery on Amazon's W
 ## Versions
 
 * 1.0 (3a1e935)
-* 0.1 (ac89e21) | initial release (beta) 
+* 0.1 (ac89e21) | initial release
 
 
 ## Getting Started
