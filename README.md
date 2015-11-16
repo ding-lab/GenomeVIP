@@ -15,9 +15,9 @@ Below are potential installation scenarios for GenomeVIP.
 
 AWS prerequisites: Amazon Web Services account; input genomics data stored in EBS (or S3, such as the public 1000 Genomes Project). 
 
-* 1. AWS cloud only: a pre-configured GenomeVIP server image is available in AWS public image repository. Computations created through this image will instantiate a public GenomeVIP runtime image with preinstalled genomics and supporting tools.
+1. AWS cloud only: a pre-configured GenomeVIP server image is available in AWS public image repository. Computations created through this image will instantiate a public GenomeVIP runtime image with preinstalled genomics and supporting tools.
 
-* 2. Local with AWS option: the GenomeVIP code is installed on a web server in the user's local network and configured to use locally installed genomics and supporting tools; computations can be sent to a local job manager (LSF support provided currently). This server may also be used as an alternative to the public server image mentioned in (1) above; AWS computations proceed as in (1) above.
+2. Local with AWS option: the GenomeVIP code is installed on a web server in the user's local network and configured to use locally installed genomics and supporting tools; computations can be sent to a local job manager (LSF support provided currently). This server may also be used as an alternative to the public server image mentioned in (1) above; AWS computations proceed as in (1) above.
 
 
 A step-by-step user guide is in development and can be found in the document HowTo_GenomeVIP.docx
