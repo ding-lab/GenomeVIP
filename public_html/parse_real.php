@@ -1797,7 +1797,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $vs_hc_filter_prefix['snv']['fail']   = "";
       $vs_hc_filter_prefix['indel']['pass'] = "";
       $vs_hc_filter_prefix['indel']['fail'] = "";
-      if (isset($_POST['vs_apply_high_confidence_filter'])) {         // TODO: break out into separate script like trio casermy
+      if (isset($_POST['vs_apply_high_confidence_filter'])) {         // TODO: break out into separate script like trio case
 	foreach( $vs_bMap as $vartype => $vartype_bool) {
 	  if ( $vartype_bool ) {
 	    $vs_hc_filter_prefix[$vartype]['pass'] = "hc_pass.";
@@ -1935,10 +1935,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
-      fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
-      fwrite($fp, "statfile_gl_g=incomplete.vs_postrun.group\$gp\n");
-      fwrite($fp, "localstatus_gl_g=\\\$RUNDIR/status/\\\$statfile_gl_g\n");
-      fwrite($fp, "remotestatus_gl_g=\\\$STATUSDIR/\\\$statfile_gl_g\n");
+      fwrite($fp, "statfile_gl_g=\\\$statfile_gl_g\n");
+      fwrite($fp, "localstatus_gl_g=\\\$localstatus_gl_g\n");
+      fwrite($fp, "remotestatus_gl_g=\\\$remotestatus_gl_g\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n");
       fwrite($fp, "outlist=varscan.out.gl_all.group\$gp.all.filelist\n");
       write_vs_gl_merge($fp, $vs_bMap, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
@@ -3399,8 +3398,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "cd \$RUNDIR/pindel\n");
     fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
-    fwrite($fp, "   mkdir -p \$RESULTSDIR/pindel/group\$gp\n");
-    fwrite($fp, "   \$put_cmd \$RUNDIR/pindel/group\$gp/pindel.bam.inp  \$RESULTSDIR/pindel/group\$gp/pindel.bam.group\$gp.inp\n");
+    if ($compute_target!="AWS") { fwrite($fp, "   mkdir -p \$RESULTSDIR/pindel/group\$gp\n");}
 
     fwrite($fp, "   statfile_g=incomplete.pindel_postrun.group\$gp\n");
     fwrite($fp, "   localstatus_g=\$RUNDIR/status/\$statfile_g\n");
@@ -3408,27 +3406,36 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "   touch \$localstatus_g\n");
     fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_g \$remotestatus_g\n");
 
+
     fwrite($fp, "   tag_pin=\$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 6 | head -n 1)\n");
     fwrite($fp, "   for chr in \$SEQS; do\n");
     fwrite($fp, "      chralt=\${chr/:/_}\n");
     fwrite($fp, "      dir=group\$gp/\$chralt\n");
     fwrite($fp, "      mkdir -p \$RUNDIR/pindel/\$dir\n");
     fwrite($fp, "      cat > \$RUNDIR/pindel/\$dir/pindel.sh <<EOF\n");
-    fwrite($fp, "#!/bin/bash\n");
 
+    fwrite($fp, "#!/bin/bash\n");
     check_aws_shell($fp);
     if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
 
-    fwrite($fp, "PINDEL_DIR=\$PINDEL_DIR\n");
+    fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
+    fwrite($fp, "export PINDEL_DIR=\$PINDEL_DIR\n");
     fwrite($fp, "RUNDIR=\$RUNDIR\n");
+    fwrite($fp, "myRUNDIR=\$RUNDIR/pindel/group\$gp\n");
+    fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+    fwrite($fp, "myRWORKDIR=\$RWORKDIR/pindel/group\$gp\n");
+    fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
     fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/pindel/group\$gp\n");
     fwrite($fp, "PINDEL_REF=\\\$RUNDIR/reference/\$PINDEL_REF\n");
+    fwrite($fp, "put_cmd=\"\$put_cmd\"\n");
+    fwrite($fp, "del_cmd=\"\$del_cmd\"
+ls -lt\n");
     fwrite($fp, "statfile=incomplete.pindel.group\$gp.chr\$chralt\n");
     fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
     fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
     fwrite($fp, "touch \\\$localstatus\n");
-    fwrite($fp, "\$put_cmd \\\$localstatus \\\$remotestatus\n");
-
+    fwrite($fp, "\\\$put_cmd \\\$localstatus \\\$remotestatus\n");
     fwrite($fp, "cd \\\$RUNDIR/pindel/\$dir\n"); 
 
 
@@ -3450,13 +3457,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "\\\$PINDEL_DIR/$PINDEL_EXE  ".$pindel_opts_more['pindel_chr']." \$chr $pindel_cmd  -f \\\$PINDEL_REF -i \\\$RUNDIR/pindel/group\$gp/pindel.bam.inp\n");
 
-    fwrite($fp, "tgt=\\\$RESULTSDIR/pindel/group\$gp\n");
-    if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-    fwrite($fp, "\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
-    fwrite($fp, "\$put_cmd ./pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
 
-    fwrite($fp, "\$del_cmd \\\$remotestatus\n");
+    if ($compute_target=="AWS") { 
+      fwrite($fp, "\\\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd \\\$myRUNDIR/pindel.bam.inp  \\\$myRWORKDIR/pindel.bam.group\$gp.inp\n");
+      fwrite($fp, "\\\$put_cmd \\\$myRUNDIR/pindel.bam.inp  \\\$myRESULTSDIR/pindel.bam.group\$gp.inp\n");
+      fwrite($fp, "\\\$del_cmd \\\$remotestatus\n");
+    }
     fwrite($fp, "\$del_local \\\$localstatus\n");
+
 
     if($do_timing) {
       fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -3519,74 +3528,106 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
 
-    // Gather group and filter
+    // Gather group and do everyting else
     fwrite($fp, "cat > \$RUNDIR/pindel/group\$gp/pindel_postrun.sh <<EOF\n");
     fwrite($fp, "#!/bin/bash\n");
     check_aws_shell($fp);
     if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); } 
-    fwrite($fp, "PINDEL_DIR=\$PINDEL_DIR\n");
+    fwrite($fp, "export PINDEL_DIR=\$PINDEL_DIR\n");
     fwrite($fp, "RUNDIR=\$RUNDIR\n");
+    fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+    fwrite($fp, "myRWORKDIR=\$RWORKDIR/pindel/group\$gp\n");
+    fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
     fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/pindel/group\$gp\n");
     fwrite($fp, "PINDEL_REF=\\\$RUNDIR/reference/\$PINDEL_REF\n");
     fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
-    fwrite($fp, "statfile=incomplete.pindel.group\$gp.postrun\n");
-    fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
-    fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
-    fwrite($fp, "touch \\\$localstatus\n");
-    fwrite($fp, "\$put_cmd \\\$localstatus \\\$remotestatus\n");
+    fwrite($fp, "put_cmd=$put_cmd\n");
+    fwrite($fp, "del_cmd=$del_cmd\n");
+    fwrite($fp, "del_local=$del_local\n");
+    fwrite($fp, "statfile_g=\$statfile_g\n");
+    fwrite($fp, "localstatus_g=\$RUNDIR/status/\$statfile_g\n");
+    fwrite($fp, "remotestatus_g=\$STATUSDIR/\$statfile_g\n");
+
     fwrite($fp, "cd \\\$RUNDIR/pindel/group\$gp\n"); 
+    fwrite($fp, "outlist=pindel.out.group\$gp.filelist\n");
     fwrite($fp, "find . -name '*_D' -o -name '*_SI' ");
     if (isset($_POST['pin_do_inversions']))  { fwrite($fp, "-o -name '*_INV' "); }
     if (isset($_POST['pin_do_tandem_dups'])) { fwrite($fp, "-o -name '*_TD' ");  }
-    fwrite($fp, " > ./pindel.out.group\$gp.filelist\n");
-    fwrite($fp, "list=\\\$(xargs -a  ./pindel.out.group\$gp.filelist)\n");
-    fwrite($fp, "cat \\\$list | grep ChrID > ./pindel.out.group\$gp.raw\n");
-    fwrite($fp, "if [ \`echo \\\$?\` -eq 0 ] ; then /bin/rm -f \\\$list ; fi\n");
+    fwrite($fp, " > ./\\\$outlist\n");
+    fwrite($fp, "list=\\\$(xargs -a  ./\\\$outlist)\n");
+    
+    fwrite($fp, "pin_var_file=pindel.out.group\$gp.raw\n");
+    fwrite($fp, "cat \\\$list | grep ChrID > ./\\\$pin_var_file\n");
+    fwrite($fp, "\\\$put_cmd  ./\\\$pin_var_file \\\$myRWORKDIR/\n");
+    fwrite($fp, "\\\$put_cmd  ./\\\$outlist      \\\$myRWORKDIR/\n");
+
+    // //Filter, cleanup, save
     fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/pindel_filter.pl  ./pindel_filter.input\n");
-    fwrite($fp, "out=pindel.out.group\$gp.raw.filter1_pass.filter2_all.vcf\n");
-    fwrite($fp, "if [ -e ./\\\$out ] ; then\n");
-    fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Pindel  ./\\\$out   ./pindel.out.group\$gp.all_final.gvip.vcf\n");
-    fwrite($fp, "#   rm -f ./\\\$out\n");
-    fwrite($fp, "fi\n");
-    fwrite($fp, "out=pindel.out.group\$gp.raw.filter1_pass.filter2_pass.vcf\n");
+    fwrite($fp, "\\\$put_cmd   ./pindel_filter.input \\\$myRWORKDIR/\n");
+    //
+    $filter1_tag = "CvgVafStrand"; // cf. pindel_filter.pl
+    $filter2_tag = "Homopolymer";  // ditto
+    //
+    if( isset($_POST['pin_apply_filter']) ){
+      if( $_POST['pin_call_mode'] == "pooled" ) {
+
+	fwrite($fp, "pre_current_final=\\\$pin_var_file.${filter2_tag}_pass.vcf\n");
+	fwrite($fp, "for mytmp in \\\$pin_var_file.vcf \\\$pre_current_final \\\${pre_current_final/%pass.vcf/fail.vcf} ; do\n");
+
+      } else {
+	fwrite($fp, "for mytmp in \\\$pin_var_file.${filter1_tag}_fail \\\$pin_var_file.${filter1_tag}_pass ; do\n");
+	fwrite($fp, "   \\\$put_cmd  ./\\\$mytmp \\\$myRWORKDIR/\n");
+	fwrite($fp, "done\n");
+
+	fwrite($fp, "pre_current_final=\\\$pin_var_file.${filter1_tag}_pass.${filter2_tag}_pass.vcf\n");
+	fwrite($fp, "for mytmp in \\\$pin_var_file.${filter1_tag}_pass.vcf  \\\$pre_current_final  \\\${pre_current_final/%pass.vcf/fail.vcf} ; do\n");
+      }
+
+    } else { // no filter
+
+      fwrite($fp, "pre_current_final=\\\$pin_var_file.vcf\n");
+      fwrite($fp, "for mytmp in \\\$pre_current_final ; do\n");
+    }
+    // 
+    fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Pindel ./\\\$mytmp ./\\\${mytmp/%vcf/gvip.vcf}\n");
+    fwrite($fp, "   \\\$put_cmd  ./\\\${mytmp/%vcf/gvip.vcf} \\\$myRWORKDIR/\n");
+    fwrite($fp, "done\n");
+
+    // dbSNP filter: no option currently provided
+
+    $mode_tag="";
     switch ($_POST['pin_call_mode']) {
     case "germline":
     case "pooled":
-      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Pindel  ./\\\$out   ./pindel.out.group\$gp.current_final.gvip.vcf\n");
-    break;
+      break;
     case "somatic":
-      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Pindel  ./\\\$out   ./pindel.out.group\$gp.current_final.gvip.Somatic.vcf\n");
+      $mode_tag="Somatic.";
       break;
     case "trio":
-      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Pindel  ./\\\$out   ./pindel.out.group\$gp.current_final.gvip.denovo.vcf\n");
+      $mode_tag="denovo.";
       break;
     }
-    fwrite($fp, "#rm -f ./\\\$out\n");
+    fwrite($fp, "current_final=\\\${pin_var_file/%raw/current_final.gvip.".$mode_tag."vcf}\n");
+    fwrite($fp, "cat ./\\\${pre_current_final/%vcf/gvip.vcf} > ./\\\$current_final\n");
 
+    // Annotate and save
     if (isset($_POST['vep_cmd'])) {
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./pindel_vep.input >& ./pindel_vep.log\n");
-      switch ($_POST['pin_call_mode']) {
-      case "germline":
-      case "pooled":
-	fwrite($fp, "\$del_local ./pindel.out.group\$gp.current_final.gvip.vcf\n");
-      break;
-      case "somatic":
-	fwrite($fp, "\$del_local ./pindel.out.group\$gp.current_final.gvip.Somatic.vcf\n");
-	break;
-      case "trio":
-	fwrite($fp, "\$del_local ./pindel.out.group\$gp.current_final.gvip.denovo.vcf\n");
-	break;
-      }
+
+      fwrite($fp, "\\\$put_cmd   ./\\\${current_final/%vcf/VEP.vcf} \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd   ./pindel_vep.* \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$del_local ./\\\$current_final\n");
+    } else {
+      fwrite($fp, "\\\$put_cmd   ./\\\$current_final  \\\$myRESULTSDIR/\n");
     }
+    fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");  // is also in myRWORKDIR above
+
+    // finish up
+    fwrite($fp, "\\\$del_cmd   \\\$remotestatus_g\n");
+    fwrite($fp, "\\\$del_local \\\$localstatus_g\n");
 
 
-    // TODO
-    //    fwrite($fp, "tgt=\\\$RESULTSDIR/pindel/group\$gp\n");
-    //    if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-    //    fwrite($fp, "\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
-    //    fwrite($fp, "\$put_cmd ./pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
-    fwrite($fp, "\$del_cmd \\\$remotestatus\n");
-    fwrite($fp, "\$del_local \\\$localstatus\n");
     if($do_timing) {
       fwrite($fp, "scr_tf=\`date +%s\`\n");
       fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
@@ -3596,25 +3637,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp,"EOF\n");
 
 
+
+
+
+
     // Generate VEP input
     if (isset($_POST['vep_cmd'])) {
       $prefix="pindel.vep";
       fwrite($fp, "cat > \$RUNDIR/pindel/group\$gp/pindel_vep.input <<EOF\n");
-      switch ($_POST['pin_call_mode']) {
-      case "germline":
-      case "pooled":
-	fwrite($fp, "$prefix.vcf = ./pindel.out.group\$gp.current_final.gvip.vcf\n");
-        fwrite($fp, "$prefix.output = ./pindel.out.group\$gp.current_final.gvip.VEP.vcf\n");
-	break;
-      case "somatic":
-	fwrite($fp, "$prefix.vcf = ./pindel.out.group\$gp.current_final.gvip.Somatic.vcf\n");
-	fwrite($fp, "$prefix.output = ./pindel.out.group\$gp.current_final.gvip.Somatic.VEP.vcf\n");
-	break;
-      case "trio":
-	fwrite($fp, "$prefix.vcf = ./pindel.out.group\$gp.current_final.gvip.denovo.vcf\n");
-	fwrite($fp, "$prefix.output = ./pindel.out.group\$gp.current_final.gvip.denovo.VEP.vcf\n");
-	break;
-      }
+      fwrite($fp, "$prefix.vcf = ./pindel.out.group\$gp.current_final.gvip.".$mode_tag."vcf\n");
+      fwrite($fp, "$prefix.output = ./pindel.out.group\$gp.current_final.gvip.".$mode_tag."VEP.vcf\n");
       write_vep_input_common($fp, $prefix);
       fwrite($fp, "EOF\n");
     }
