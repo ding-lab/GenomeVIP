@@ -416,13 +416,13 @@ function write_vs_trio_merge($fp, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix,
   fwrite($fp, "fi\n");
 }
 
-function write_strlk_merge($fp, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix) {
+function write_strlk_merge($fp, $callset, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix) {
   $vartype="snv";
-  $suffix = "passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['pass']."vcf"; 
+  $suffix = "$callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['pass']."vcf"; 
   $find_cmd  = "find ./strelka_out/results -size +0c -iname \\\*strelka.somatic.$vartype.*.$suffix\\\*  >  ./\\\$outlist";
   fwrite($fp, "$find_cmd\n");
   $vartype="indel";
-  $suffix = "passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['pass']."vcf"; 
+  $suffix = "$callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['pass']."vcf"; 
   $find_cmd  = "find ./strelka_out/results -size +0c -iname \\\*strelka.somatic.$vartype.*.$suffix\\\*  >>  ./\\\$outlist";
   fwrite($fp, "$find_cmd\n");
   fwrite($fp, "if [ -s ./\\\$outlist ] ; then\n");
@@ -1706,7 +1706,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp,"cd \$RUNDIR/varscan\n");
       fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
-      if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/varscan/group\$gp\n"); }
+      if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/group\$gp\n"); } // deld tool
       
 
       fwrite($fp, "   statfile_gl_g=incomplete.vs_postrun.group\$gp\n");
@@ -1732,12 +1732,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
       fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool 
       fwrite($fp, "VS_REF=\\\$RUNDIR/reference/$VS_REF\n");
+      fwrite($fp, "put_cmd=$put_cmd\n");
+      fwrite($fp, "del_cmd=$del_cmd\n");
+      fwrite($fp, "del_local=$del_local\n");
       fwrite($fp, "statfile=incomplete.varscan.group\$gp.chr\$chralt\n");
       fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
       fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
       fwrite($fp, "touch \\\$localstatus\n");
-      fwrite($fp, "\$put_cmd \\\$localstatus  \\\$remotestatus\n");
+      fwrite($fp, "\\\$put_cmd \\\$localstatus  \\\$remotestatus\n");
       
       fwrite($fp, "cd \\\$RUNDIR/varscan/\$dir\n");
       $SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
@@ -1771,12 +1775,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_opts_cmd -f \\\$VS_REF -r \$chr -b \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp  | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." $vs_mpileup_cmd ". " - $vs_opts_cmd  > ./\\\$out  2> ./\\\$log\n");
 
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$out  ./\\\${out/%orig.vcf/gvip.vcf}\n");
-	  fwrite($fp, "\$del_local ./\\\$out\n");
+	  fwrite($fp, "\\\$del_local ./\\\$out\n");
 
 	  // store raw results
 	  if ($compute_target=="AWS") { 
-      	    fwrite($fp, "\$put_cmd  ./\\\$log  ./\\\${out/%orig.vcf/gvip.vcf}    \\\$myRWORKDIR/\n");
-	    fwrite($fp, "\$put_cmd  \\\$myRUNDIR/bamfilelist.inp \\\$myRWORKDIR/bamfilelist.group\$gp.inp\n");
+      	    fwrite($fp, "\\\$put_cmd  ./\\\$log  ./\\\${out/%orig.vcf/gvip.vcf}    \\\$myRWORKDIR/\n");
 	  }
 	} 
       } // run type
@@ -1854,12 +1857,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
       }
       
-      fwrite($fp, "\$del_cmd  \\\$remotestatus\n");
-      fwrite($fp, "\$del_local \\\$localstatus\n");
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus\n");
+      fwrite($fp, "\\\$del_local \\\$localstatus\n");
 
-      // store results 
+
+      if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
+      // store raw results
       if ($compute_target=="AWS") {
-	fwrite($fp, "\$put_cmd  ./varscan.log.* ./varscan.*.vcf  ./*.input \\\$myRWORKDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./varscan.log.* ./varscan.*.vcf  ./*.input \\\$myRWORKDIR/\n");
       }
 
 
@@ -1928,34 +1933,37 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
       fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
-      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/varscan/group\$gp\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
-      fwrite($fp, "statfile_gl_g=\\\$statfile_gl_g\n");
-      fwrite($fp, "localstatus_gl_g=\\\$localstatus_gl_g\n");
-      fwrite($fp, "remotestatus_gl_g=\\\$remotestatus_gl_g\n");
+      fwrite($fp, "statfile_gl_g=\$statfile_gl_g\n");
+      fwrite($fp, "localstatus_gl_g=\\\$RUNDIR/status/\\\$statfile_gl_g\n");
+      fwrite($fp, "remotestatus_gl_g=\\\$STATUSDIR/\\\$statfile_gl_g\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n");
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRWORKDIR/varscan.bam.group\$gp.inp\n");
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRESULTSDIR/varscan.bam.group\$gp.inp\n");
       fwrite($fp, "outlist=varscan.out.gl_all.group\$gp.all.filelist\n");
       write_vs_gl_merge($fp, $vs_bMap, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
       // Results, possibly with annotation
       if (isset($_POST['vep_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
-	fwrite($fp, "\$put_cmd  ./varscan.out.gl_all.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
-	fwrite($fp, "\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
-	fwrite($fp, "\$del_local ./varscan.out.gl_all.group\$gp.all.current_final.gvip.vcf\n");
+	fwrite($fp, "\\\$put_cmd  ./varscan.out.gl_all.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
+	fwrite($fp, "\\\$del_local ./varscan.out.gl_all.group\$gp.all.current_final.gvip.vcf\n");
       } else {
-	fwrite($fp, "\$put_cmd  ./varscan.out.gl_all.group\$gp.all.current_final.gvip.vcf  \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./varscan.out.gl_all.group\$gp.all.current_final.gvip.vcf  \\\$myRESULTSDIR/\n");
       }
-      fwrite($fp, "\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./stdout.*.postrun ./stderr.*.postrun \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus_gl_g\n");
+      fwrite($fp, "\\\$del_local \\\$localstatus_gl_g\n");
 
-
-      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_g\n");
-      fwrite($fp, "\$del_local \\\$localstatus_gl_g\n");
 
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -2043,7 +2051,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	fwrite($fp,"cd \$RUNDIR/varscan\n");
 	fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
-	if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/varscan/group\$gp\n"); }
+	if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/group\$gp\n"); } //deld tool
 	
 	fwrite($fp, "   statfile_gl_g=incomplete.vs_postrun.group\$gp\n");
 	fwrite($fp, "   localstatus_gl_g=\$RUNDIR/status/\$statfile_gl_g\n");
@@ -2066,12 +2074,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
 	fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
 	fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+	fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); //deld tool
 	fwrite($fp, "VS_REF=\\\$RUNDIR/reference/$VS_REF\n");
+	fwrite($fp, "put_cmd=$put_cmd\n");
+	fwrite($fp, "del_cmd=$del_cmd\n");
+	fwrite($fp, "del_local=$del_local\n");
 	fwrite($fp, "statfile=incomplete.vs_som_snvindels.group\$gp.chr\$chralt\n");
 	fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
 	fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
 	fwrite($fp, "touch \\\$localstatus\n");
-	fwrite($fp, "\$put_cmd \\\$localstatus  \\\$remotestatus\n");
+	fwrite($fp, "\\\$put_cmd \\\$localstatus  \\\$remotestatus\n");
 
 	fwrite($fp, "cd \\\$RUNDIR/varscan/\$dir\n");
 	$SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
@@ -2087,7 +2099,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	// Basic results here
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$snvoutbase.vcf   ./\\\$snvoutbase.gvip.vcf\n");
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$indeloutbase.vcf ./\\\$indeloutbase.gvip.vcf\n");
-	fwrite($fp, "\$del_local ./\\\$snvoutbase.vcf  ./\\\$indeloutbase.vcf\n");
+	fwrite($fp, "\\\$del_local ./\\\$snvoutbase.vcf  ./\\\$indeloutbase.vcf\n");
 	
 
 
@@ -2095,21 +2107,20 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	if ($_POST['vs_som_report_validation']=="true") { 
 	  fwrite($fp, "validoutbase=\\\${TMPBASE}.group\$gp.chr\$chralt.validation\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$validoutbase  ./\\\$validoutbase.gvip.vcf\n");
-	  fwrite($fp, "\$del_local ./\\\$validoutbase\n");
+	  fwrite($fp, "\\\$del_local ./\\\$validoutbase\n");
 	}
 
-	fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
-	if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$tgt \n"); }
+
+	if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
 	// store raw results
 	if ($compute_target=="AWS") { 
-	  fwrite($fp, "\$put_cmd  ./varscan.out.{som_snv,som_indel}.*.gvip.vcf  \\\$myRWORKDIR/\n");
-	  fwrite($fp, "\$put_cmd  \\\$myRUNDIR/bamfilelist.inp \\\$myRWORKDIR/bamfilelist.group\$gp.inp\n");
+	  fwrite($fp, "\\\$put_cmd  ./varscan.out.{som_snv,som_indel}.*.gvip.vcf  \\\$myRWORKDIR/\n");
 	}
 
-
-	if ($_POST['vs_som_report_validation']=="true") {
-	  fwrite($fp, "\$put_cmd  ./\\\$TMPBASE.chr\$chralt.validation \\\$tgt/\n");
-	}
+	// TODO: currently disabled
+	//if ($_POST['vs_som_report_validation']=="true") {
+	//  fwrite($fp, "\\\$put_cmd  ./\\\$TMPBASE.chr\$chralt.validation \\\$myRWORKDIR/\n");
+	//}
 
 
 
@@ -2129,14 +2140,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "mysnvorig=./\\\$snvoutbase.gvip.vcf\n");
 	  fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." processSomatic \\\$mysnvorig  $vs_opts_cmd &>> \\\$LOG\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/extract_somatic_other.pl <  \\\$mysnvorig  >  \\\${mysnvorig/%vcf/other.vcf}\n");
- 	  fwrite($fp, "# \$del_local  \\\$mysnvorig\n");
+ 	  fwrite($fp, "# \\\$del_local  \\\$mysnvorig\n");
 	  fwrite($fp, "for kk in Somatic Germline LOH ; do\n");
 	  fwrite($fp, "   thisorig=\\\${mysnvorig/%vcf/\\\$kk.vcf}\n");
 	  fwrite($fp, "   thispass=\\\${mysnvorig/%vcf/\\\$kk.hc.vcf}\n");
 	  fwrite($fp, "   thisfail=\\\${mysnvorig/%vcf/\\\$kk.lc.vcf}\n");
 	  fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/extract_fail.sh  ./\\\$thisorig  ./\\\$thispass  ./\\\$thisfail\n");
 	  fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/set_vcf_filter_label.sh  ./\\\$thisfail  hc_fail\n");
-	  fwrite($fp, "   \$del_local  ./\\\$thisorig\n");
+	  fwrite($fp, "   \\\$del_local  ./\\\$thisorig\n");
 	  fwrite($fp, "done\n");
 	  $vs_opts_cmd="";
 	  foreach ($vs_som_opts_hcf_indel as $tmpkey => $value) { $key="vs_som_filter_$tmpkey"; $vs_opts_cmd .= " ".$value." ".$_POST[$key]." "; }
@@ -2153,7 +2164,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "   thisfail=\\\${myindelorig/%vcf/\\\$kk.lc.vcf}\n");
 	  fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/extract_fail.sh  ./\\\$thisorig  ./\\\$thispass  ./\\\$thisfail\n");
 	  fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/set_vcf_filter_label.sh  ./\\\$thisfail  hc_fail\n");
-	  fwrite($fp, "   \$del_local  ./\\\$thisorig\n");
+	  fwrite($fp, "   \\\$del_local  ./\\\$thisorig\n");
 	  fwrite($fp, "done\n");
 
 
@@ -2181,16 +2192,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." somaticFilter  ./\\\$thissnvorig   $vs_opts_cmd  --indel-file  ./\\\$myindelorig --output-file  ./\\\$thissnvpass  &>> \\\$LOG\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/extract_fail.sh          ./\\\$thissnvorig  ./\\\$thissnvpass   ./\\\$thissnvfail\n"); 
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/set_vcf_filter_label.sh  ./\\\$thissnvfail   somfilter_fail\n");
-	  fwrite($fp, "#\$del_local  ./\\\$thissnvorig\n");
-	  fwrite($fp, "# \$del_local  ./\\\$myindelorig\n");    // can remove orig indel now if desired
+	  fwrite($fp, "# \\\$del_local  ./\\\$thissnvorig\n");
+	  fwrite($fp, "# \\\$del_local  ./\\\$myindelorig\n");    // can remove orig indel now if desired
 
 	} else {
 	  // Perform somatic separation
 	  fwrite($fp, "echo 'SEPARATING OUT SOMATIC AND OTHER CALLS:' &>> \\\$LOG\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/split_vs_somatic.pl ./\\\$snvoutbase.gvip.vcf\n"); 
-	  fwrite($fp, "# \$del_local  ./\\\$snvoutbase.gvip.vcf\n");
+	  fwrite($fp, "# \\\$del_local  ./\\\$snvoutbase.gvip.vcf\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/split_vs_somatic.pl ./\\\$indeloutbase.gvip.vcf\n"); 	
-	  fwrite($fp, "# \$del_local  ./\\\$indeloutbase.gvip.vcf\n");
+	  fwrite($fp, "# \\\$del_local  ./\\\$indeloutbase.gvip.vcf\n");
 
 
 
@@ -2216,9 +2227,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    $vs_dbsnp_filter_prefix[$vartype]['fail']   = "dbsnp_present.";
 	    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/dbsnp_filter.pl  \\\$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input\n"); 
 	    if( $vs_hc_filter_prefix[$vartype]['pass'] != "") {
-	      fwrite($fp, "# \$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n"); 
+	      fwrite($fp, "# \\\$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n"); 
 	    } else {
-	      fwrite($fp, "# \$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
+	      fwrite($fp, "# \\\$del_local ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
 	    }
 	  }
 	  
@@ -2236,18 +2247,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $vs_fpfilter_prefix[$vartype]['fail'] = "fp_fail.";
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/snv_filter.pl  \\\$RUNDIR/varscan/group\$gp/\$chralt/vs_fpfilter.somatic.$vartype.input\n");
 	  if( $vs_dbsnp_filter_prefix[$vartype]['pass'] != "" ) {
-	    fwrite($fp, "# \$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	    fwrite($fp, "# \\\$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
 	  } elseif ( $vs_hc_filter_prefix[$vartype]['pass'] != "") {
-	    fwrite($fp, "# \$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
+	    fwrite($fp, "# \\\$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	  } else {
-	    fwrite($fp, "# \$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
+	    fwrite($fp, "# \\\$del_local  ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix."vcf\n"); 
 	  }
 	}
 
 	// store results
 	if ($compute_target=="AWS") {
-	  fwrite($fp, "\$put_cmd  ./varscan.out.* ./*.input \\\$myRWORKDIR/\n");
+	  fwrite($fp, "\\\$put_cmd  ./varscan.out.* ./stdout.varscan.* ./stderr.varscan.*  ./*.input \\\$myRWORKDIR/\n");
 	}
+
+	fwrite($fp, "\\\$del_cmd  \\\$remotestatus\n");
+	fwrite($fp, "\\\$del_local \\\$localstatus\n");
 
 
 	if($do_timing) {
@@ -2324,35 +2338,37 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
       fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
-      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/varscan/group\$gp\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
-      fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
+      fwrite($fp, "tgt=\\\$RESULTSDIR/group\$gp\n"); // deld tool
       fwrite($fp, "statfile_gl_s=incomplete.vs_postrun.group\$gp\n");
       fwrite($fp, "localstatus_gl_s=\\\$RUNDIR/status/\\\$statfile_gl_s\n");
       fwrite($fp, "remotestatus_gl_s=\\\$STATUSDIR/\\\$statfile_gl_s\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n");
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRWORKDIR/varscan.bam.group\$gp.inp\n");
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRESULTSDIR/varscan.bam.group\$gp.inp\n");
       fwrite($fp, "outlist=varscan.out.som_all.group\$gp.all.filelist\n");
       write_vs_som_merge($fp,  $vs_som_prefix, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
       // Results, possibly with annotation
       if (isset($_POST['vep_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
-	fwrite($fp, "\$put_cmd  ./varscan.out.som_all.group\$gp.all.current_final.gvip.*.VEP.vcf  \\\$myRESULTSDIR/\n");
-	fwrite($fp, "\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
-	fwrite($fp, "\$del_local ./varscan.out.som_all.group\$gp.all.current_final.gvip.Somatic.vcf\n");
+	fwrite($fp, "\\\$put_cmd  ./varscan.out.som_all.group\$gp.all.current_final.gvip.*.VEP.vcf  \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
+	fwrite($fp, "\\\$del_local ./varscan.out.som_all.group\$gp.all.current_final.gvip.Somatic.vcf\n");
       } else {
-	fwrite($fp, "\$put_cmd  ./varscan.out.som_all.group\$gp.all.current_final.gvip.*.vcf  \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./varscan.out.som_all.group\$gp.all.current_final.gvip.*.vcf  \\\$myRESULTSDIR/\n");
       }
-      fwrite($fp, "\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
-      
-
-      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_s\n");
-      fwrite($fp, "\$del_local \\\$localstatus_gl_s\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./stdout.*.postrun ./stderr.*.postrun \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus_gl_s\n");
+      fwrite($fp, "\\\$del_local \\\$localstatus_gl_s\n");
 
 
       if($do_timing) {
@@ -2435,7 +2451,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp,"cd \$RUNDIR/varscan\n");
       fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
-      if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/varscan/group\$gp\n"); }
+      if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/group\$gp\n"); } //deld tool
       
       fwrite($fp, "   statfile_gl_t=incomplete.vs_postrun.group\$gp\n");
       fwrite($fp, "   localstatus_gl_t=\$RUNDIR/status/\$statfile_gl_t\n");
@@ -2460,12 +2476,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
       fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); //deld tool
       fwrite($fp, "VS_REF=\\\$RUNDIR/reference/$VS_REF\n");
+      fwrite($fp, "put_cmd=$put_cmd\n");
+      fwrite($fp, "del_cmd=$del_cmd\n");
+      fwrite($fp, "del_local=$del_local\n");
       fwrite($fp, "statfile=incomplete.varscan.group\$gp.chr\$chralt\n");
       fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
       fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
       fwrite($fp, "touch \\\$localstatus\n");
-      fwrite($fp, "\$put_cmd \\\$localstatus  \\\$remotestatus\n");
+      fwrite($fp, "\\\$put_cmd \\\$localstatus  \\\$remotestatus\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/\$dir\n");
       fwrite($fp, "TMPBASE=varscan.out.trio.group\$gp.chr\$chralt\n");
       fwrite($fp, "LOG=\\\$TMPBASE.log\n");
@@ -2479,19 +2499,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "cat ./\\\$TMPBASE.snp.vcf  > ./\\\$TMPBASE.$vartype.vcf\n");
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$TMPBASE.$vartype.vcf  ./\\\$TMPBASE.$vartype.gvip.vcf\n");
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/split_trio.pl ./\\\$TMPBASE.$vartype.gvip.vcf\n");
-      fwrite($fp, "\$del_local  ./\\\$TMPBASE.snp.vcf ./\\\$TMPBASE.$vartype.vcf \n");
+      fwrite($fp, "\\\$del_local  ./\\\$TMPBASE.snp.vcf ./\\\$TMPBASE.$vartype.vcf \n");
       fwrite($fp, "# \$del_local  ./\\\$TMPBASE.$vartype.gvip.vcf\n"); // keep orig
       $vartype='indel';
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$TMPBASE.$vartype.vcf  ./\\\$TMPBASE.$vartype.gvip.vcf\n");
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/split_trio.pl ./\\\$TMPBASE.$vartype.gvip.vcf\n");
-      fwrite($fp, "\$del_local  ./\\\$TMPBASE.$vartype.vcf \n");
+      fwrite($fp, "\\\$del_local  ./\\\$TMPBASE.$vartype.vcf \n");
       fwrite($fp, "# \$del_local  ./\\\$TMPBASE.$vartype.gvip.vcf\n"); // keep orig
 
 
-      fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
-      if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$tgt \n"); }
-      fwrite($fp, "\$put_cmd  ./\\\$TMPBASE.chr\${chralt}.{snv,indel,snv.denovo_pass}.vcf  ./\\\$TMPBASE.log.chr{\$chralt,\$chralt.log} \\\$tgt/\n");
-      fwrite($fp, "\$put_cmd  \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp \\\$tgt/bamfilelist.varscan.group\$gp.chr\$chralt.inp\n");
+
+      if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
+      // store raw results
+      if ($compute_target=="AWS") {
+	fwrite($fp, "\\\$put_cmd  ./\\\$TMPBASE.chr\${chralt}.{snv,indel,snv.denovo_pass}.vcf  ./\\\$TMPBASE.log.chr{\$chralt,\$chralt.log} \\\$myRWORKDIR/\n");
+      }
+
 
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -2512,7 +2535,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $vs_hc_filter_prefix[$vartype]['pass'] = "hc_pass.";
 	  $vs_hc_filter_prefix[$vartype]['fail'] = "hc_fail.";
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/trio_hcfilter.pl  ./vs_hcfilter.$vartype.input\n");
-	  fwrite($fp, "# \$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.vcf\n");  // keep original
+	  fwrite($fp, "# \\\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.vcf\n");  // keep original
 	}
       }
     
@@ -2527,9 +2550,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $vs_dbsnp_filter_prefix[$vartype]['fail'] = "dbsnp_present.";
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/dbsnp_filter.pl  ./vs_dbsnp_filter.$vartype.input\n");
 	  if( $vs_hc_filter_prefix[$vartype]['pass'] != "" ) {
-	    fwrite($fp, "\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
+	    fwrite($fp, "\\\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	  } else {
-	    fwrite($fp, "\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass."."vcf\n");
+	    fwrite($fp, "\\\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass."."vcf\n");
 	  }
 	}
       }
@@ -2545,17 +2568,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$vs_fpfilter_prefix[$vartype]['fail'] = "fp_fail.";
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/snv_filter.pl  ./vs_fpfilter.$vartype.input\n");
 	if ( $vs_dbsnp_filter_prefix[$vartype]['pass'] != "") {
-	  fwrite($fp, "\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "\\\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
 	} elseif ( $vs_hc_filter_prefix[$vartype]['pass'] != "") {
-	  fwrite($fp, "\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "\\\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	} else {
-	  fwrite($fp, "\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass."."vcf\n");
+	  fwrite($fp, "\\\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass."."vcf\n");
 	}
       }
 
-      // TODO
-      //fwrite($fp, "\$del_cmd \\\$remotestatus\n");
-      //fwrite($fp, "\$del_local \\\$localstatus\n");
+
+      fwrite($fp, "\\\$del_cmd \\\$remotestatus\n");
+      fwrite($fp, "\\\$del_local \\\$localstatus\n");
+
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
         fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
@@ -2633,39 +2657,38 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRWORKDIR=\$RWORKDIR/varscan/group\$gp\n");
       fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
-      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/varscan/group\$gp\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool 
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
-      fwrite($fp, "tgt=\\\$RESULTSDIR/varscan/group\$gp\n");
-      fwrite($fp, "statfile_gl_t=incomplete.vs_postrun.group\$gp\n");
+      fwrite($fp, "statfile_gl_t=\$statfile_gl_t\n");
       fwrite($fp, "localstatus_gl_t=\\\$RUNDIR/status/\\\$statfile_gl_t\n");
       fwrite($fp, "remotestatus_gl_t=\\\$STATUSDIR/\\\$statfile_gl_t\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n");
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRWORKDIR/varscan.bam.group\$gp.inp\n");
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRESULTSDIR/varscan.bam.group\$gp.inp\n");
       fwrite($fp, "outlist=varscan.out.trio_all.group\$gp.all.filelist\n");
       write_vs_trio_merge ($fp, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
+      // Results, possibly with annotation
+      // TODO: check 
       if (isset($_POST['vep_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
-	
-	// put
-
-	fwrite($fp, "\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
-
-	fwrite($fp, "\$del_local ./varscan.out.trio_all.group\$gp.all.current_final.gvip.denovo.vcf\n");
-
+	fwrite($fp, "\\\$put_cmd  ./varscan.out.trio_all.group\$gp.all.current_final.gvip.*.VEP.vcf  \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./vs_vep.* \\\$myRWORKDIR/\n");
+	fwrite($fp, "\\\$del_local ./varscan.out.trio_all.group\$gp.all.current_final.gvip.denovo.vcf\n");
       } else {
-
+	fwrite($fp, "\\\$put_cmd  ./varscan.out.trio_all.group\$gp.all.current_final.gvip.*.vcf  \\\$myRESULTSDIR/\n");
       }
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./stdout.*.postrun ./stderr.*.postrun \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus_gl_t\n");
+      fwrite($fp, "\\\$del_local \\\$localstatus_gl_t\n");
 
-
-      // TODO
-      //fwrite($fp, "\$del_local \\\$tmplist \\\$tmpunsorted\n");
-      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_t\n");
-      fwrite($fp, "\$del_local \\\$localstatus_gl_t\n");
 
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -2684,7 +2707,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	write_vep_input_common($fp, $prefix);
 	fwrite($fp, "EOF\n");
       }
-	  
 
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
@@ -2720,44 +2742,52 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // --------------------------------------------------------------------------------
   if (isset($_POST['strlk_cmd'])) {
 
+    // Which set of results to operate on; possible future gui option
+    //    $strelka_callset = "strlk_pass";
+    $strelka_callset = "all";
+
     write_sample_tuples($fp, $list_of_sorted_bams, "strelka", 2);
 
     fwrite($fp, "# strelka somatic\n");
     fwrite($fp, "cd \$RUNDIR/strelka\n");
     gen_strelka_ini($fp, "strelka.ini", $strlk_opts);
-    fwrite($fp, "\$put_cmd \$RUNDIR/strelka/strelka.ini \$RESULTSDIR/strelka/strelka.ini\n");
+    fwrite($fp, "\\\$put_cmd \$RUNDIR/strelka/strelka.ini \$RESULTSDIR/strelka.ini\n"); // deld tool
 
     fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
-    fwrite($fp, "   mkdir -p \$RESULTSDIR/strelka/group\$gp\n");
-    fwrite($fp, "   statfile_g=incomplete.strelka.group\$gp\n");
+
+    if ($compute_target != "AWS") { fwrite($fp, "   mkdir -p \$RESULTSDIR/group\$gp\n"); } // deld tool
+
+    fwrite($fp, "   statfile_g=incomplete.strelka_postrun.group\$gp\n");
     fwrite($fp, "   localstatus_g=\$RUNDIR/status/\$statfile_g\n");
     fwrite($fp, "   remotestatus_g=\$STATUSDIR/\$statfile_g\n");
     fwrite($fp, "   touch \$localstatus_g\n");
     fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_g \$remotestatus_g\n");
 
+
     fwrite($fp, "   tag_strlk=\$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 6 | head -n 1)\n");
     fwrite($fp, "    dir=group\$gp\n");
     fwrite($fp, "    mkdir -p \$RUNDIR/strelka/\$dir\n");
     fwrite($fp, "      cat > \$RUNDIR/strelka/\$dir/strelka.sh <<EOF\n");
-    fwrite($fp, "#!/bin/bash\n");
-
-    if (isset($_POST['strlk_apply_dbsnp_filter'])) {
-      write_vs_preamble($fp, $toolsinfo_h);               // borrow java
-    } else {
-      check_aws_shell($fp);
-      if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
-    }
-
+    write_vs_preamble($fp, $toolsinfo_h);
     fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
+    fwrite($fp, "export VARSCAN_DIR=".$toolsinfo_h['varscan238']['path']."\n"); // fpfilter uses varscan
     fwrite($fp, "STRELKA_DIR=".$toolsinfo_h[$_POST['strlk_version']]['path']."\n");
     fwrite($fp, "RUNDIR=\$RUNDIR\n");
+    fwrite($fp, "myRUNDIR=\$RUNDIR/strelka/group\$gp\n");
+    fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+    fwrite($fp, "myRWORKDIR=\$RWORKDIR/strelka/group\$gp\n");
+    fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
     fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n");  // deld tool
     fwrite($fp, "STRELKA_REF=\\\$RUNDIR/reference/$STRELKA_REF\n");
+    fwrite($fp, "put_cmd=$put_cmd\n");
+    fwrite($fp, "del_cmd=$del_cmd\n");
+    fwrite($fp, "del_local=$del_local\n");
     fwrite($fp, "statfile=incomplete.strelka.group\$gp\n");
     fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
     fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
     fwrite($fp, "touch \\\$localstatus\n");
-    fwrite($fp, "\$put_cmd \\\$localstatus \\\$remotestatus\n");
+    fwrite($fp, "\\\$put_cmd \\\$localstatus \\\$remotestatus\n");
     fwrite($fp, "SG_DIR=\\\$RUNDIR/strelka/group\$gp\n");
     fwrite($fp, "cd \\\$SG_DIR\n");
     fwrite($fp, "TBAM=\\`awk '{if(NR==1){print \\$0}}' \\\$SG_DIR/bamfilelist.inp\\`\n"); // (tumor,normal) order
@@ -2765,23 +2795,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "\\\$STRELKA_DIR/".$toolsinfo_h[$_POST['strlk_version']]['exe']." "."--normal \\\$NBAM --tumor \\\$TBAM --ref \\\$STRELKA_REF --config \\\$RUNDIR/strelka/strelka.ini --output-dir \\\$SG_DIR/strelka_out\n"); 
     fwrite($fp, "cd \\\$SG_DIR/strelka_out\n");
     fwrite($fp, "make -j 4\n");
+
     fwrite($fp, "cd \\\$SG_DIR/strelka_out/results\n");
+    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./all.somatic.snvs.vcf      ./strelka.somatic.snv.group\$gp.all.gvip.vcf\n");
+    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./all.somatic.indels.vcf    ./strelka.somatic.indel.group\$gp.all.gvip.vcf\n");
+    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./passed.somatic.snvs.vcf   ./strelka.somatic.snv.group\$gp.strlk_pass.gvip.vcf\n");
+    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./passed.somatic.indels.vcf ./strelka.somatic.indel.group\$gp.strlk_pass.gvip.vcf\n");
+    fwrite($fp, "\\\$del_local ./{all,passed}.somatic.{snv,indel}s.vcf\n");
 
-    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./all.somatic.snvs.vcf   ./strelka.somatic.snv.group\$gp.gvip.vcf\n");
-    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./all.somatic.indels.vcf ./strelka.somatic.indel.group\$gp.gvip.vcf\n");
-
-    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./passed.somatic.snvs.vcf   ./strelka.somatic.snv.group\$gp.passed.gvip.vcf\n");
-    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./passed.somatic.indels.vcf ./strelka.somatic.indel.group\$gp.passed.gvip.vcf\n");
-
-    fwrite($fp, "\$del_local ./{all,passed}.somatic.{snv,indel}s.vcf\n");
-
-    // TODO
-    //    fwrite($fp, "tgt=\\\$RESULTSDIR/pindel/group\$gp\n");
-    //    if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
-    //    fwrite($fp, "\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$tgt/\n");
-    //    fwrite($fp, "\$put_cmd ./pindel.out.group\$gp.chr\${chralt}_*  \\\$tgt/\n");
-    //    fwrite($fp, "\$del_cmd \\\$remotestatus\n");
-    //    fwrite($fp, "\$del_local \\\$localstatus\n");
+    if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
+    // store results
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd ./strelka.somatic.*.gvip.vcf  \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd \\\$RUNDIR/strelka/strelka.ini \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd \\\$RUNDIR/strelka/group\$gp/bamfilelist.inp  \\\$myRWORKDIR/strelka.bam.group\$gp.inp\n");
+      fwrite($fp, "\\\$put_cmd \\\$RUNDIR/strelka/group\$gp/{stdout,stderr}.strelka.group\$gp \\\$myRWORKDIR/\n");
+    }
 
     if($do_timing) {
       fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -2817,14 +2846,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $strlk_fpfilter_prefix[$vartype]['fail'] = "fp_fail.";
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/snv_filter.pl  \\\$RUNDIR/strelka/group\$gp/strelka_fpfilter.$vartype.input\n");
       if (isset($_POST['strlk_apply_dbsnp_filter'])) {
-	fwrite($fp, "\$del_local ./strelka.somatic.$vartype.group\$gp.passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	fwrite($fp, "\\\$del_local ./strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
       }
     }
 
-    // TODO
-    //      fwrite($fp, "cd \\\$RUNDIR/varscan/group\$gp\n"); 
-    //fwrite($fp, "\$del_cmd  \\\$remotestatus\n");
-    //fwrite($fp, "\$del_local \\\$localstatus\n");
+    fwrite($fp, "\\\$del_cmd  \\\$remotestatus\n");
+    fwrite($fp, "\\\$del_local \\\$localstatus\n");
+
+    if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
+    // store results
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  ./strelka.somatic.*.gvip.*.vcf \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd  \\\$RUNDIR/strelka/group\$gp/*.input \\\$myRWORKDIR/\n");
+    }
+
+
     if($do_timing) {
       fwrite($fp, "scr_tf=\`date +%s\`\n");
       fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
@@ -2837,35 +2873,35 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     // Generate input files
     foreach (array('snv','indel') as $vartype) {
-
+      
       if (isset($_POST['strlk_apply_dbsnp_filter'])) {
-	    $prefix="strelka.dbsnp.$vartype";
-	    fwrite($fp, "cat > \$RUNDIR/strelka/group\$gp/strelka_dbsnp_filter.$vartype.input <<EOF\n");  
-	    fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
-	    fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
-	    fwrite($fp, "$prefix.rawvcf = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.passed.gvip.vcf\n");
-	    fwrite($fp, "$prefix.passfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
-	    fwrite($fp, "$prefix.dbsnpfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['fail']."vcf\n");
-	    fwrite($fp, "EOF\n");
-	  }
-	  
-	  if (isset($_POST['strlk_apply_false_positives_filter'])) {
-	    if ( $vartype=="snv" ) {  //  only for snvs at this time
-	      $prefix="strelka.fpfilter.$vartype";
-	      fwrite($fp, "FP_BAM=`awk '{if(NR==1){print \$1}}' \$RUNDIR/strelka/group\$gp/bamfilelist.inp`\n");
-	      fwrite($fp, "cat > \$RUNDIR/strelka/group\$gp/strelka_fpfilter.$vartype.input <<EOF\n");
-	      fwrite($fp, "$prefix.bam_readcount = ".$toolsinfo_h['readcount']['path']."/".$toolsinfo_h['readcount']['exe']."\n");
-	      fwrite($fp, "$prefix.bam_file = \$FP_BAM\n");
-	      fwrite($fp, "$prefix.REF = \$RUNDIR/reference/\$STRELKA_REF\n");
-	      fwrite($fp, "$prefix.variants_file = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
-	      fwrite($fp, "$prefix.passfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['pass']."vcf\n");
-	      fwrite($fp, "$prefix.failfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.passed.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['fail']."vcf\n");
-	      foreach ($vs_opts_fpfilter as $value) { $key = "vs_fp_".$value; fwrite($fp, "$prefix.$value = ".$_POST[$key]."\n"); }
-	      fwrite($fp, "EOF\n");
-	    }
-	  }
+	$prefix="strelka.dbsnp.$vartype";
+	fwrite($fp, "cat > \$RUNDIR/strelka/group\$gp/strelka_dbsnp_filter.$vartype.input <<EOF\n");  
+	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
+	fwrite($fp, "$prefix.rawvcf = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.vcf\n");
+	fwrite($fp, "$prefix.passfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	fwrite($fp, "$prefix.dbsnpfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['fail']."vcf\n");
+	fwrite($fp, "EOF\n");
+      }
+      
+      if (isset($_POST['strlk_apply_false_positives_filter'])) {
+	if ( $vartype=="snv" ) {  //  only for snvs at this time
+	  $prefix="strelka.fpfilter.$vartype";
+	  fwrite($fp, "FP_BAM=`awk '{if(NR==1){print \$1}}' \$RUNDIR/strelka/group\$gp/bamfilelist.inp`\n");
+	  fwrite($fp, "cat > \$RUNDIR/strelka/group\$gp/strelka_fpfilter.$vartype.input <<EOF\n");
+	  fwrite($fp, "$prefix.bam_readcount = ".$toolsinfo_h['readcount']['path']."/".$toolsinfo_h['readcount']['exe']."\n");
+	  fwrite($fp, "$prefix.bam_file = \$FP_BAM\n");
+	  fwrite($fp, "$prefix.REF = \$RUNDIR/reference/\$STRELKA_REF\n");
+	  fwrite($fp, "$prefix.variants_file = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "$prefix.passfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "$prefix.failfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['fail']."vcf\n");
+	  foreach ($vs_opts_fpfilter as $value) { $key = "vs_fp_".$value; fwrite($fp, "$prefix.$value = ".$_POST[$key]."\n"); }
+	  fwrite($fp, "EOF\n");
+	}
+      }
     }
-
+    
 
     fwrite($fp, "cd \$RUNDIR/strelka/\$dir ; chmod +x ./strelka.sh\n");
     // configure memory
@@ -2891,28 +2927,44 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       check_aws_shell($fp);
       if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
       fwrite($fp, "RUNDIR=\$RUNDIR\n");
+      fwrite($fp, "RWORKDIR=\$RWORKDIR\n"); 
+      fwrite($fp, "myRWORKDIR=\$RWORKDIR/strelka/group\$gp\n"); 
+      fwrite($fp, "STATUSDIR=\$STATUSDIR\n"); 
       fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+      fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n");  // deld tool
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
       fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
-      fwrite($fp, "tgt=\\\$RESULTSDIR/strelka/group\$gp\n");
-      fwrite($fp, "statfile_gl_g=incomplete.strlk_postrun.group\$gp\n");
-      fwrite($fp, "localstatus_gl_g=\\\$RUNDIR/status/\\\$statfile_gl_g\n");
-      fwrite($fp, "remotestatus_gl_g=\\\$STATUSDIR/\\\$statfile_gl_g\n");
-      fwrite($fp, "cd \\\$RUNDIR/strelka/group\$gp\n");
-      fwrite($fp, "outlist=strelka.out.somatic_all.group\$gp.filelist\n");
-      write_strlk_merge($fp, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix);
+      fwrite($fp, "statfile_g=\$statfile_g\n");
+      fwrite($fp, "localstatus_g=\\\$RUNDIR/status/\\\$statfile_g\n");
+      fwrite($fp, "remotestatus_g=\\\$STATUSDIR/\\\$statfile_g\n");
 
+      fwrite($fp, "cd \\\$RUNDIR/strelka/group\$gp\n");
+      if ($compute_target=="AWS") { 
+	fwrite($fp, "\\\$put_cmd ./bamfilelist.inp  \\\$myRESULTSDIR/strelka.bam.group\$gp.inp\n");
+      }
+      fwrite($fp, "outlist=strelka.out.somatic_all.group\$gp.filelist\n");
+      write_strlk_merge($fp, $strelka_callset, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix);
+
+      // Results, possibly with annotation
       if (isset($_POST['vep_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./strelka_vep.input >& ./strelka_vep.log\n");
-	fwrite($fp, "\$del_local ./strelka.out.somatic_all.group\$gp.current_final.gvip.vcf\n");
+	fwrite($fp, "\\\$put_cmd ./strelka.out.somatic_all.group\$gp.current_final.gvip.VEP.vcf \\\$myRESULTSDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./strelka_vep.log \\\$myRWORKDIR/\n"); 
+	fwrite($fp, "\\\$del_local ./strelka.out.somatic_all.group\$gp.current_final.gvip.vcf\n");
+      } else {
+	fwrite($fp, "\\\$put_cmd ./strelka.out.somatic_all.group\$gp.current_final.gvip.vcf \\\$myRESULTSDIR/\n");
       }
-      // TODO
-      //      fwrite($fp, "\$del_cmd  \\\$remotestatus_gl_g\n");
-      //      fwrite($fp, "\$del_local \\\$localstatus_gl_g\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./stdout.*.postrun ./stderr.*.postrun \\\$myRWORKDIR/\n");
+        fwrite($fp, "\\\$del_cmd  \\\$remotestatus_g\n");
+      fwrite($fp, "\\\$del_local \\\$localstatus_g\n");
+
+
 
       if($do_timing) {
         fwrite($fp, "scr_tf=\`date +%s\`\n");
@@ -3071,7 +3123,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "done < \\\$RUNDIR/breakdancer/group\$gp/bamfilelist.inp\n");
     fwrite($fp, "cat ./breakdancer.group\$gp.sample*.tmpcfg > ./breakdancer.group\$gp.cfg\n");
 
-    fwrite($fp, "tgt=\\\$RESULTSDIR/breakdancer/group\$gp\n");
+    fwrite($fp, "tgt=\\\$RESULTSDIR/group\$gp\n"); // deld tool
     if ($compute_target != "AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
     fwrite($fp, "\$put_cmd  ./breakdancer.group\$gp.cfg \\\$tgt/\n");
     fwrite($fp, "\$put_cmd  ./bamfilelist.inp   \\\$tgt/bamfilelist.group\$gp.inp\n");
@@ -3131,7 +3183,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "\\\$BREAKDANCER_DIR2/$BDEXE_2  $working_ctx_cmd  \\\$RUNDIR/breakdancer/group\$gp/breakdancer.group\$gp.cfg > ./breakdancer.group\$gp.ctx\n");
 
-      fwrite($fp, "tgt=\\\$RESULTSDIR/breakdancer/group\$gp\n");
+      fwrite($fp, "tgt=\\\$RESULTSDIR/group\$gp\n"); // deld tool
       if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
       fwrite($fp, "\$put_cmd ./breakdancer.group\$gp.ctx \\\$tgt/\n");
 
@@ -3204,11 +3256,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "\\\$BREAKDANCER_DIR2/$BDEXE_2 -o \$chr  $working_itx_cmd  \\\$RUNDIR/breakdancer/group\$gp/breakdancer.group\$gp.cfg > ./breakdancer.group\$gp.chr\$chralt.itx\n"); 
 
-      //      fwrite($fp, "mkdir -p \\\$RESULTSDIR/breakdancer/group\$gp ; cp -a ./breakdancer.group\$gp.chr\$chr.itx \\\$RESULTSDIR/breakdancer/group\$gp\n");
+      //      fwrite($fp, "mkdir -p \\\$RESULTSDIR/group\$gp ; cp -a ./breakdancer.group\$gp.chr\$chr.itx \\\$RESULTSDIR/group\$gp\n"); // deld tool
 
       if (trim($_POST['bd_fastq_outfile_prefix_of_supporting_reads']) != "") {
 	fwrite($fp, "for j in \`ls ".trim($_POST['bd_fastq_outfile_prefix_of_supporting_reads']).".*.fastq\` ; do\n");
-	fwrite($fp, "   \$put_cmd ./\\\$j \\\$RESULTSDIR/breakdancer/group\$gp/\\\${j/%fastq/chr\$chralt.itx.fastq}\n");
+	fwrite($fp, "   \$put_cmd ./\\\$j \\\$RESULTSDIR/group\$gp/\\\${j/%fastq/chr\$chralt.itx.fastq}\n"); // deld tool
 	fwrite($fp, "done\n");
       }
       fwrite($fp, "\$del_cmd  \\\$remotestatus_itx\n");
@@ -3258,7 +3310,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "gather_out=breakdancer.group\$gp.all.itx\n");
       fwrite($fp, "find . -mindepth 2 -type f -size +0c -iname 'breakdancer.group*itx' > ./breakdancer.group\$gp.all.itx.filelist\n");
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/gather_itx.sh  \\\$RUNDIR/breakdancer/group\$gp/ITX  breakdancer.group\$gp.all.itx.filelist \\\$gather_out\n");
-      fwrite($fp, "tgt=\\\$RESULTSDIR/breakdancer/group\$gp\n");
+      fwrite($fp, "tgt=\\\$RESULTSDIR/group\$gp\n");  // deld tool 
       if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
       fwrite($fp, "\$put_cmd  ./ITX/\\\$gather_out  \\\$tgt/\n");
       // TODO
@@ -3398,7 +3450,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "cd \$RUNDIR/pindel\n");
     fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
 
-    if ($compute_target!="AWS") { fwrite($fp, "   mkdir -p \$RESULTSDIR/pindel/group\$gp\n");}
+    if ($compute_target!="AWS") { fwrite($fp, "   mkdir -p \$RESULTSDIR/group\$gp\n");} // deld tool
 
     fwrite($fp, "   statfile_g=incomplete.pindel_postrun.group\$gp\n");
     fwrite($fp, "   localstatus_g=\$RUNDIR/status/\$statfile_g\n");
@@ -3426,11 +3478,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "myRWORKDIR=\$RWORKDIR/pindel/group\$gp\n");
     fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
     fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
-    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/pindel/group\$gp\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
     fwrite($fp, "PINDEL_REF=\\\$RUNDIR/reference/\$PINDEL_REF\n");
     fwrite($fp, "put_cmd=\"\$put_cmd\"\n");
-    fwrite($fp, "del_cmd=\"\$del_cmd\"
-ls -lt\n");
+    fwrite($fp, "del_cmd=\"\$del_cmd\"\n");
+    fwrite($fp, "del_local=$del_local\n");
     fwrite($fp, "statfile=incomplete.pindel.group\$gp.chr\$chralt\n");
     fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
     fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
@@ -3460,11 +3512,9 @@ ls -lt\n");
 
     if ($compute_target=="AWS") { 
       fwrite($fp, "\\\$put_cmd ./{pindel.log,stdout.pindel,stderr.pindel}.group\$gp.chr\$chralt   \\\$myRWORKDIR/\n");
-      fwrite($fp, "\\\$put_cmd \\\$myRUNDIR/pindel.bam.inp  \\\$myRWORKDIR/pindel.bam.group\$gp.inp\n");
-      fwrite($fp, "\\\$put_cmd \\\$myRUNDIR/pindel.bam.inp  \\\$myRESULTSDIR/pindel.bam.group\$gp.inp\n");
       fwrite($fp, "\\\$del_cmd \\\$remotestatus\n");
     }
-    fwrite($fp, "\$del_local \\\$localstatus\n");
+    fwrite($fp, "\\\$del_local \\\$localstatus\n");
 
 
     if($do_timing) {
@@ -3539,7 +3589,7 @@ ls -lt\n");
     fwrite($fp, "myRWORKDIR=\$RWORKDIR/pindel/group\$gp\n");
     fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
     fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
-    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/pindel/group\$gp\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
     fwrite($fp, "PINDEL_REF=\\\$RUNDIR/reference/\$PINDEL_REF\n");
     fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
     fwrite($fp, "put_cmd=$put_cmd\n");
@@ -3550,6 +3600,10 @@ ls -lt\n");
     fwrite($fp, "remotestatus_g=\$STATUSDIR/\$statfile_g\n");
 
     fwrite($fp, "cd \\\$RUNDIR/pindel/group\$gp\n"); 
+    if ($compute_target=="AWS") { 
+      fwrite($fp, "\\\$put_cmd ./pindel.bam.inp  \\\$myRWORKDIR/pindel.bam.group\$gp.inp\n");
+      fwrite($fp, "\\\$put_cmd ./pindel.bam.inp  \\\$myRESULTSDIR/pindel.bam.group\$gp.inp\n");
+    }
     fwrite($fp, "outlist=pindel.out.group\$gp.filelist\n");
     fwrite($fp, "find . -name '*_D' -o -name '*_SI' ");
     if (isset($_POST['pin_do_inversions']))  { fwrite($fp, "-o -name '*_INV' "); }
@@ -3560,11 +3614,10 @@ ls -lt\n");
     fwrite($fp, "pin_var_file=pindel.out.group\$gp.raw\n");
     fwrite($fp, "cat \\\$list | grep ChrID > ./\\\$pin_var_file\n");
     fwrite($fp, "\\\$put_cmd  ./\\\$pin_var_file \\\$myRWORKDIR/\n");
-    fwrite($fp, "\\\$put_cmd  ./\\\$outlist      \\\$myRWORKDIR/\n");
 
     // //Filter, cleanup, save
     fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/pindel_filter.pl  ./pindel_filter.input\n");
-    fwrite($fp, "\\\$put_cmd   ./pindel_filter.input \\\$myRWORKDIR/\n");
+    fwrite($fp, "\\\$put_cmd  ./pindel_filter.input \\\$myRWORKDIR/\n");
     //
     $filter1_tag = "CvgVafStrand"; // cf. pindel_filter.pl
     $filter2_tag = "Homopolymer";  // ditto
@@ -3611,19 +3664,18 @@ ls -lt\n");
     fwrite($fp, "current_final=\\\${pin_var_file/%raw/current_final.gvip.".$mode_tag."vcf}\n");
     fwrite($fp, "cat ./\\\${pre_current_final/%vcf/gvip.vcf} > ./\\\$current_final\n");
 
-    // Annotate and save
+    // Results, possibly with annotations
     if (isset($_POST['vep_cmd'])) {
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./pindel_vep.input >& ./pindel_vep.log\n");
-
-      fwrite($fp, "\\\$put_cmd   ./\\\${current_final/%vcf/VEP.vcf} \\\$myRESULTSDIR/\n");
-      fwrite($fp, "\\\$put_cmd   ./pindel_vep.* \\\$myRWORKDIR/\n");
-      fwrite($fp, "\\\$del_local ./\\\$current_final\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\${current_final/%vcf/VEP.vcf} \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./pindel_vep.* \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$del_local  ./\\\$current_final\n");
     } else {
-      fwrite($fp, "\\\$put_cmd   ./\\\$current_final  \\\$myRESULTSDIR/\n");
+      fwrite($fp, "\\\$put_cmd  ./\\\$current_final  \\\$myRESULTSDIR/\n");
     }
-    fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");  // is also in myRWORKDIR above
-
-    // finish up
+    fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRESULTSDIR/\n");
+    fwrite($fp, "\\\$put_cmd  ./\\\$outlist \\\$myRWORKDIR/\n");
+    fwrite($fp, "\\\$put_cmd  ./stdout.*.postrun ./stderr.*.postrun \\\$myRWORKDIR/\n");
     fwrite($fp, "\\\$del_cmd   \\\$remotestatus_g\n");
     fwrite($fp, "\\\$del_local \\\$localstatus_g\n");
 
@@ -3635,9 +3687,6 @@ ls -lt\n");
     }
       if($compute_target=="AWS") { fwrite($fp, "$sgemem_cmd\n"); }
     fwrite($fp,"EOF\n");
-
-
-
 
 
 
@@ -3814,7 +3863,7 @@ ls -lt\n");
     }
 
     // TODO
-       //      fwrite($fp, "tgt=\\\$RESULTSDIR/genomestrip/group\$gp\n");
+       //      fwrite($fp, "tgt=\\\$RESULTSDIR/group\$gp\n"); // deld tool
     //if ($compute_target!="AWS") { fwrite($fp, "mkdir -p \\\$tgt\n"); }
 
       //      fwrite($fp, "\$put_cmd  ./$vs_mpileup_out.group\$gp.chr\$chralt  \\\$tgt/\n");
@@ -3859,7 +3908,7 @@ ls -lt\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
-      fwrite($fp, "tgt=\\\$RESULTSDIR/genomestrip/group\$gp\n");
+      fwrite($fp, "tgt=\\\$RESULTSDIR/group\$gp\n"); // deld tool
       fwrite($fp, "tmp=\`tempfile\`\n");      
       fwrite($fp, "cd \$RUNDIR/genomestrip/group\$gp\n");
       // It appears all info in discovery vcf is also present in genotype vcf
