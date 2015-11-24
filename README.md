@@ -5,6 +5,7 @@ GenomeVIP is a web application platform for performing variant discovery on Amaz
 
 ## Versions
 
+* v1.1 (1c987e7)
 * v1.0 (3a1e935)
 * v0.1 (ac89e21) | initial release 
 
