@@ -20,13 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   if(! file_exists($tmp_sc) ) {
     //    $tmp_sc = tempnam("/tmp", "");
     //    chmod($tmp_sc, 0600);
-    system("touch $tmp_sc && chmod 0600 $tmp_sc");
+    system("touch $tmp_sc; chmod 0600 $tmp_sc");
   } 
   $template = file_get_contents( $s3template );
   $patterns = array('/MY_ACCESS_KEY/','/MY_SECRET_KEY/','/My_https_value/','/My_ssenc_value/');
   $replacements = array( trim($ak), trim($sk), $proto,$enc );
   $template = preg_replace( $patterns, $replacements, $template );
   file_put_contents($tmp_sc, $template);
+  system("chmod 0600 $tmp_sc");
 }
 echo "ok";
 ?>

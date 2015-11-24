@@ -454,6 +454,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // SETUP ENVIRONMENT
   // Read pre-determined software paths on target machine
   $compute_target = $_POST['compute_target'];
+  $scconf="";
+  $scconf_h=array();
+  $aws_vcpu=0;
   switch ($compute_target) {
   case 'AWS':
     $workdir    = generateRandomString($randlen);
@@ -478,6 +481,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		   'nproc'        => '-pe orte',
 		   'limitgr'      => '',
 		  );
+
+    $scconf     = "/tmp/".$_POST['gvip_sid_conf'].".sc";
+    $scconf_h   = parse_ini_file($scconf, true);
+    $aws_type   = $scconf_h[ "cluster"." ".$_POST['real_cluster']]['NODE_INSTANCE_TYPE'];
+    $aws_inst_h = parse_ini_file('configsys/aws_ec2types_suggested.conf', true);
+    $aws_vcpu   = $aws_inst_h["instance $aws_type"]['VCPU']; 
 
     break;
 
@@ -1772,8 +1781,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  }
 	  fwrite($fp, "out=$vs_mpileup_out.group\$gp.chr\$chralt.orig.vcf\n");
 	  fwrite($fp, "log=$vs_mpileup_log.group\$gp.chr\$chralt\n");
-	  fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_opts_cmd -f \\\$VS_REF -r \$chr -b \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp  | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." $vs_mpileup_cmd ". " - $vs_opts_cmd  > ./\\\$out  2> ./\\\$log\n");
-
+	  fwrite($fp, "BAMLIST=\\\$RUNDIR/varscan/group\$gp/bamfilelist.inp\n");
+	  fwrite($fp, "ncols=\\\$(echo \"3*( \\\$(wc -l < \\\$BAMLIST) +1)\"|bc)\n");
+	  fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_opts_cmd -f \\\$VS_REF -r \$chr -b \\\$BAMLIST | awk -v ncols=\\\$ncols 'NF==ncols' | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." $vs_mpileup_cmd ". " - $vs_opts_cmd  > ./\\\$out  2> ./\\\$log\n");
 	  fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$out  ./\\\${out/%orig.vcf/gvip.vcf}\n");
 	  fwrite($fp, "\\\$del_local ./\\\$out\n");
 
@@ -1857,15 +1867,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
       }
       
-      fwrite($fp, "\\\$del_cmd  \\\$remotestatus\n");
-      fwrite($fp, "\\\$del_local \\\$localstatus\n");
-
-
       if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
-      // store raw results
+      // store results
       if ($compute_target=="AWS") {
 	fwrite($fp, "\\\$put_cmd  ./varscan.log.* ./varscan.*.vcf  ./*.input \\\$myRWORKDIR/\n");
       }
+
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus\n");
+      fwrite($fp, "\\\$del_local \\\$localstatus\n");
 
 
       if($do_timing) {
@@ -2084,25 +2093,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
 	fwrite($fp, "touch \\\$localstatus\n");
 	fwrite($fp, "\\\$put_cmd \\\$localstatus  \\\$remotestatus\n");
-
 	fwrite($fp, "cd \\\$RUNDIR/varscan/\$dir\n");
 	$SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
 
-
 	fwrite($fp, "TMPBASE=./varscan.out.som\n");
 	fwrite($fp, "LOG=\\\$TMPBASE.group\$gp.chr\$chralt.log\n");
-
 	fwrite($fp, "snvoutbase=\\\${TMPBASE}_snv.group\$gp.chr\$chralt\n");
 	fwrite($fp, "indeloutbase=\\\${TMPBASE}_indel.group\$gp.chr\$chralt\n");
-
-	fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_som_opts_cmd  -f \\\$VS_REF -r \$chr -b \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." somatic -  \\\${TMPBASE}.group\$gp.chr\$chralt  --mpileup 1  $vs_som_opts_cmd --output-snp \\\$snvoutbase --output-indel \\\$indeloutbase &> \\\$LOG\n");
+	fwrite($fp, "BAMLIST=\\\$RUNDIR/varscan/group\$gp/bamfilelist.inp\n");
+	fwrite($fp, "ncols=\\\$(echo \"3*( \\\$(wc -l < \\\$BAMLIST) +1)\"|bc)\n");
+	fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_som_opts_cmd  -f \\\$VS_REF -r \$chr -b \\\$BAMLIST | awk -v ncols=\\\$ncols 'NF==ncols' | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." somatic -  \\\${TMPBASE}.group\$gp.chr\$chralt  --mpileup 1  $vs_som_opts_cmd --output-snp \\\$snvoutbase --output-indel \\\$indeloutbase &> \\\$LOG\n");
 	// Basic results here
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$snvoutbase.vcf   ./\\\$snvoutbase.gvip.vcf\n");
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$indeloutbase.vcf ./\\\$indeloutbase.gvip.vcf\n");
 	fwrite($fp, "\\\$del_local ./\\\$snvoutbase.vcf  ./\\\$indeloutbase.vcf\n");
 	
-
-
 	// TODO: while validation is useful, we disabled it in the interface; need to check whether including it overrides expected output filenames
 	if ($_POST['vs_som_report_validation']=="true") { 
 	  fwrite($fp, "validoutbase=\\\${TMPBASE}.group\$gp.chr\$chralt.validation\n");
@@ -2256,6 +2261,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
 
 	// store results
+	if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
 	if ($compute_target=="AWS") {
 	  fwrite($fp, "\\\$put_cmd  ./varscan.out.* ./stdout.varscan.* ./stderr.varscan.*  ./*.input \\\$myRWORKDIR/\n");
 	}
@@ -2487,33 +2493,29 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "touch \\\$localstatus\n");
       fwrite($fp, "\\\$put_cmd \\\$localstatus  \\\$remotestatus\n");
       fwrite($fp, "cd \\\$RUNDIR/varscan/\$dir\n");
+      $SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
       fwrite($fp, "TMPBASE=varscan.out.trio.group\$gp.chr\$chralt\n");
       fwrite($fp, "LOG=\\\$TMPBASE.log\n");
+      fwrite($fp, "BAMLIST=\\\$RUNDIR/varscan/group\$gp/bamfilelist.inp\n");
+      fwrite($fp, "ncols=\\\$(echo \"3*( \\\$(wc -l < \\\$BAMLIST) +1)\"|bc)\n");
+      fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_trio_opts_cmd  -f \\\$VS_REF -r \$chr -b \\\$BAMLIST | awk -v ncols=\\\$ncols 'NF==ncols' | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." trio  -  ./\\\$TMPBASE   $vs_trio_opts_cmd  &> \\\$LOG\n");
+      fwrite($fp, "cat ./\\\$TMPBASE.snp.vcf  > ./\\\$TMPBASE.snv.vcf\n");
+      fwrite($fp, "rm -f ./\\\$TMPBASE.snp.vcf\n");
 
-      $SAMTOOLS_EXE = $toolsinfo_h['samtools']['exe'];
-      fwrite($fp, "\\\$SAMTOOLS_DIR/$SAMTOOLS_EXE mpileup $sam_trio_opts_cmd  -f \\\$VS_REF -r \$chr -b \\\$RUNDIR/varscan/group\$gp/bamfilelist.inp | java \\\$JAVA_OPTS -jar \\\$VARSCAN_DIR/".$toolsinfo_h[$_POST['vs_version']]['exe']." trio  -  ./\\\$TMPBASE   $vs_trio_opts_cmd  &> \\\$LOG\n");
-
-      fwrite($fp, "exit\n");
-
-      $vartype='snv';
-      fwrite($fp, "cat ./\\\$TMPBASE.snp.vcf  > ./\\\$TMPBASE.$vartype.vcf\n");
-      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$TMPBASE.$vartype.vcf  ./\\\$TMPBASE.$vartype.gvip.vcf\n");
-      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/split_trio.pl ./\\\$TMPBASE.$vartype.gvip.vcf\n");
-      fwrite($fp, "\\\$del_local  ./\\\$TMPBASE.snp.vcf ./\\\$TMPBASE.$vartype.vcf \n");
-      fwrite($fp, "# \$del_local  ./\\\$TMPBASE.$vartype.gvip.vcf\n"); // keep orig
-      $vartype='indel';
-      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$TMPBASE.$vartype.vcf  ./\\\$TMPBASE.$vartype.gvip.vcf\n");
-      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/split_trio.pl ./\\\$TMPBASE.$vartype.gvip.vcf\n");
-      fwrite($fp, "\\\$del_local  ./\\\$TMPBASE.$vartype.vcf \n");
-      fwrite($fp, "# \$del_local  ./\\\$TMPBASE.$vartype.gvip.vcf\n"); // keep orig
-
-
-
+      // Store raw results
       if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
-      // store raw results
       if ($compute_target=="AWS") {
-	fwrite($fp, "\\\$put_cmd  ./\\\$TMPBASE.chr\${chralt}.{snv,indel,snv.denovo_pass}.vcf  ./\\\$TMPBASE.log.chr{\$chralt,\$chralt.log} \\\$myRWORKDIR/\n");
+	fwrite($fp, "\\\$put_cmd  ./\\\$TMPBASE.log ./{stderr,stdout}.varscan.group* ./*.input \\\$myRWORKDIR/\n");
       }
+
+      fwrite($fp, "for nn in snv indel ; do\n");
+      fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/genomevip_label.pl VarScan ./\\\$TMPBASE.\\\$nn.vcf  ./\\\$TMPBASE.\\\$nn.gvip.vcf\n");
+      if ($compute_target=="AWS") {
+	fwrite($fp, "   \\\$put_cmd  ./\\\$TMPBASE.\\\$nn.gvip.vcf \\\$myRWORKDIR/\n");
+      }
+      fwrite($fp, "   rm -f ./\\\$TMPBASE.\\\$nn.vcf\n");
+      fwrite($fp, "   \\\$GENOMEVIP_SCRIPTS/split_trio.pl ./\\\$TMPBASE.\\\$nn.gvip.vcf\n");
+      fwrite($fp, "done\n");
 
 
       if($do_timing) {
@@ -2574,6 +2576,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	} else {
 	  fwrite($fp, "\\\$del_local   \\\$TMPBASE.$vartype.gvip.denovo_pass."."vcf\n");
 	}
+      }
+
+
+      if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
+      // store results
+      if ($compute_target=="AWS") {
+	fwrite($fp, "\\\$put_cmd  \\\$TMPBASE.snv.gvip.*.vcf   \\\$myRWORKDIR/\n");
+	fwrite($fp, "\\\$put_cmd  \\\$TMPBASE.indel.gvip.*.vcf \\\$myRWORKDIR/\n");
       }
 
 
@@ -2748,6 +2758,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     write_sample_tuples($fp, $list_of_sorted_bams, "strelka", 2);
 
+    // Set cpu count; try at most 4
+    $ncpu = 4;
+    if($compute_target=="AWS") {
+      if($aws_vcpu > 0  &&  $aws_vcpu < $ncpu) { $ncpu = $aws_vcpu ; }
+    }
+
     fwrite($fp, "# strelka somatic\n");
     fwrite($fp, "cd \$RUNDIR/strelka\n");
     gen_strelka_ini($fp, "strelka.ini", $strlk_opts);
@@ -2794,7 +2810,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "NBAM=\\`awk '{if(NR==2){print \\$0}}' \\\$SG_DIR/bamfilelist.inp\\`\n");
     fwrite($fp, "\\\$STRELKA_DIR/".$toolsinfo_h[$_POST['strlk_version']]['exe']." "."--normal \\\$NBAM --tumor \\\$TBAM --ref \\\$STRELKA_REF --config \\\$RUNDIR/strelka/strelka.ini --output-dir \\\$SG_DIR/strelka_out\n"); 
     fwrite($fp, "cd \\\$SG_DIR/strelka_out\n");
-    fwrite($fp, "make -j 4\n");
+    fwrite($fp, "make -j $ncpu\n");
 
     fwrite($fp, "cd \\\$SG_DIR/strelka_out/results\n");
     fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl Strelka ./all.somatic.snvs.vcf      ./strelka.somatic.snv.group\$gp.all.gvip.vcf\n");
@@ -2907,9 +2923,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // configure memory
     $mem_opt = gen_mem_str($compute_target, $toolmem_h['strelka']['mem_default']);
  
-    $ncpu     = $batch['nproc']." 4";
-    // TODO: Recheck to enable for SGE
-    if ($compute_target == "AWS") { $ncpu = "" ; }
+
+    $ncpu = $batch['nproc']." ".$ncpu;
+    // Optionally disable
+    // if ($compute_target == "AWS") { $ncpu = "" ; }
 
     $jobdeps="";
     $job_name = $batch['name_opt']." "."\$tag_strlk.strelka.group\$gp";
