@@ -1,9 +1,11 @@
 [samtools]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/samtools/1.2/bin
+version=1.2
 exe=samtools
 
 [java]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/jre/1.8.0_60_x64
+version=1.8.0_60_x64
 exe=java
 opts="\"-Xms256m -Xmx512m\""
 

@@ -1,9 +1,11 @@
 [samtools]	
 path=/usr/local/bin/samtools/1.2/bin
+version=1.2
 exe=samtools
 
 [java]		
 path=/usr/local/bin/jre/1.7.0_51	
+version=1.7.0_51
 exe=java
 opts="\"-Xms256m -Xmx512m\""
 
