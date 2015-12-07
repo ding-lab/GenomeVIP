@@ -2,10 +2,6 @@
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/samtools/1.2/bin
 exe=samtools
 
-[samtools_stable]
-path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/samtools/0.1.19
-exe=samtools
-
 [java]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/jre/1.8.0_60_x64
 exe=java
