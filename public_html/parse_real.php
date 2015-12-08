@@ -30,6 +30,7 @@ include realpath(dirname(__FILE__)."/"."resources_util.php");
 include realpath(dirname(__FILE__)."/"."array_defs.php");
 include realpath(dirname(__FILE__)."/"."pprofile_wrapper.php");
 include realpath(dirname(__FILE__)."/"."bam_util.php");
+include realpath(dirname(__FILE__)."/"."versions.php");
 
 
 function write_bamlist($fp,$list,$thefile)   {
@@ -3989,6 +3990,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   fwrite($fp, "#!/bin/bash\n");
 
   check_aws_shell($fp);
+
+  fwrite($fp, "#\n");
+  fwrite($fp, "# GenomeVIP version $gvip_version\n");
+  fwrite($fp, "# Script created ".date(DATE_ISO8601)."\n");
+  fwrite($fp, "#\n");
 
   foreach ($paths_h as $key => $value) {
     if ($DNAM_use[$key]) {
