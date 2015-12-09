@@ -2759,8 +2759,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     write_sample_tuples($fp, $list_of_sorted_bams, "strelka", 2);
 
-    // Set cpu count; try at most 4
-    $ncpu = 4;
+    // Set cpu count
+    $ncpu = 8;
     if($compute_target=="AWS") {
       if($aws_vcpu > 0  &&  $aws_vcpu < $ncpu) { $ncpu = $aws_vcpu ; }
     }
