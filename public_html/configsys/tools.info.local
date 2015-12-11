@@ -37,6 +37,10 @@ exe=pindel
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/pindel/0.2.5b5
 exe=pindel
 
+[pindel025b6]
+path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/pindel/0.2.5b6
+exe=pindel
+
 ;[s3cmd]
 ;path=/usr/local/src/s3cmd-1.5.0-beta1
 ;exe=s3cmd
