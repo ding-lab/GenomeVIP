@@ -53,3 +53,8 @@ height: 102px;  /* +2px to fix IE8 */
 .tdindent3 { padding-left:90px;}
 .tdindent4 { padding-left:120px;}
 .rindent  { margin-left:30px;}
+
+.inline {  
+  height: 1.5em;
+  vertical-align: middle;
+}

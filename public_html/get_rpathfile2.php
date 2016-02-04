@@ -69,16 +69,26 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $myhost = $_POST['host'];
     get_file_contents($myhost, $usern, $passw, $fpath, $tmp_data);
   }
+
   
- 
- 
+
   if ($tmp_data != "") {
     $myc_arr = "";
- 
+    $tmp_data_arr = array_filter(explode("\n", $tmp_data));
+
    // create map
     $realkey_cnt   = 0;
     $paths_map = array();
-    foreach (array_filter(explode("\n", $tmp_data)) as $f ) {
+    for ($i=0; $i < count($tmp_data_arr); $i++) {
+      $f = $tmp_data_arr[$i];
+
+      // Clean data where data is in first column
+      if( preg_match( '/\t/', $f)) {
+	$tmp_split_arr = preg_split('/\t/', $f);
+	$f = trim($tmp_split_arr[0]);
+	$tmp_data_arr[$i] = $f;
+      }
+
       $dn = dirname($f);
       if (! array_key_exists($dn, $paths_map)) {
 	$paths_map[$dn] = $realkey_cnt;
@@ -94,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $myc = $mymap[$i]."\n";
       $myc_arr .= $myc;
     }
-    foreach (array_filter(explode("\n", $tmp_data)) as $f ) {
+    foreach ($tmp_data_arr as $f ) {
       $dn = dirname($f);
       $bn = basename($f);
       $realkey = $paths_map[$dn];

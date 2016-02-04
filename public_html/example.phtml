@@ -1140,7 +1140,7 @@ function download(filename, text) {
 
 	      </tr><tr>  
 		<td>Submission host:</td>
-		<td><input type="text" class="tb1" id="clust_gw" name="clust_gw">&nbsp;<img src="image/Help.png" class="inline" title="Enter hostname (or, possibly address) of a machine that can accept batch jobs."></td>
+		<td><input type="text" class="tb1" id="clust_gw" name="clust_gw">&nbsp;<img src="image/Help.png" class="inline" title="Enter remote hostname for accessing files and submitting jobs. (Try an IP address instead of a hostname if necessary.)"></td>
 	      </tr><tr>
 		<td>Queue name:</td>
 		<td><input type="text" class="tb1" id="clust_qn" name="clust_qn"></td>
@@ -1201,8 +1201,8 @@ function download(filename, text) {
 	    <div id="zonedb"><input type='hidden' id='awszonedb' name='awszonedb' value=''/></div>
 
 
-	    <div id="inp_rfile_opt"><p>&nbsp;&bull; Enter path to file containing list of files:</p>
-	      <p class="tdindents"><input type="text" class="tb2 rpath" id='rpath' name='rpath' value='' placeholder="/path/to/file" title="On AWS, the format is s3://bucket/path/to/file. Otherwise, please provide a file path"/></p>
+	    <div id="inp_rfile_opt"><p>&nbsp;&bull; Enter path to file containing list of files:&nbsp;<img src="image/Help.png" class="inline" title="Please provide a list of files with full paths, one per line. On AWS, the path format is s3://bucket/path/to/file"/></p>
+	      <p class="tdindents"><input type="text" class="tb2 rpath" id='rpath' name='rpath' value='' placeholder="/path/to/file"/></p>
 	      <p class="tdindents"><input type='button' value='Retrieve file' id='rpath_btn'/></p>
 
 	    <p><br/></p>
@@ -3172,7 +3172,7 @@ $("#rpath_btn").click(function () {
 	success: function(data) {
 	    populate_divs(data);
 	    $("#multivolume").empty();	    // Enforce mutual exclusivity of data sources
-	    $("#rpath").val("");
+	    // $("#rpath").val("");
 	}
     });
 });

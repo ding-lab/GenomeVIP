@@ -15,7 +15,12 @@ Author: R. Jay Mashl
 <link rel="stylesheet" type="text/css" href="frame.css"> 
 
 <script>
-    $(document).ajaxStart(function() {
+$(function() {
+    $(document).tooltip({
+        track: true
+    });
+});
+$(document).ajaxStart(function() {
         $('.spinner').show();
     });
 $(document).ajaxStop(function() {
@@ -38,7 +43,7 @@ $(document).ready(function(event) {
 </head>
 <body>
 
-<p>&nbsp;&bull; Select upload file containing list of files:</p>
+<p>&nbsp;&bull; Select upload file containing list of files:&nbsp;<img src="image/Help.png" class="inline" title="Please provide a list of files with full paths, one per line. On AWS, the path format is s3://bucket/path/to/file"/></p>
 <div class="tdindents">
   <form name="frm2" id="frm2" action="upfile.php" method="post" enctype="multipart/form-data">
   <div class="checkbutton">
