@@ -3,6 +3,7 @@
 # @name GenomeVIP dbSNP annotation and filtering script
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
 #
+# @version 0.3 (rjm): add mode switch
 # @version 0.2 (rjm): workaround for stat on AWS
 # @version 0.1 (rjm): based on approach from Venkata Yellapantula
 #--------------------------------------
@@ -34,15 +35,16 @@ map { chomp;  if(!/^[#;]/ && /=/) { @_ = split /=/; $_[1] =~ s/ //g; my $v = $_[
 
 
 # Use uncompressed db to avoid being bitten by java compression bug
-my $anno=$paras{'rawvcf'}."anno.vcf";
+my $anno=$paras{'rawvcf'}."dbsnp_anno.vcf";
 if ($paras{'rawvcf'} =~ /\.vcf$/) {
-    ($anno = $paras{'rawvcf'}) =~ s/\.vcf$/\.anno\.vcf/;
+    ($anno = $paras{'rawvcf'}) =~ s/\.vcf$/\.dbsnp_anno\.vcf/;
 }
 
 my $cmd = "java $ENV{'JAVA_OPTS'} -jar $paras{'annotator'} annotate -id $paras{'db'} $paras{'rawvcf'} > $anno";
 print "$cmd\n";
 system($cmd);
 checksize($anno, $paras{'rawvcf'});
+if( exists $paras{'mode'}  &&  $paras{'mode'} eq "filter" )  {
 $cmd = "java $ENV{'JAVA_OPTS'} -jar $paras{'annotator'} filter -n \" (exists ID) & (ID =~ 'rs' ) \" -f $anno > $paras{'passfile'}";
 system($cmd);
 checksize($paras{'passfile'}, $anno);
@@ -51,6 +53,6 @@ system($cmd);
 checksize($paras{'dbsnpfile'}, $anno);
 $cmd = "rm -f $anno";
 system($cmd);
-
+}
 1;
 
