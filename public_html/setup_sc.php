@@ -72,6 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $clust_tag = generateRandomString(4); 
     $real_cluster = $clustbasename."_".$clust_tag;
 
+    // Check for alternative image
+    if( strlen($_POST['alt_img']) > 0) { $genomevip_imageID = $_POST['alt_img']; }
+
     // Proposed configuration
     $buffer0 = array();
 

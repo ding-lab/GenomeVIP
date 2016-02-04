@@ -354,11 +354,22 @@ function validateform(){
     var tmp = warn_bd();
     if (tmp == false ) { numerr++; }
 
+    // validate alt image
+    var alt_img = $("#gvip_img").val().trim();
+    if( alt_img.length>0  &&  (alt_img.length != 12  || ! alt_img.match(/^ami/)) ) {
+        alert("The format of the alternative image identifier listed under the Options tab is invalid.");
+        numerr++;
+        return false;
+    }
+
     if( ! numerr) {  
 	msg="Validation tests for user settings: PASSED.";
 	if ( $("#login_aws").is(':checked')) {
 	    if( cnam != "nada") {
-	    msg += "\n\nGenomeVIP is set to use a new compute resource"+((!bRunning)?(" of type '"):(" '"))+ res +"' and to have results stored in S3 bucket '"+ $("input[type='radio'][name='s3buckets']:checked").val()+"'.";
+		msg += "\n\nGenomeVIP is set to create a new compute resource"+((!bRunning)?(" of type '"):(" '"))+ res +"' and to have results stored in S3 bucket '"+ $("input[type='radio'][name='s3buckets']:checked").val()+"'.";
+                if( alt_img.length>0 ) {
+                    msg += "\nThe alternative run time image '"+alt_img+"' will be used.";
+                }
 	    } 
 	    if( c_lnam !="nada") {
 	    msg += "\n\nGenomeVIP is set to re-use compute resource '"+res+"' and to have results stored in S3 bucket '"+ $("input[type='radio'][name='s3buckets']:checked").val()+"'.";
@@ -520,8 +531,9 @@ function do_sub() {
 	    timeout: 300000,  
 	    type: "POST",
 	    async: false,
-	    data: {'cfg': $("#gvip_sid_conf").val(), 'cmd': cmd, 'obj': obj, 'size': $("#nclust").val(), 
-		   'awsinfovol': $("#awsvoldb").val(), 'awsvolspec': JSON.stringify(awsvolspec) },
+            data: {'cfg': $("#gvip_sid_conf").val(), 'cmd': cmd, 'obj': obj, 'size': $("#nclust").val(),
+                   'awsinfovol': $("#awsvoldb").val(), 'awsvolspec': JSON.stringify(awsvolspec),
+                   'alt_img': $("#gvip_img").val().trim()},
 	    error: function() {
 		alert("Timeout or unexpected error occurred while starting Amazon resource '"+obj+"'.");
 	    },
@@ -2800,7 +2812,7 @@ function download(filename, text) {
     <div id="gvip_img0" class="subhead tdindentd"><p>GenomeVIP Amazon Machine Image (AMI)</p></div>
        <p><br></p> 
        <div id="gvip_img_div" class="tdindent"></div> 
-    <p class="tdindent">Enter alternative GenomeVIP AMI to use instead:&nbsp;<input type="text" id="gvip_img" name="gvip_img" value=""/></p>
+    <p class="tdindent">Enter alternative GenomeVIP AMI to use instead:&nbsp;<input type="text" id="gvip_img" name="gvip_img" value=""/><img class="inline" title="Format is 'ami-' followed by 8 alphanumeric characters." src="image/Help.png"</img>&nbsp;</p>
        <p><br></p>
      </div>
      
