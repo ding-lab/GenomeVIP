@@ -218,7 +218,7 @@ function check_has_dup() {
 }
 
 
-function validateform(){ 
+function validateform( bSubmit ){ 
     var numerr = 0;
 
     // computing target
@@ -226,9 +226,17 @@ function validateform(){
 	alert ("Please specify a computing resource under Accounts in the navigational menu.");
 	numerr++; return false;
     }
-    if ( $("#login_local").is(':checked') && ( $("#un").val().length < 1 || $("#pw").val().length < 1 )) {
-	alert ("Please provide username and password.");
-	numerr++; return false;
+    if ( $("#login_local").is(':checked') ) {
+	if ( $("#un").val().trim().length < 1 || $("#pw").val().trim().length < 1  || $('#clust_gw').val().trim().length < 1) {
+	    alert ("Please make sure username, passphrase, and remote hostname are provided under Accounts!");
+	    numerr++; return false;
+	}
+	if( bSubmit &&  $("#subactionR").is(':checked')) {
+	    if ( $('#clust_qn').val().trim().length < 1 ) {
+		alert("Please provide a queue name under Accounts!");
+		numerr++; return false;
+	    }
+	}
     }
 
     var bRunning=0;
@@ -1139,7 +1147,7 @@ function download(filename, text) {
 
 
 	      </tr><tr>  
-		<td>Submission host:</td>
+		<td>Remote host:</td>
 		<td><input type="text" class="tb1" id="clust_gw" name="clust_gw">&nbsp;<img src="image/Help.png" class="inline" title="Enter remote hostname for accessing files and submitting jobs. (Try an IP address instead of a hostname if necessary.)"></td>
 	      </tr><tr>
 		<td>Queue name:</td>
@@ -2742,10 +2750,10 @@ function download(filename, text) {
 	   <td align="center"><input type="button" id="Preview" name="Preview" value="Preview" onclick="preview_ep(0);"/></td>
     <td>Preview execution profile (or, download <input type='button' value='here' id='do_downbox'>)</td>
 	 </tr><tr>
-	   <td align="center"><input type="button" id="Validate" name="Validate" value="Validate" onclick="var a=validateform();"/></td>
+	   <td align="center"><input type="button" id="Validate" name="Validate" value="Validate" onclick="var a=validateform(0);"/></td>
 	   <td>Validate user settings</td>
 	 </tr><tr>
-	   <td align="center"><input type="button" id="Submit" name="Submit" value="Submit" onclick="var a=validateform();if(a==true){do_sub();}"/></td>
+	   <td align="center"><input type="button" id="Submit" name="Submit" value="Submit" onclick="var a=validateform(1);if(a==true){do_sub();}"/></td>
 	   <td>Run the current configuration</td>
  	 </tr><tr>
 	   <td><p><br></p></td>
@@ -3222,7 +3230,7 @@ $("#apply_vol_lists").click(function () {
 
 $("#list_files_btn2").click(function () {
     if( $('#un').val().trim().length == 0 ||   $('#pw').val().trim().length == 0 ||   $('#clust_gw').val().trim().length == 0 ) {
-	alert("Please make sure username, passphrase, and queue host are provided under Accounts!");
+	alert("Please make sure username, passphrase, and remote hostname are provided under Accounts!");
 	return false;
     }
     var filepaths=[];
