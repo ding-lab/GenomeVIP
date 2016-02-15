@@ -2824,7 +2824,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp,"echo Preparing Strelka...\n");
     fwrite($fp, "cd \$RUNDIR/strelka\n");
     gen_strelka_ini($fp, "strelka.ini", $strlk_opts);
-    fwrite($fp, "\\\$put_cmd \$RUNDIR/strelka/strelka.ini \$RESULTSDIR/strelka.ini\n"); // deld tool
+    fwrite($fp, "\$put_cmd \$RUNDIR/strelka/strelka.ini \$RESULTSDIR/strelka.ini\n"); // deld tool
 
     fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
     fwrite($fp,"echo    Preparing group \$gp of \$((numgps - 1))...\n");
