@@ -1,8 +1,9 @@
 #!/usr/bin/perl -w 
 #----------------------------------
 # @name GenomeVIP VEP annotator script
-# @version
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
+# @version 0.2: allow VEP options to be passed
+# @version 0.1: original version
 #--------------------------------------
 use strict;
 use warnings;
@@ -17,8 +18,12 @@ use File::Temp qw/ tempfile /;
 
 # get paras from config file
 my (%paras);
-map {chomp;  if(!/^[#;]/ && /=/) { @_ = split /=/; $_[1] =~ s/ //g; my $v = $_[1]; print $v."\n";  $_[0] =~ s/ //g; $paras{ (split /\./, $_[0])[-1] } = $v } } (<>);
+map {chomp;  if(!/^[#;]/ && /=/) { @_ = split /=/; $_[1] =~ s/^\s+//;  $_[1] =~ s/\s+$//; my $v = $_[1]; print $v."\n";  $_[0] =~ s/ //g; $paras{ (split /\./, $_[0])[-1] } = $v } } (<>);
  map { print; print "\t"; print $paras{$_}; print "\n" } keys %paras;
+
+# check if options are present
+my $opts="";
+if( exists($paras{'vep_opts'}) ) { $opts = $paras{'vep_opts'} };
 
 my $cmd="";
 
@@ -29,7 +34,7 @@ $cmd="/bin/grep -v ^# $paras{'vcf'} > $tmp_orig_calls";
 
 # run vep
 my (undef, $tmp_vep_out) = tempfile();
-$cmd = "perl $paras{'vep_cmd'} --database --offline --cache --dir $paras{'cachedir'} --assembly $paras{'assembly'} --fork 4 --format vcf --vcf -i $tmp_orig_calls -o $tmp_vep_out --force_overwrite  --fasta $paras{'reffasta'}";
+$cmd = "perl $paras{'vep_cmd'} $opts --database --offline --cache --dir $paras{'cachedir'} --assembly $paras{'assembly'} --fork 4 --format vcf --vcf -i $tmp_orig_calls -o $tmp_vep_out --force_overwrite  --fasta $paras{'reffasta'}";
    system($cmd);
 
 # re-merge headers and move

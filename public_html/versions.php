@@ -9,7 +9,7 @@ ini_set('display_errors',1);
 error_reporting(E_ALL & ~E_DEPRECATED);
 
 // GenomeVIP versioning
-$gvip_version      = "1.1.1+";
+$gvip_version      = "1.1.1+ commit_a54a13a";
 $genomevip_imageID = "ami-05f5b16f";
 
 // Tool versioning
