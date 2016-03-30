@@ -437,6 +437,7 @@ function write_strlk_merge($fp, $callset, $strlk_dbsnp_filter_prefix, $strlk_fpf
 function write_vep_input_common($fp, $prefix) {
   global $toolsinfo_h;
   fwrite($fp, "$prefix.vep_cmd = ".$toolsinfo_h[$_POST['vep_version']]['installdir']."/".$toolsinfo_h[$_POST['vep_version']]['relpath']."/".$toolsinfo_h[$_POST['vep_version']]['vep_exe']."\n");
+  fwrite($fp, "$prefix.vep_opts = --everything\n");
   fwrite($fp, "$prefix.cachedir = ".$toolsinfo_h[$_POST['vep_version']]['installdir']."/".$toolsinfo_h[$_POST['vep_version']]['cache_relpath']."\n");
   fwrite($fp, "$prefix.reffasta = ".$toolsinfo_h[$_POST['vep_version']]['installdir']."/".$toolsinfo_h[$_POST['vep_version']]['fasta_relpath']."/".$toolsinfo_h[$_POST['vep_version']]['reffasta']."\n");
   fwrite($fp, "$prefix.assembly = ".$toolsinfo_h[$_POST['vep_version']]['assembly']."\n");
@@ -2017,7 +2018,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
       // configure memory
-      $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      if (isset($_POST['vep_cmd'])) {
+	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
+      }	else {
+	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      }
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_vs.vs_gl.group\$gp.$wc".$batch['dep_opt_post'];
       $job_name = $batch['name_opt']." "."vs_postrun.group\$gp";
       $ERRARG = "-e ./stderr.varscan.group\$gp.postrun";
@@ -2439,7 +2444,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
       // configure memory
-      $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      if (isset($_POST['vep_cmd'])) {
+	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
+      }	else {
+	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      }
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_vs.vs_som.group\$gp".$batch['dep_opt_post'];
       $job_name = $batch['name_opt']." "."vs_postrun.group\$gp";
       $ERRARG = "-e ./stderr.varscan.group\$gp.postrun";
@@ -2777,7 +2786,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
       // configure memory
-      $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      if (isset($_POST['vep_cmd'])) {
+	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
+      }	else {
+	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      }
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_vs.vs_trio.group\$gp".$batch['dep_opt_post'];
       $job_name = $batch['name_opt']." "."vs_postrun.group\$gp";
       $ERRARG = "-e ./stderr.varscan.group\$gp.postrun";
@@ -3072,7 +3085,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       }
 
       fwrite($fp, "cd \$RUNDIR/strelka/group\$gp ;  chmod +x ./strelka_postrun.sh\n");
-      $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      if (isset($_POST['vep_cmd'])) {
+	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
+      }	else {
+	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+      }
       // TODO
       $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_strlk.strelka.group\$gp".$batch['dep_opt_post'];
       $job_name = $batch['name_opt']." "."strelka_postrun.group\$gp";
@@ -3868,6 +3885,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "cd \$RUNDIR/pindel/group\$gp ; chmod +x ./pindel_postrun.sh\n");
     $tmp_mem = $toolmem_h['pindel']['mem_p2v'];
 
+    if (isset($_POST['vep_cmd'])) {
+      $mem_opt = max( $mem_opt, $toolmem_h['vep']['mem_default'] );
+    }
     $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_pin.pindel.group\$gp.$wc".$batch['dep_opt_post'];
 
     $job_name = $batch['name_opt']." "."pindel_postrun.group\$gp";

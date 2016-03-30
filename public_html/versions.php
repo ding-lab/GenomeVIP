@@ -9,7 +9,7 @@ ini_set('display_errors',1);
 error_reporting(E_ALL & ~E_DEPRECATED);
 
 // GenomeVIP versioning
-$gvip_version      = "1.1.1+ commit_a54a13a";
+$gvip_version      = "1.2-dev";
 $genomevip_imageID = "ami-05f5b16f";
 
 // Tool versioning
@@ -25,9 +25,9 @@ $bd_ver_map = array(
 		    );
 
 $pin_ver_map = array(
-		     "pindel025a7"   => "0.2.5a7",
 		     "pindel025b5"   => "0.2.5b5",
 		     "pindel025b6"   => "0.2.5b6",
+		     "pindel025b8"   => "0.2.5b8",
 		     );
 $gs_ver_map = array(
 		    "gs1_04_1441"  => "1.04.1441",

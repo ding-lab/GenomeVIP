@@ -29,16 +29,16 @@ exe=bam2cfg
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/breakdancer/1.4.5
 exe=breakdancer-max
 
-[pindel025a7]
-path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/pindel/0.2.5a7
-exe=pindel
-
 [pindel025b5]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/pindel/0.2.5b5
 exe=pindel
 
 [pindel025b6]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/pindel/0.2.5b6
+exe=pindel
+
+[pindel025b8]
+path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/pindel/0.2.5b8
 exe=pindel
 
 ;[s3cmd]
@@ -66,19 +66,27 @@ path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/bam-readcount/0.7.4
 exe=bam-readcount
 
 [snpsift]
-path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/snpEff/20150522
+path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/snpEff/4.2
 exe=SnpSift.jar
 
 [vcftools]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/vcftools/0.1.12b/bin
 
-[ncbi_grch37_snp142]
-path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/dbSNP/NCBI/snp142/GRCh37
-file=00-All.brief.vcf
+[ncbi_grch37p13_snp142]
+path=/gscmnt/gc2525/dinglab/rmashl/Reference/dbSNP/ncbi_grch37p13_snp142/qc
+file=00-All.vcf.gz
+
+[ncbi_grch37p13_snp146]
+path=/gscmnt/gc2525/dinglab/rmashl/Reference/dbSNP/ncbi_grch37p13_snp146/qc
+file=00-All.vcf.gz
 
 [ncbi_grch38_snp142]
-path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/dbSNP/NCBI/snp142/GRCh38
-file=00-All.brief.vcf
+path=/gscmnt/gc2525/dinglab/rmashl/Reference/dbSNP/ncbi_grch38_snp142/qc
+file=00-All.vcf.gz
+
+[ncbi_grch38p2_snp146]
+path=/gscmnt/gc2525/dinglab/rmashl/Reference/dbSNP/ncbi_grch38p2_snp146/qc
+file=00-All.vcf.gz
 
 [vep81_grch37_hsapiens]
 installdir=/gscmnt/gc2525/dinglab/rmashl/Software/bin/VEP/v81
@@ -88,3 +96,12 @@ cache_relpath=cache
 fasta_relpath=cache/homo_sapiens/81_GRCh37
 reffasta=Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
 assembly=GRCh37
+
+[vep81_grch38_hsapiens]
+installdir=/gscmnt/gc2525/dinglab/rmashl/Software/bin/VEP/v81
+relpath=ensembl-tools-release-81/scripts/variant_effect_predictor
+vep_exe=variant_effect_predictor.pl 
+cache_relpath=cache
+fasta_relpath=cache/homo_sapiens/81_GRCh38
+reffasta=Homo_sapiens.GRCh38.dna.primary_assembly.fa
+assembly=GRCh38

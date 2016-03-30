@@ -54,3 +54,6 @@ mem_default=2600
 mem_min=2600
 mem_max=4000
 ncpu=4
+
+[vep]
+mem_default=3072
