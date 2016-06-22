@@ -9,7 +9,7 @@ version=1.7.0_80-x64
 exe=java
 opts="\"-Xms256m -Xmx512m\""
 
-[java18]
+[java]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/jre/1.8.0_92_x64
 version=1.8.0_92_x64
 exe=java
@@ -94,6 +94,13 @@ file=00-All.vcf.gz
 [ncbi_grch38p2_snp146]
 path=/gscmnt/gc2525/dinglab/rmashl/Reference/dbSNP/ncbi_grch38p2_snp146/qc
 file=00-All.vcf.gz
+
+[clinvar_37]
+path=/gscmnt/gc2525/dinglab/rmashl/Software/src/ClinVar/GRCh37/20160302
+
+[clinvar_38]
+path=/gscmnt/gc2525/dinglab/rmashl/Software/src/ClinVar/GRCh38/20160302
+
 
 [vep81_grch37_hsapiens]
 installdir=/gscmnt/gc2525/dinglab/rmashl/Software/bin/VEP/v81
