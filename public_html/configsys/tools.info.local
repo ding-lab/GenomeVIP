@@ -3,9 +3,15 @@ path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/samtools/1.2/bin
 version=1.2
 exe=samtools
 
-[java]
-path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/jre/1.8.0_60_x64
-version=1.8.0_60_x64
+[java17]
+path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/jre/1.7.0_80-x64
+version=1.7.0_80-x64
+exe=java
+opts="\"-Xms256m -Xmx512m\""
+
+[java18]
+path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/jre/1.8.0_92_x64
+version=1.8.0_92_x64
 exe=java
 opts="\"-Xms256m -Xmx512m\""
 
@@ -70,7 +76,8 @@ path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/snpEff/4.2
 exe=SnpSift.jar
 
 [vcftools]
-path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/vcftools/0.1.12b/bin
+path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/vcftools/0.1.14/bin
+perllibpath=/gscmnt/gc2525/dinglab/rmashl/Software/bin/vcftools/0.1.14/lib/perl5
 
 [ncbi_grch37p13_snp142]
 path=/gscmnt/gc2525/dinglab/rmashl/Reference/dbSNP/ncbi_grch37p13_snp142/qc
