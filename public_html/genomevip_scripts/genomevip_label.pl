@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # ---------------------
 # @name GenomeVIP utility to annotate with variant calling tool program
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # ---------------------
 # @name GenomeVIP utility to split VarScan somatic calls
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>

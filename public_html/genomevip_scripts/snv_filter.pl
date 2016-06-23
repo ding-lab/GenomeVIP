@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #----------------------------------
 # @name GenomeVIP SNVs false-positives filter using VarScan
 # @author Beifang Niu 

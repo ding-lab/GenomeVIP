@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w 
+#!/usr/bin/env perl 
 # ---------------------
 # @name GenomeVIP utility script for VarScan trios
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>

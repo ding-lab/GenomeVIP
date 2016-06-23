@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w 
+#!/usr/bin/env perl 
 #----------------------------------
 # @name GenomeVIP VEP annotator script
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>

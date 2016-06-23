@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # ---------------------
 # @name GenomeVIP utility to extract 'other' calls from varscan
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>

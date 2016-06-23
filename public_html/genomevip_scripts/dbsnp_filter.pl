@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w 
+#!/usr/bin/env perl
 #----------------------------------
 # @name GenomeVIP dbSNP annotation and filtering script
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
