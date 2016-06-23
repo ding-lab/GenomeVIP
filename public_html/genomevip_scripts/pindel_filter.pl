@@ -4,7 +4,8 @@
 # @author Beifang Niu
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
 # 
-# @version 0.4 (rjm): pass (optionally) and append to log file
+# @version 0.5 (rjm): improve documentation
+# @version 0.4 (rjm): (optional) user-specified log file for appending; mode not required to be specified when not performing filtering
 # @version 0.3 (rjm): generalize filter hierarchy filename handling and simply code structure
 # @version 0.2 (rjm): added coverage, germline, trio, minimal pool filtering; revised approach; added failed pass. Adjusted filename and parameters names; allow for commented lines
 # @version 0.1 (bn):  original somatic filter, written for (tumor,normal) column order
@@ -21,7 +22,7 @@ use POSIX qw( WIFEXITED );
 use File::Temp qw/ tempfile /;
 
 
-my $zero=0.01;
+my $zero=0.001;
 
 my $thisdir;
 $thisdir=`dirname $ARGV[0]`;
@@ -31,7 +32,7 @@ chomp $thisdir;
 my %paras; 
 map { chomp; if ( !/^[#;]/ &&  /=/) { @_ = split /=/; $_[1] =~ s/ //g; my $v = $_[1]; $_[0] =~ s/ //g; $paras{ (split /\./, $_[0])[-1] } = $v } } (<>);
 #map { print; print "\t"; print $paras{$_}; print "\n" } keys %paras;
-if ( ! exists($paras{'mode'})) { die "Could not detect a filtering mode !!!\n"; }
+if( $paras{'apply_filter'} eq "true" &&  !exists($paras{'mode'}) ) { die "Could not detect a filtering mode for filtering !!!\n"; }
 # file exist ? 
 unless ( -e $paras{'variants_file'} ) { die "input indels not exist !!! \n"; }
 
@@ -68,7 +69,24 @@ if ($paras{'apply_filter'} eq "true"  &&  $paras{'mode'} ne "pooled") {
     $filter1_fail_fh = IO::File->new( "$var_file.$filter1_prefix{'fail'}",  ">" ) or die "Could not create $var_file.$filter1_prefix{'fail'} for writing $!";
 
 
-    if ($paras{'mode'} eq "germline") {   # germline
+# Pindel column output
+# Ref: http://seqanswers.com/forums/showthread.php?t=41121
+# Ref: http://gmt.genome.wustl.edu/packages/pindel/user-manual.html
+#
+# In terms of 0-based numbering for three samples:
+#SampleID RefSupportingLeft RefSupportingRight AltSupportingLeft AltSupportingLeftUnique AltSupportingRight AltSupportingRightUnique
+#   31          32               33                 34                    35                    36                  37
+#   38          39               40                 41                    42                    43                  44
+#   45          46               47                 48                    49                    50                  51
+
+    
+# Pindel's genotyping code takes the total reference support as max($t[32],$t[33]), etc. It may be that pindel is counting 
+# lefts and rights separately so as to avoid misrepresenting total depth at a given location where left and right read fragments 
+# happen to overlap at that location. In the VAF calculations below, we implicity use ref support = avg($t[32],$t[33]).
+
+    # Germline filtering options:
+    # minimum coverage, VAF threshold, reads are considered balanced as long as there is nonzero read support in both directions
+    if ($paras{'mode'} eq "germline") {
 	while (<$input_fh>) {
 	    chomp; 
 	    my @t = split /\s+/;
@@ -90,7 +108,10 @@ if ($paras{'apply_filter'} eq "true"  &&  $paras{'mode'} ne "pooled") {
 	}
     }
 
-    if ($paras{'mode'} eq "somatic") {   # somatic: note sample column order is tumor/normal
+    # Somatic filtering options:
+    # This calculation assumes sample column order is tumor/normal, as done in GenomeVIP.
+    # minimum coverage met for both samples; VAF threshold in tumor; zero variant support in normal; reads are considered balanced as long as there is nonzero read support in both directions in tumor
+    if ($paras{'mode'} eq "somatic") {
 	while (<$input_fh>) {
 	    chomp; 
 	    my @t = split /\s+/;
@@ -124,8 +145,10 @@ if ($paras{'apply_filter'} eq "true"  &&  $paras{'mode'} ne "pooled") {
     }
     
 
-
-    if ($paras{'mode'} eq "trio") {   # trio: note sample column order is parent/parent/child
+    # Trio filtering options:
+    # This calculation assumes sample column order is parent/parent/child, as done in GenomeVIP.
+    # minimum coverage met for all samples; VAF threshold in child; maximum allowed variant support in parents combined; reads are considered balanced as long as there is nonzero read support in both directions in child
+    if ($paras{'mode'} eq "trio") {   # trio
 	while (<$input_fh>) {
 	    chomp; 
 	    my @t = split /\s+/;
