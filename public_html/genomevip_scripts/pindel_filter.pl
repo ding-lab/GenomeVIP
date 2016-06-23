@@ -4,6 +4,7 @@
 # @author Beifang Niu
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
 # 
+# @version 0.4 (rjm): pass (optionally) and append to log file
 # @version 0.3 (rjm): generalize filter hierarchy filename handling and simply code structure
 # @version 0.2 (rjm): added coverage, germline, trio, minimal pool filtering; revised approach; added failed pass. Adjusted filename and parameters names; allow for commented lines
 # @version 0.1 (bn):  original somatic filter, written for (tumor,normal) column order
@@ -89,7 +90,7 @@ if ($paras{'apply_filter'} eq "true"  &&  $paras{'mode'} ne "pooled") {
 	}
     }
 
-    if ($paras{'mode'} eq "somatic") {   # somatic
+    if ($paras{'mode'} eq "somatic") {   # somatic: note sample column order is tumor/normal
 	while (<$input_fh>) {
 	    chomp; 
 	    my @t = split /\s+/;
@@ -124,7 +125,7 @@ if ($paras{'apply_filter'} eq "true"  &&  $paras{'mode'} ne "pooled") {
     
 
 
-    if ($paras{'mode'} eq "trio") {   # trio
+    if ($paras{'mode'} eq "trio") {   # trio: note sample column order is parent/parent/child
 	while (<$input_fh>) {
 	    chomp; 
 	    my @t = split /\s+/;
@@ -173,7 +174,10 @@ if ($paras{'apply_filter'} eq "true" && $paras{'mode'} ne "pooled") { # only cas
     $var_src  = "$var_file";
     $var_dest = "$var_file.vcf";
 }
-$pindel2vcf_command = "$paras{'pindel2vcf'} -r $paras{'REF'} -R $ref_base -p $var_src -d $paras{'date'} -v $var_dest -he $paras{'heterozyg_min_var_allele_freq'} -ho $paras{'homozyg_min_var_allele_freq'} 2> $thisdir/log.pindel2vcf";
+my $logfile="pindel2vcf.log";
+if(exists($paras{'logfile'})) { $logfile=$paras{'logfile'}; }
+# NOTE: pindel -co option seems to work on vcf output but warning messages may happend regardless
+$pindel2vcf_command = "$paras{'pindel2vcf'} -r $paras{'REF'} -R $ref_base -p $var_src -d $paras{'date'} -v $var_dest -he $paras{'heterozyg_min_var_allele_freq'} -ho $paras{'homozyg_min_var_allele_freq'}  >> $thisdir/$logfile 2>&1";
 # print $pindel2vcf_command."\n";
 $result = system( $pindel2vcf_command );
 
