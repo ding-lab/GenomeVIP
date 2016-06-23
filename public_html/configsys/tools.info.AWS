@@ -33,10 +33,6 @@ exe=breakdancer-max
 path=/usr/local/bin/pindel/0.2.5b5
 exe=pindel
 
-[pindel025b6]	
-path=/usr/local/bin/pindel/0.2.5b6
-exe=pindel
-
 [pindel025b8]	
 path=/usr/local/bin/pindel/0.2.5b8
 exe=pindel
