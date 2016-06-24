@@ -25,8 +25,6 @@ $bd_ver_map = array(
 		    );
 
 $pin_ver_map = array(
-		     "pindel025b5"   => "0.2.5b5",
-		     "pindel025b6"   => "0.2.5b6",
 		     "pindel025b8"   => "0.2.5b8",
 		     );
 $gs_ver_map = array(

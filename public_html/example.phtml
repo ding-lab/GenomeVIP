@@ -816,7 +816,12 @@ function apply_profile(results) {
 		} else if ($("[name="+ k +"]").is("input:radio")) {
  		    $("[name="+k+"][value="+v+"]").prop('checked',true).trigger('change');
 		} else if ($("[name="+ k +"]").is("input:text") || $("[name="+ k +"]").is("input:hidden") || $("[name="+ k +"]").is("select") ) {
-		    $("[name="+k+"]").val(results[i]['v']); 
+		  // notify of pindel version 
+		  if (k == "pin_version" && v != "pindel025b8") {
+		    alert("Pindel version '"+v+"' is not supported. Substituting with version 0.2.5b8.");
+		    v = "pindel025b8";
+		  }
+		  $("[name="+k+"]").val(results[i]['v']); 
 		    
 		} else {
 		    alert("Error: Profile key "+k_orig+" is not recognized. Please check the configuration.");
@@ -2180,8 +2185,6 @@ function download(filename, text) {
        <input type="checkbox" id="pindel_cmd" name="pin_cmd"><label for="pindel_cmd">Run Pindel</label>
        <select name="pin_version">
 	 <option class="menu1" value="pindel025b8">version 0.2.5b8</option>
-	 <option class="menu1" value="pindel025b6">version 0.2.5b6</option>
-	 <option class="menu1" value="pindel025b5">version 0.2.5b5 (42aa4fb293)</option>
        </select>
        <br><br><br>
 	 
