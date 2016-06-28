@@ -333,13 +333,13 @@ function validateform( bSubmit ){
 	    if(chr_str_fail("bder_chrdef_str","BreakDancer")==true) { alert("The user-input genomic region for BreakDancer is invalid."); numerr++; return false; }
 	}
     }
-    if ( $("#pindels_cmd").is(':checked')) {
+    if ( $("#pindel_cmd").is(':checked')) {
 	if( $("#pindel_chrdef2").is(':checked')) { // user
 	    if(chr_str_fail("pin_chrdef_str","Pindel")==true) { alert("The user-input genomic region for Pindel is invalid."); numerr++; return false; }
 	}
     }
     if ( $("#gs_cmd").is(':checked')) {
-	if( $("#vs_chrdef2").is(':checked')) { // user
+	if( $("#gs_chrdef2").is(':checked')) { // user
 	    if(chr_str_fail("gs_chrdef_str","GenomeSTRiP")==true) { alert("The user-input genomic region for GenomeSTRiP is invalid."); numerr++; return false; }
 	}
     }
