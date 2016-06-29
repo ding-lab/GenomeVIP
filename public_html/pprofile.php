@@ -23,6 +23,7 @@ array_push($pp, "$prefix.created = ".date(DATE_ISO8601)."\n");
 array_push($pp, "$prefix.version = $gvip_version\n");
 array_push($pp, "\n");
 
+if( isset($_POST['compute_target']) || array_key_exists('compute_target', $_POST) ){
 $thetools = array();
 array_push($pp, "; Supporting tools (global)\n");
 if ($_POST['compute_target']=="AWS") {
@@ -34,7 +35,7 @@ array_push($pp, "; samtools.version = ".$thetools['samtools']['version']."\n");
 array_push($pp, "; java.version = ".$thetools['java']['version']."\n");
 array_push($pp, "\n");
 unset($thetools);
-
+}
 
 if (isset($_POST['vs_cmd'])) {
   $prefix="varscan";
