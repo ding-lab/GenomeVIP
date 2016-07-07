@@ -4,6 +4,7 @@
 # @author Beifang Niu 
 # @author R. Jay Mashl <rmashl@genome.wustl.edu>
 # 
+# @version 0.6 (rjm): make pass test explicit for extensibility
 # @version 0.5 (rjm): workaround for stat on AWS
 # @version 0.4 (rjm): handle zero-input case
 # @version 0.3 (rjm): adjust filenames and parameter names; allow for commented lines
@@ -68,7 +69,8 @@ if( $fs !=  0)  {
 	    $input_fh_passed->print($_);
 	    $input_fh_failed->print($_);
 	} else {
-	    if ( /PASS/ ) {
+	    my @a = split /\t/;
+	    if ( $a[6] eq "PASS" || $a[6] eq "." ) { # dot option is for gatk
 		$input_fh_passed->print($_);
 	    } else {
 		$input_fh_failed->print($_);
