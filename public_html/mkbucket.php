@@ -7,7 +7,7 @@
 
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-  $cfg = trim($_POST['cfg']);
+  $cfg = "/tmp/".$_POST['cfg'].".s3cfg";
   $b   = trim($_POST['b']);
 
   $toolsinfo_server=parse_ini_file("configsys/tools.info.server",true);
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   if(! preg_match('/^[0-9a-zA-Z_]+$/', $b)) {
     echo "INVALID";
   } else {
-    $cmd = "$s3cmd -c $cfg mb s3://$b 2>&1";
+    $cmd = "$s3cmd -c $cfg mb s3://$b";
     $log =shell_exec($cmd);
     if(preg_match('/created\s+$/',$log)){
       echo "OK";
