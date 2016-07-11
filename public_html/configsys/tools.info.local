@@ -17,6 +17,10 @@ exe=VarScan.jar
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/varscan/2.3.9
 exe=VarScan.jar
 
+[gatk35]
+path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/gatk/3.5
+exe=GenomeAnalysisTK.jar
+
 [strlk1014]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/strelka/1.0.14/bin
 exe=configureStrelkaWorkflow.pl

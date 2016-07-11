@@ -1,6 +1,7 @@
 [config]
 varscan.cmd="true"
 varscan.call_mode="somatic"
+gatk.cmd="false"
 strelka.cmd="true"
 breakdancer.cmd="true"
 breakdancer.call_mode="somatic"

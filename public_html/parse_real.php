@@ -417,6 +417,23 @@ function write_vs_trio_merge($fp, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix,
   fwrite($fp, "fi\n");
 }
 
+function write_gatk_merge($fp, $gatk_dbsnp_filter_prefix, $gatk_fpfilter_prefix) {
+  $vartype="snv";
+  $suffix = "gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass'].$gatk_fpfilter_prefix[$vartype]['pass']."vcf";
+  $find_cmd  = "find . -size +0c -iname  gatk.out.*.$vartype.$suffix  >  ./\\\$outlist";
+  fwrite($fp, "$find_cmd\n");
+  $vartype="indel";
+  $suffix = "gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass'].$gatk_fpfilter_prefix[$vartype]['pass']."vcf";
+  $find_cmd  = "find . -size +0c -iname  gatk.out.*.$vartype.$suffix  >>  ./\\\$outlist";
+  fwrite($fp, "$find_cmd\n");
+  fwrite($fp, "if [ -s ./\\\$outlist ] ; then\n");
+  fwrite($fp, "   \\\$VCFTOOLSDIR/bin/vcf-concat -f ./\\\$outlist | \\\$VCFTOOLSDIR/bin/vcf-sort -c  > ./gatk.out.group\$gp.all.current_final.gvip.vcf\n");
+  fwrite($fp, "else\n");
+  fwrite($fp, "   touch ./gatk.out.group\$gp.all.current_final.gvip.vcf\n");
+  fwrite($fp, "fi\n");
+}
+
+
 function write_strlk_merge($fp, $callset, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix) {
   $vartype="snv";
   $suffix = "$callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass'].$strlk_fpfilter_prefix[$vartype]['pass']."vcf"; 
@@ -443,7 +460,19 @@ function write_vep_input_common($fp, $prefix) {
   fwrite($fp, "$prefix.assembly = ".$toolsinfo_h[$_POST['vep_version']]['assembly']."\n");
 }
 
-      
+// Wait for file creation
+function write_wait_func($fp) {
+  fwrite($fp, "wait_file() {\n");
+  fwrite($fp, "   local file=\"\\\$1\"; shift\n");
+  fwrite($fp, "   local duration=\"\\\${1:-30}\"; shift  #30 attempts default\n");
+  fwrite($fp, "   until test \\\$((duration--)) -eq 0 -o -f \"\\\$file\" ; do\n");
+  fwrite($fp, "      echo Waiting for file \\\$file\n");
+  fwrite($fp, "      sleep 2\n");
+  fwrite($fp, "   done\n");
+  fwrite($fp, "   ((++duration))\n");
+  fwrite($fp, "}\n");
+}
+
 
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
@@ -569,7 +598,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $s3_action="\$get_cmd";
     $action="ln -s";
     break;
-    
+
   case "local":
     $RUNDIR     = "$workdir";
     $RWORKDIR   = "\$RUNDIR";
@@ -588,14 +617,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   fwrite($fp, "RESULTSDIR=$RESULTSDIR\n");
   fwrite($fp, "STATUSDIR=$STATUSDIR\n");
 
-  fwrite($fp, "mkdir -p \$RUNDIR/{genomes,reference} \$RESULTSDIR \$STATUSDIR\n");
-  fwrite($fp, "touch \$STATUSDIR/Tasks_left\n");
 
-  //  if ($compute_target=="local") {
-  //    fwrite($fp, "mkdir -p \$STATUSDIR\n");
-  //  }
-  
-  
   // --------------------------------------------------------------------------------
   // Utility functions:  moved to bam_util.php
   // --------------------------------------------------------------------------------
@@ -605,10 +627,30 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     write_check_aws_file_int($fp);
   }
 
+  if(isset($_POST['gatk_cmd'])) {
+    if ($compute_target=="AWS") {
+      fwrite($fp, "GATK_REMOTE=".$_POST['gatk_aws_jarpath']."\n");
+      fwrite($fp, "export GATK_DIR=\$RUNDIR/gatk\n");
+      fwrite($fp, "export GATK_EXE=".basename($_POST['gatk_aws_jarpath'])."\n");
+      fwrite($fp, "mkdir -p \$GATK_DIR\n");
+      fwrite($fp, "echo Retrieving GATK...\n");
+      fwrite($fp, "msg=`$s3_action  \$GATK_REMOTE  \$GATK_DIR/\$GATK_EXE  2>&1`\n");
+      fwrite($fp, "check_aws_file \$msg \n");
+    } else {
+      fwrite($fp, "export GATK_DIR=".$toolsinfo_h[$_POST['gatk_version']]['path']."\n");
+      fwrite($fp, "export GATK_EXE=".$toolsinfo_h[$_POST['gatk_version']]['exe']."\n");
+    }
+  }
 
   // --------------------------------------------------------------------------------
   // Set up genomes
   // --------------------------------------------------------------------------------
+  fwrite($fp, "mkdir -p \$RUNDIR/{genomes,reference,status} \$RESULTSDIR\n");
+  fwrite($fp, "touch \$RUNDIR/status/Tasks_left\n");
+  if ($compute_target=="AWS") {
+    fwrite($fp, "\$put_cmd  \$RUNDIR/status/Tasks_left  \$STATUSDIR/\n");
+  }
+
   // Buffer output until we know if write_do_prep_bam() is needed
   $fp_buf = array();
   
@@ -886,6 +928,82 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
   } // end vs ref
 
+  // for gatk
+  if(isset($_POST['gatk_cmd'])) {
+    fwrite($fp, "# Check avail refs for gatk ref\n");
+    $bFound=0;
+    foreach ($typematch as $key => $value) {
+      switch ($key) {
+      case $IS_FA_GZ:    // "$stemref.fa.gz":
+      case $IS_FASTA_GZ: //"$stemref.fasta.gz":
+	$bFound=1;
+	list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+
+	// normal
+	fwrite($fp, "GATK_REF=$availref\n");
+	fwrite($fp, "if [[ ! -e  \$GATK_REF ]]; then\n");
+        if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	  fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$GATK_REF 2>&1`\n");
+	  fwrite($fp, "   check_aws_file \$msg \$GATK_REF\n");
+	} else {
+	  fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$GATK_REF  .\n");
+        }
+	fwrite($fp, "fi\n");
+
+	$DNAM_use[$pathid] = 1;
+	$retrieved[$availref] = $availref_type_h[$availref];
+	$retrieved_pathid[$availref] = $pathid;
+	fwrite($fp, "GATK_REF_fai=\${GATK_REF}.fai\n");
+	$GATK_REF = $availref;
+	$GATK_REF_fai = "$GATK_REF.fai";
+	handle_fai($fp, $hasfai, $GATK_REF_fai, "GATK_REF", $pathid, $action, $compute_target, $s3_action);
+	$retrieved[$GATK_REF_fai] = get_ref_type($GATK_REF_fai);
+	break 2;
+      }
+    }
+
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA:    //"$stemref.fa"
+	case $IS_FASTA: //"$stemref.fasta"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "GATK_REF=$availref\n");
+	  fwrite($fp, "if [[ ! -e  \$GATK_REF ]]; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GATK_REF  .\n");
+	  fwrite($fp, "fi\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+	  fwrite($fp, "GATK_REF_fai=\${GATK_REF}.fai\n");
+	  // TODO: tie into functions
+	  fwrite($fp, "if [[ ! -e  \$GATK_REF_fai ]]; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GATK_REF_fai  .\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fa.gz)\n");
+	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fasta.gz)\n");
+	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fa)\n");
+	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fasta)\n");
+	  fwrite($fp, "if [[ ! -e  \$mystem.dict  ]]; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$mystem.dict .\n");
+	  fwrite($fp, "fi\n");
+	  //
+	  $GATK_REF = $availref;
+	  $GATK_REF_fai = "$GATK_REF.fai";
+	  handle_fai($fp, $hasfai, $GATK_REF_fai, "GATK_REF", $pathid, $action, $compute_target, $s3_action);
+	  $retrieved[$GATK_REF_fai] = get_ref_type($GATK_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      fwrite($fp, "\nexit\n");
+      fwrite($fp, "# ERROR:  No compatible reference for gatk found.\n");
+      echo "ERROR:  No compatible reference for gatk found.<br>\n";
+    }
+  } // end gatk ref
 
 
   // for strelka
@@ -1635,10 +1753,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // Last chance to define samtools
   check_sam($fp);
   
-  // Save log
-  if ($compute_target=="AWS") {
-    fwrite($fp, "\$put_cmd  \$RUNDIR/status/Tasks_left  \$STATUSDIR/\n");
-  }
   fwrite($fp, "echo Preparing references...done\n");
   fwrite($fp, "\n");
   fwrite($fp, "#------------------------------\n");
@@ -1653,6 +1767,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		     "bd_cmd"     => "breakdancer",
 		     "pin_cmd"    => "pindel",
 		     "gs_cmd"     => "genomestrip",
+		     "gatk_cmd"   => "gatk",
 		     );
   foreach ($prog_cmds as $key => $value) {
     if(isset($_POST[$key])) {
@@ -2814,6 +2929,302 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
   } // if vs_cmd
+
+
+  // --------------------------------------------------------------------------------
+  // RUN GATK
+  // --------------------------------------------------------------------------------
+  if (isset($_POST['gatk_cmd'])) {
+    fwrite($fp, "#------------------------------\n");
+
+    $gatk_opts_cmd = "";
+
+    // Set user options
+    foreach ($gatk_opts as $tmpkey => $value) {
+      $key = "gatk_$tmpkey";
+      switch($key) {
+      case "gatk_remove_duplicates":
+      case "gatk_remove_unmapped":
+	if($_POST[$key] == "true" ) { $gatk_opts_cmd .= " ".$value." "; }
+        break;
+      case "gatk_min_emit_qual":
+      case "gatk_min_call_qual":
+	$gatk_opts_cmd .= " ".$value." ".$_POST[$key].".0"." ";	// floats recommended
+        break;
+      default:
+	$gatk_opts_cmd .= " ".$value." ".$_POST[$key];
+      }
+    }
+
+    // options (both on by default with this gatk module)
+    $gatk_bMap = array("snv" => 1, "indel" => 1);
+
+    // set up dirs and samples
+    write_sample_tuples($fp, $list_of_sorted_bams, "gatk", 1);
+
+    // Chromosome
+    write_chromosomes($fp,$_POST['gatk_chrdef'], "GATK_REF_fai", $_POST['gatk_chrdef_str'] );
+
+    fwrite($fp,"# gatk germline\n");
+    fwrite($fp,"echo Preparing GATK...\n");
+    fwrite($fp,"cd \$RUNDIR/gatk\n");
+    fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
+    fwrite($fp,"echo    Preparing group \$gp of \$((numgps - 1))...\n");
+
+    if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/group\$gp\n"); } // deld tool
+
+    fwrite($fp, "   statfile_gl_g=incomplete.gatk_postrun.group\$gp\n");
+    fwrite($fp, "   localstatus_gl_g=\$RUNDIR/status/\$statfile_gl_g\n");
+    fwrite($fp, "   touch \$localstatus_gl_g\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "   remotestatus_gl_g=\$STATUSDIR/\$statfile_gl_g\n");
+      fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_gl_g  \$remotestatus_gl_g\n");
+    }
+
+    fwrite($fp, "   tag_gatk=\$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 6 | head -n 1)\n");
+    fwrite($fp, "   for chr in \$SEQS; do\n");
+    fwrite($fp, "      chralt=\${chr/:/_}\n");
+    fwrite($fp, "      dir=group\$gp/\$chralt\n");
+    fwrite($fp, "      mkdir -p \$RUNDIR/gatk/\$dir\n");
+    fwrite($fp, "      cat > \$RUNDIR/gatk/\$dir/gatk.sh <<EOF\n");
+    write_vs_preamble($fp, $toolsinfo_h);
+    write_wait_func($fp);
+    fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
+    fwrite($fp, "export VARSCAN_DIR=".$toolsinfo_h['varscan238']['path']."\n"); // fpfilter uses varscan
+    fwrite($fp, "RUNDIR=\$RUNDIR\n");
+    fwrite($fp, "myRUNDIR=\$RUNDIR/gatk/group\$gp\n");
+    fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+    fwrite($fp, "myRWORKDIR=\$RWORKDIR/gatk/group\$gp\n");
+    fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
+    fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
+    fwrite($fp, "GATK_REF=\\\$RUNDIR/reference/$GATK_REF\n");
+    fwrite($fp, "GATK_DIR=\\\$RUNDIR/gatk\n");
+    fwrite($fp, "GATK_EXE=\$GATK_EXE\n");
+    fwrite($fp, "put_cmd=$put_cmd\n");
+    fwrite($fp, "del_cmd=$del_cmd\n");
+    fwrite($fp, "del_local=$del_local\n");
+    fwrite($fp, "statfile=incomplete.gatk.group\$gp.chr\$chralt\n");
+    fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
+    fwrite($fp, "touch \\\$localstatus\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
+      fwrite($fp, "\\\$put_cmd \\\$localstatus  \\\$remotestatus\n");
+    }
+    fwrite($fp, "cd \\\$RUNDIR/gatk/\$dir\n");
+
+    // Set up calcs
+    fwrite($fp, "outstem=gatk.out.group\$gp.chr\$chralt\n");
+
+
+    fwrite($fp, "log=gatk.log.group\$gp.chr\$chralt\n");
+    fwrite($fp, "BAMLIST=\\\$RUNDIR/gatk/group\$gp/bamfilelist.inp\n");
+    fwrite($fp, "BAMFILE=\\\$(awk 'NR==1{print}' \\\$BAMLIST)\n");
+    fwrite($fp, "java  \\\$JAVA_OPTS -jar \\\$GATK_DIR/\\\$GATK_EXE  -R \\\$GATK_REF  -T HaplotypeCaller -I \\\$BAMFILE -L \$chr  $gatk_opts_cmd  -o  \\\$outstem.raw.vcf   &> \\\$log\n");
+    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl GATK ./\\\$outstem.raw.vcf  ./\\\$outstem.gvip.vcf\n");
+    fwrite($fp, "wait_file ./\\\$outstem.raw.vcf.idx\n"); // frequently needed here
+    fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$GATK_DIR/\\\$GATK_EXE  -R \\\$GATK_REF  -T SelectVariants  -V  \\\$outstem.gvip.vcf   -o  \\\$outstem.snv.gvip.vcf    -selectType SNP -selectType MNP  &>>  \\\$log\n");
+    fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$GATK_DIR/\\\$GATK_EXE  -R \\\$GATK_REF  -T SelectVariants  -V  \\\$outstem.gvip.vcf   -o  \\\$outstem.indel.gvip.vcf  -selectType INDEL                &>>  \\\$log\n");
+    fwrite($fp, "\\\$del_local ./\\\$outstem.gvip.vcf ./*.idx\n");
+
+    // store raw results
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  ./\\\$log  ./\\\$outstem.*.vcf    \\\$myRWORKDIR/\n");
+    }
+
+    if($do_timing) {
+      fwrite($fp, "scr_tf=\`date +%s\`\n");
+      fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
+      fwrite($fp, "echo GVIP_TIMING_GATK_DISCOVERY=\\\$scr_t0,\\\$scr_dt\n");
+      //
+      fwrite($fp, "scr_t0=\\\$scr_tf\n");
+    }
+
+    // Run dbSNP filter
+    $gatk_dbsnp_filter_prefix['snv']['pass']   = "";
+    $gatk_dbsnp_filter_prefix['snv']['fail']   = "";
+    $gatk_dbsnp_filter_prefix['indel']['pass'] = "";
+    $gatk_dbsnp_filter_prefix['indel']['fail'] = "";
+    if (isset($_POST['gatk_apply_dbsnp_filter'])) {
+      foreach( array('snv','indel') as $vartype) {
+	$gatk_dbsnp_filter_prefix[$vartype]['pass'] = "dbsnp_pass.";
+	$gatk_dbsnp_filter_prefix[$vartype]['fail'] = "dbsnp_present.";
+	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/dbsnp_filter.pl  ./gatk_dbsnp_filter.$vartype.input\n");
+      }
+    }
+
+    // Run false-positives filter (only for snvs at this time)
+    $gatk_fpfilter_prefix['snv']['pass']   = "";
+    $gatk_fpfilter_prefix['snv']['fail']   = "";
+    $gatk_fpfilter_prefix['indel']['pass'] = "";
+    $gatk_fpfilter_prefix['indel']['fail'] = "";
+    if (isset($_POST['gatk_apply_false_positives_filter'])) {
+      $vartype="snv";
+      $gatk_fpfilter_prefix[$vartype]['pass'] = "fp_pass.";
+      $gatk_fpfilter_prefix[$vartype]['fail'] = "fp_fail.";
+      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/snv_filter.pl  ./gatk_fpfilter.$vartype.input\n");
+      if( isset($_POST['gatk_apply_dbsnp_filter'])) {
+	fwrite($fp, "\\\$del_local  ./gatk.out.group\$gp.chr\$chralt.gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+      }
+    }
+
+
+    if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
+    // store results
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  ./gatk.log.* ./gatk.*.vcf  ./*.input \\\$myRWORKDIR/\n");
+    }
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus\n");
+    }
+    fwrite($fp, "\\\$del_local \\\$localstatus\n");
+
+
+    if($do_timing) {
+      fwrite($fp, "scr_tf=\`date +%s\`\n");
+      fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
+      fwrite($fp, "echo GVIP_TIMING_GATK_FILTERING=\\\$scr_t0,\\\$scr_dt\n");
+    }
+    if($compute_target=="AWS") { fwrite($fp, "$sgemem_cmd\n"); }
+    fwrite($fp,"EOF\n");
+
+    // Generate input files
+    foreach (array('snv','indel') as $vartype) {
+
+      if (isset($_POST['gatk_apply_dbsnp_filter'])) {
+	$prefix="gatk.dbsnp.$vartype";
+	fwrite($fp, "cat > \$RUNDIR/gatk/group\$gp/\$chralt/gatk_dbsnp_filter.$vartype.input <<EOF\n");
+	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");
+	fwrite($fp, "$prefix.rawvcf = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.vcf\n");
+	fwrite($fp, "$prefix.mode = filter\n");
+	fwrite($fp, "$prefix.passfile = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	fwrite($fp, "$prefix.dbsnpfile = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.".$gatk_dbsnp_filter_prefix[$vartype]['fail']."vcf\n");
+	fwrite($fp, "EOF\n");
+      }
+
+      if (isset($_POST['gatk_apply_false_positives_filter'])) {
+	if ( $vartype=="snv" ) {  //  only for snvs at this time
+	  $prefix="gatk.fpfilter.$vartype";
+	  fwrite($fp, "FP_BAM=`awk '{if(NR==1){print \$1}}' \$RUNDIR/gatk/group\$gp/bamfilelist.inp`\n");
+	  fwrite($fp, "cat > \$RUNDIR/gatk/group\$gp/\$chralt/gatk_fpfilter.$vartype.input <<EOF\n");
+	  fwrite($fp, "$prefix.bam_readcount = ".$toolsinfo_h['readcount']['path']."/".$toolsinfo_h['readcount']['exe']."\n");
+	  fwrite($fp, "$prefix.bam_file = \$FP_BAM\n");
+	  fwrite($fp, "$prefix.REF = \$RUNDIR/reference/\$GATK_REF\n");
+	  fwrite($fp, "$prefix.variants_file = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "$prefix.passfile = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass'].$gatk_fpfilter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "$prefix.failfile = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass'].$gatk_fpfilter_prefix[$vartype]['fail']."vcf\n");
+	  foreach ($vs_opts_fpfilter as $value) { $key = "vs_fp_".$value; fwrite($fp, "$prefix.$value = ".$_POST[$key]."\n"); }
+	  fwrite($fp, "EOF\n");
+	}
+      }
+    }
+
+
+    fwrite($fp, "cd \$RUNDIR/gatk/\$dir ; chmod +x ./gatk.sh\n");
+    // configure memory
+    $mem_opt = gen_mem_str($compute_target, $toolmem_h['gatk']['mem_default']);
+    $job_name = $batch['name_opt']." "."\$tag_gatk.group\$gp.chr";
+    $ERRARG = "-e ./stderr.gatk.group\$gp.chr\$chralt";
+    $OUTARG = "-o ./stdout.gatk.group\$gp.chr\$chralt";
+    $EXEARG = "./gatk.sh";
+    fwrite($fp,"$nobsub"." ".$batch['cmd']." ".$batch['limitgr']." ".$job_name." ".$batch['q_opt']." "."$ERRARG $OUTARG $mem_opt $EXEARG\n");
+    fwrite($fp,"sleep $dlay\n");
+    fwrite($fp,"# done chr\n");
+    fwrite($fp,"   done\n");  //chr
+
+    // Gather group results and annotate
+    fwrite($fp, " cat > \$RUNDIR/gatk/group\$gp/gatk_postrun.sh <<EOF\n");
+    fwrite($fp, "#!/bin/bash\n");
+    check_aws_shell($fp);
+    if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
+    fwrite($fp, "RUNDIR=\$RUNDIR\n");
+    fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+    fwrite($fp, "myRWORKDIR=\$RWORKDIR/gatk/group\$gp\n");
+    fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
+    fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
+    fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
+    fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
+    fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+    fwrite($fp, "put_cmd=$put_cmd\n");
+    fwrite($fp, "del_cmd=$del_cmd\n");
+    fwrite($fp, "del_local=$del_local\n");
+    fwrite($fp, "statfile_gl_g=\$statfile_gl_g\n");
+    fwrite($fp, "localstatus_gl_g=\\\$RUNDIR/status/\\\$statfile_gl_g\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "remotestatus_gl_g=\\\$STATUSDIR/\\\$statfile_gl_g\n");
+    }
+    fwrite($fp, "cd \\\$RUNDIR/gatk/group\$gp\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRWORKDIR/gatk.bamfilelist.group\$gp.inp\n");
+    }
+    fwrite($fp, "\\\$put_cmd  \`pwd\`/bamfilelist.inp \\\$myRESULTSDIR/gatk.bamfilelist.group\$gp.inp\n");
+    fwrite($fp, "outlist=gatk.out.group\$gp.all.filelist\n");
+    write_gatk_merge( $fp, $gatk_dbsnp_filter_prefix, $gatk_fpfilter_prefix );
+
+    // Results, possibly with annotation
+    if (isset($_POST['vep_cmd'])) {
+      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./gatk_vep.input >& ./gatk_vep.log\n");
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/gatk.out.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
+      if ($compute_target=="AWS") {
+	fwrite($fp, "\\\$put_cmd  ./gatk_vep.* \\\$myRWORKDIR/\n");
+      }
+      fwrite($fp, "\\\$del_local ./gatk.out.group\$gp.all.current_final.gvip.vcf\n");
+    } else {
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/gatk.out.group\$gp.all.current_final.gvip.vcf  \\\$myRESULTSDIR/\n");
+    }
+    fwrite($fp, "\\\$put_cmd  \`pwd\`/\\\$outlist \\\$myRESULTSDIR/\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/\\\$outlist \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/stdout.*.postrun \`pwd\`/stderr.*.postrun \\\$myRWORKDIR/\n");
+    }
+
+    fwrite($fp, "\\\$del_local \\\$localstatus_gl_g\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus_gl_g\n");
+    }
+
+    if($do_timing) {
+      fwrite($fp, "scr_tf=\`date +%s\`\n");
+      fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
+      fwrite($fp, "echo GVIP_TIMING_GATK_GATHER=\\\$scr_t0,\\\$scr_dt\n");
+    }
+    if($compute_target=="AWS") { fwrite($fp, "$sgemem_cmd\n"); }
+    fwrite($fp, "EOF\n");
+
+    // Generate VEP input
+    if (isset($_POST['vep_cmd'])) {
+      $prefix="gatk.vep";
+      fwrite($fp, "cat > \$RUNDIR/gatk/group\$gp/gatk_vep.input <<EOF\n");
+      fwrite($fp, "$prefix.vcf = ./gatk.out.group\$gp.all.current_final.gvip.vcf\n");
+      fwrite($fp, "$prefix.output = ./gatk.out.group\$gp.all.current_final.gvip.VEP.vcf\n");
+      write_vep_input_common($fp, $prefix);
+      fwrite($fp, "EOF\n");
+    }
+
+    fwrite($fp, "cd \$RUNDIR/gatk/group\$gp ;  chmod +x ./gatk_postrun.sh\n");
+    // configure memory
+    if (isset($_POST['vep_cmd'])) {
+      $mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
+    }	else {
+      $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+    }
+    $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_gatk.group\$gp.$wc".$batch['dep_opt_post'];
+    $job_name = $batch['name_opt']." "."gatk_postrun.group\$gp";
+    $ERRARG = "-e ./stderr.gatk.group\$gp.postrun";
+    $OUTARG = "-o ./stdout.gatk.group\$gp.postrun";
+    $EXEARG = "./gatk_postrun.sh";
+    fwrite($fp, "$nobsub"." ".$batch['cmd']." ".$batch['limitgr']." "."$job_name $jobdeps"." ".$batch['q_opt']." "."$ERRARG $OUTARG $mem_opt $EXEARG\n");
+    fwrite($fp,"sleep $dlay\n");
+    fwrite($fp, "\n");
+
+
+    fwrite($fp,"# done group\n");
+    fwrite($fp, "done\n");  // group
+    fwrite($fp, "\n");
+
+  } // if gatk_cmd
 
   // ---------------------------------------------------------------------------
   // RUN STRELKA

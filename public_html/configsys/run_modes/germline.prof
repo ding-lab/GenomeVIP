@@ -1,6 +1,7 @@
 [config]
 varscan.cmd="true"
 varscan.call_mode="germline"
+gatk.cmd="true"
 strelka.cmd="false"
 breakdancer.cmd="true"
 breakdancer.call_mode="germline"
@@ -14,6 +15,8 @@ genomestrip.samples="single"
 varscan.apply_high_confidence_filter="true"
 varscan.apply_dbsnp_filter="true"
 varscan.apply_false_positives_filter="true"
+gatk.apply_dbsnp_filter="true"
+gatk.apply_false_positives_filter="true"
 pindel.apply_filter="true"
 breakdancer.apply_bam_filter="false"
 

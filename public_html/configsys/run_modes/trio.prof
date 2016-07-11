@@ -1,6 +1,7 @@
 [config]
 varscan.cmd="true"
 varscan.call_mode="trio"
+gatk.cmd="false"
 strelka.cmd="false"
 breakdancer.cmd="true"
 breakdancer.call_mode="trio"

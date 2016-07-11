@@ -31,7 +31,8 @@ mem_default=500
 
 [gather]
 ;mem_default=200
-mem_default=500
+;mem_default=500
+mem_default=1500
 
 [pindel]
 ;mem_default=6000
@@ -57,3 +58,8 @@ ncpu=4
 
 [vep]
 mem_default=3072
+
+[gatk]
+mem_default=5000
+mem_min=5000
+mem_max=5000

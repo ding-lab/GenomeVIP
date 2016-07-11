@@ -17,6 +17,9 @@ $vs_ver_map = array(
 		    "varscan238" => "2.3.8",
 		    "varscan239" => "2.3.9",
 		    );
+$gatk_ver_map = array(
+		       "gatk35" => "3.5",
+		       );
 $strlk_ver_map = array(
 		       "strlk1014" => "1.0.14",
 		       );

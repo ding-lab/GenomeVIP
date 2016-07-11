@@ -244,6 +244,62 @@ if (isset($_POST['vs_cmd'])) {
   
   // ------------------------------------------------------------
 
+  if( isset($_POST['gatk_cmd'])) {
+    array_push($pp, "\n");
+
+    $prefix = "gatk";
+    array_push($pp, "[ $prefix ]\n");
+
+    array_push($pp, "$prefix.version = ".$gatk_ver_map[$_POST['gatk_version']]."\n");
+
+    if( isset($_POST['compute_target']) || array_key_exists('compute_target', $_POST) ){
+      if ($_POST['compute_target']=="AWS") {
+	array_push($pp, "$prefix.aws_jarpath = ".$_POST['gatk_aws_jarpath']."\n");
+      }
+    }
+
+    foreach ($gatk_opts as $tmpkey => $novalue) {
+      $key = "gatk_$tmpkey";
+
+      switch($tmpkey) {
+      case "remove_duplicates":
+      case "remove_unmapped":
+	if( ! isset($_POST[$key]) ) {
+	  array_push($pp, "$prefix.$tmpkey = \"false\"\n");
+	} else {
+	  array_push($pp, "$prefix.$tmpkey = \"true\"\n");
+	}
+      break;
+      default:
+	array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
+      }
+
+    }
+
+    array_push($pp, "\n");
+
+    // dbSNP filter
+    if( ! isset($_POST['gatk_apply_dbsnp_filter'])) {
+      array_push($pp, "$prefix.apply_dbsnp_filter = \"false\"\n");
+    } else {
+      array_push($pp, "$prefix.apply_dbsnp_filter = \"true\"\n");
+    }
+    array_push($pp, "\n");
+
+
+    // gatk false positives filter
+    if( ! isset($_POST['gatk_apply_false_positives_filter']) ) {
+      array_push($pp, "$prefix.apply_false_positives_filter = \"false\"\n");
+    } else {
+      array_push($pp, "$prefix.apply_false_positives_filter = \"true\"\n");
+    }
+    array_push($pp, "\n");
+
+  }  // end gatk
+
+  // ------------------------------------------------------------
+
+
   if( isset($_POST['strlk_cmd'])) {
     array_push($pp, "\n");
 

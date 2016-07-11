@@ -78,6 +78,12 @@ varscan.filter.somatic.p_value = 0.05
 
 varscan.filter.trio.parents_max_num_supporting_reads = 0
 
+; ----------------------------------------
+; gatk
+; ----------------------------------------
+; values for base quality and emit/call thresholds are set within the interface
+gatk.remove_duplicates = "true"
+gatk.remove_unmapped = "true"
 
 ; ----------------------------------------
 ; strelka 

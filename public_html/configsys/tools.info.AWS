@@ -17,6 +17,10 @@ exe=VarScan.jar
 path=/usr/local/bin/varscan/2.3.9
 exe=VarScan.jar
 
+[gatk35]
+path=
+exe=
+
 [strlk1014]
 path=/usr/local/bin/strelka/1.0.14/bin
 exe=configureStrelkaWorkflow.pl

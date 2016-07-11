@@ -16,6 +16,7 @@ $cmd_names = array(
  "pindel"                   =>"",
  "genomestrip"              =>"",
  "variant_effect_predictor" =>"",
+ "gatk"                     =>"",
 );
 
 
@@ -150,6 +151,15 @@ $strlk_opts = array(
  "extra_arguments"                          =>  "extraStrelkaArguments",
 );
 
+// ----------------------------------------
+
+$gatk_opts = array(
+ "min_base_qual"      => " -mbq ",
+ "remove_duplicates"  => " -rf DuplicateRead ",
+ "remove_unmapped"    => " -rf UnmappedRead ",
+ "min_emit_qual"      => " -stand_emit_conf ",
+ "min_call_qual"      => " -stand_call_conf ",
+);
 
 
 // ----------------------------------------

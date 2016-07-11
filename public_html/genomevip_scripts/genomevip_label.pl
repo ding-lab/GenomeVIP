@@ -13,8 +13,8 @@ my ($progid, $infile, $outfile, @header, $encoding, %assoc);
 
 
 $progid = $ARGV[0]; $infile = $ARGV[1];  $outfile = $ARGV[2];
-%assoc = ("VarScan"=>1,"Pindel"=>2,"BreakDancer"=>3,"GenomeSTRiP"=>4,"Strelka"=>5);
-$encoding="VarScan,1;Pindel,2;BreakDancer,3;GenomeSTRiP,4;Strelka,5";
+%assoc = ("VarScan"=>1,"Pindel"=>2,"BreakDancer"=>3,"GenomeSTRiP"=>4,"Strelka"=>5,"GATK"=>6);
+$encoding="VarScan,1;Pindel,2;BreakDancer,3;GenomeSTRiP,4;Strelka,5;GATK,6";
 
 # Insert custom info line after last existing info line, then update info
 open (IN, "<", $infile) || die "Error: cannot open input file $infile"; close(IN);

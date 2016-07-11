@@ -275,6 +275,9 @@ function validateform( bSubmit ){
 	    numerr++;
 	    return false;
 	}
+
+	// TODO: Check jarfile path syntax and exists
+	$("#gatk_aws_jarpath").val($.trim($("#gatk_aws_jarpath").val()));
     }
 
 
@@ -287,7 +290,7 @@ function validateform( bSubmit ){
 	numerr++; return false;
     }
 
-    if ( ! ( $("#vs_cmd").is(':checked') || $("#strlk_cmd").is(':checked') ||  $("#bd_cmd").is(':checked') || $("#pindel_cmd").is(':checked') || $("#gs_cmd").is(':checked')) ) {
+    if ( ! ( $("#vs_cmd").is(':checked') || $("#strlk_cmd").is(':checked') ||  $("#bd_cmd").is(':checked') || $("#pindel_cmd").is(':checked') || $("#gs_cmd").is(':checked') || $("#gatk_cmd").is(':checked')) ) {
 	alert("No tools selected. Please select at least one tool before submitting.");
 	numerr++; return false;
     }
@@ -326,6 +329,11 @@ function validateform( bSubmit ){
     if ( $("#vs_cmd").is(':checked')) {
 	if( $("#vs_chrdef2").is(':checked')) { // user
 	    if(chr_str_fail("vs_chrdef_str","VarScan")==true) { alert("The user-input genomic region for VarScan is invalid."); numerr++; return false; }
+	}
+    }
+    if ( $("#gatk_cmd").is(':checked')) {
+	if( $("#gatk_chrdef2").is(':checked')) { // user
+	    if(chr_str_fail("gatk_chrdef_str","GATK")==true) { alert("The user-input genomic region for GATK is invalid."); numerr++; return false; }
 	}
     }
     if ( $("#bd_cmd").is(':checked')) {
@@ -692,8 +700,8 @@ function setup_s3() {
 
 
 function gotomytab(i) {
-    var myarray=[0,1,2,3,4,5,6,7,8,9,10,11,12];
-    var tabnum =[0,1,2,3,4,5,6,7,8,9,10,11,12];
+    var myarray=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
+    var tabnum =[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
     var buttonarr=[0,1,2,3,9,10,11];
     
     for (var j=0; j< buttonarr.length; j++) {
@@ -707,7 +715,7 @@ function gotomytab(i) {
     $("#litab-"+i).show();
     if (i==3) {
 	for (var j=4;  j<=8;  j++) { $("#litab-"+j).show(); }
-	for (var j=12; j<=12; j++) { $("#litab-"+j).show(); }
+	for (var j=12; j<=13; j++) { $("#litab-"+j).show(); }
     }
     $("#litab-"+i).trigger('click');  // sufficient
 }
@@ -728,6 +736,10 @@ function upd_vs_hcfilters() {
 function upd_vs_fpfilter() {
     if( $("#vs_do_dbsnp").is(':checked') ) { $("#vs_filter_dbsnp").show(); } else { $("#vs_filter_dbsnp").hide(); } 
     if( $("#vs_do_fpfilter").is(':checked') ){ $("#vs_filter_fps").show(); } else { $("#vs_filter_fps").hide(); } 
+}
+function upd_gatk_fpfilter() {
+    if( $("#gatk_do_dbsnp").is(':checked') ) { $("#gatk_filter_dbsnp").show(); } else { $("#gatk_filter_dbsnp").hide(); }
+    if( $("#gatk_do_fpfilter").is(':checked') ){ $("#gatk_filter_fps").show(); } else { $("#gatk_filter_fps").hide(); }
 }
 function upd_strlk_fpfilter() {
     if( $("#strlk_do_dbsnp").is(':checked') ){ $("#strlk_filter_dbsnp").show(); } else { $("#strlk_filter_dbsnp").hide(); }
@@ -816,12 +828,12 @@ function apply_profile(results) {
 		} else if ($("[name="+ k +"]").is("input:radio")) {
  		    $("[name="+k+"][value="+v+"]").prop('checked',true).trigger('change');
 		} else if ($("[name="+ k +"]").is("input:text") || $("[name="+ k +"]").is("input:hidden") || $("[name="+ k +"]").is("select") ) {
-		  // notify of pindel version 
-		  if (k == "pin_version" && v != "pindel025b8") {
-		    alert("Pindel version '"+v+"' is not supported. Substituting with version 0.2.5b8.");
-		    v = "pindel025b8";
-		  }
-		  $("[name="+k+"]").val(results[i]['v']); 
+		    // remove certain floats
+		    if( k.match(/gatk_min_(.+)_qual/) ) {
+			$("[name="+k+"]").val(parseInt(results[i]['v']));
+		    } else {
+			$("[name="+k+"]").val(results[i]['v']);
+		    }
 		    
 		} else {
 		    alert("Error: Profile key "+k_orig+" is not recognized. Please check the configuration.");
@@ -832,6 +844,7 @@ function apply_profile(results) {
 	
 	upd_vs_hcfilters();
 	upd_vs_fpfilter();
+	upd_gatk_fpfilter();
 	upd_bd_regions();
 	upd_pin_filters();
 
@@ -1051,6 +1064,7 @@ function download(filename, text) {
 	  <li><a class="tooltip" href="#tabs-2" id="litab-2" title="Select alignment and reference files">Select Genomes</a>
 	  <li><a class="tooltip" href="#tabs-3" id="litab-3" title="Configure computations by selecting and applying a pre-made execution profile">Quick Setup</a>
 	  <li><a class="tooltip" href="#tabs-4" id="litab-4" title="Configure VarScan to call nucleotide variants, insertions & deletions for germline, somatic, or single trio analysis">VarScan</a>
+	  <li><a class="tooltip" href="#tabs-13" id="litab-13" title="Configure GATK to call nucleotide variants, insertions & deletions for germline analysis. Uses GATK's HaplotypeCaller module.">GATK</a>
 	  <li><a class="tooltip" href="#tabs-5" id="litab-5" title="Configure Strelka to call nucleotide variants, insertions & deletions for somatic analysis">Strelka</a>
 	  <li><a class="tooltip" href="#tabs-6" id="litab-6" title="Configure BreakDancer to call various structural variants in single or multiple samples">BreakDancer</a>
 	  <li><a class="tooltip" href="#tabs-7" id="litab-7" title="Configure Pindel to call insertions, deletions & tandem duplications in single or multiple samples">Pindel</a>
@@ -1827,6 +1841,83 @@ function download(filename, text) {
 
 
      </div>
+
+<!-- GATK -->
+     <div id="tabs-13" class="ui-tabs-panel">
+
+       <input type="checkbox" id="gatk_cmd" name="gatk_cmd"><label for="gatk_cmd">Run GATK</label>
+       <select id="version_gatk" name="gatk_version">
+	 <option class="menu1" value="gatk35">version 3.5</option>
+       </select>
+       for germline variant calling
+      <br><br><br>
+
+       <div class="subhead tdindents"><b>STEP 1: Configure discovery</b></div>
+       <table class="tdindents">
+	 <tr>
+	   <td>Minimum base quality to consider a base for calling</td>
+           <td><select id="gatk_min_base_qual" name="gatk_min_base_qual"></select>&nbsp;(default: 10)</td>
+	 </tr><tr>
+	   <td>Filter duplicate reads ?</td>
+	   <td><input type="radio" id="gatk_remove_duplicates_y" name="gatk_remove_duplicates" value="true" checked><label for="gatk_remove_duplicates_y">True (default)</label>&nbsp;&nbsp;
+	   <input type="radio" id="gatk_remove_duplicates_n" name="gatk_remove_duplicates" value="false"><label for="gatk_remove_duplicates_n">False</label></td>
+	 </tr><tr>
+
+	   <td>Filter unmapped reads ?</td>
+	   <td><input type="radio" id="gatk_remove_unmapped_y" name="gatk_remove_unmapped" value="true" checked><label for="gatk_remove_unmapped_y">True (default)</label>&nbsp;&nbsp;
+	   <input type="radio" id="gatk_remove_unmapped_n" name="gatk_remove_unmapped" value="false"><label for="gatk_remove_unmapped_n">False</label></td>
+	 </tr><tr>
+
+	   <td>Minimum phred-scaled confidence threshold to emit variants</td>
+	   <td><select id="gatk_min_emit_qual" name="gatk_min_emit_qual"></select>&nbsp;(default: 10)</td>
+	 </tr><tr>
+
+	   <td>Minimum phred-scaled confidence threshold to call variants</td>
+	   <td><select id="gatk_min_call_qual" name="gatk_min_call_qual"> </select>&nbsp;(default: 30)</td>
+	 </tr>
+</table>
+	 <p><br></p>
+
+
+	 <div class="subhead tdindents"><b>STEP 2: Select genomics regions</b></div>
+
+	 <table class="tdindents">
+	   <tr><td class="tdw3">Select one:</td>
+
+	     <td><input type="radio" id="gatk_chrdef0" name="gatk_chrdef" value="standard" checked><label for="gatk_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
+	       <input type="radio" id="gatk_chrdef1" name="gatk_chrdef" value="standard_plus_contigs"><label for="gatk_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
+               <input type="radio" id="gatk_chrdef2" name="gatk_chrdef" value="user"><label for="gatk_chrdef2">User-defined:</label>&nbsp;
+               <textarea id="gatk_chrdef_str"  name="gatk_chrdef_str" value=""></textarea>
+             <img src="image/Help.png" class="inline" title="Enter a list of regions (in BED or interval format), delimited by commmas or line return. (Example: 1-4, X, 6:1000, 5:1000-2000, 22)"> <button onclick="clear_chr(1);" type="button">Clear list</button></td>
+	   </tr>
+	 </table>
+
+       <p><br></p>
+       <div class="subhead tdindents"><b>STEP 3: Select filtering (optional)</b></div>
+       <br>
+
+       <!-- div for dbSNP -->
+       <p  class="tdindent">1.<input type="checkbox" id="gatk_do_dbsnp" name="gatk_apply_dbsnp_filter"><label for="gatk_do_dbsnp">Apply dbSNP filter</label></p>
+       <div class="tdindent1"><div id="gatk_filter_dbsnp" class="vspanel" style="display:none;">
+	   <p><br></p>
+	   <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	   <p><br></p>
+       </div> </div>
+       <p><br></p>
+
+       <!-- div for fpfilter -->
+       <p  class="tdindent">2.<input type="checkbox" id="gatk_do_fpfilter" name="gatk_apply_false_positives_filter"><label for="gatk_do_fpfilter">Apply false-positives filter (currently SNV-only)</label></p>
+       <div class="tdindent1"><div id="gatk_filter_fps" class="vspanel" style="display:none;">
+	   <p><br></p>
+	   <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	   <p><br></p>
+       </div> </div>
+       <p><br></p>
+
+
+
+     </div>
+
 <!-- Strelka -->
 
      <div id="tabs-5" class="ui-tabs-panel"> 
@@ -2718,6 +2809,14 @@ function download(filename, text) {
        
        
        <div id="jobinst" class="initiallyHidden subhead tdindentd fps"><p>Provide any additional necessary information:</p></div>
+
+
+       <div id="gatk_jardiv" class="initiallyHidden fps">
+	 <div class="tdindents"><p class="fps">S3 path of GATK jarfile:&nbsp;<img class="inline" title="Format is s3://bucket/path/to/jarfile (e.g., s3://mybucket/Software/GenomeAnalysisTK.jar)" src="image/Help.png"</img>&nbsp;</p>
+	   <input type="text" class="tb2" id="gatk_aws_jarpath" name="gatk_aws_jarpath"/>
+	 </div>
+	 <p><br></p>
+       </div>
        
        <div id="titleinfo" class="initiallyHidden fps">
 	 <div class="tdindents"><p class="fps">Comment to place into execution profile (OPTIONAL):</p>
@@ -2963,6 +3062,7 @@ $(document).ready(function() {
 
     upd_vs_hcfilters();
     upd_vs_fpfilter();
+    upd_gatk_fpfilter();
     upd_strlk_fpfilter();
     upd_bd_regions();
     upd_pin_filters();
@@ -3390,6 +3490,7 @@ function do_aws_setup() {
     $("#jobinst").show();
     $("#runinfo").hide();
     $("#titleinfo").show();
+    if( $("#gatk_cmd").is(":checked")) { $("#gatk_jardiv").show(); }
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3428,6 +3529,7 @@ function do_local_setup () {
     $("#jobinst").show();						   
     $("#runinfo").show();
     $("#titleinfo").show();
+    $("#gatk_jardiv").hide();
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3460,10 +3562,26 @@ $("#vs_isTRIO").change(function() {
     }
 });
 
+$("#gatk_cmd").change(function() {
+    if( $(this).is(':checked')) {
+	opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==10)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_emit_qual").html(opt);$("#gatk_min_base_qual").html(opt);
+	opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==30)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_call_qual").html(opt);
+	if( $("#login_aws").is(":checked") ) {
+	    $("#gatk_jardiv").show();
+	    if( ! $("#gatk_aws_jarpath").length ) {
+		alert("Note: you will need to provide the AWS S3 location of the GATK jarfile under the Submit tab before job submission.");
+	    }
+	}
+    } else {
+	$("#gatk_jardiv").hide();
+    }
+});
+
 
 $("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
 $("#vs_do_hcfilter").change(function() { upd_vs_hcfilters(); check_vs_mode(); });
 $("#vs_do_fpfilter, #vs_do_dbsnp").change(function() { upd_vs_fpfilter(); check_vs_mode(); });
+$("#gatk_do_fpfilter, #gatk_do_dbsnp").change(function() { upd_gatk_fpfilter(); });
 $("#strlk_do_fpfilter, #strlk_do_dbsnp").change(function() { upd_strlk_fpfilter(); });
 
 
@@ -3476,12 +3594,14 @@ $("[id^=bd_trans_type]").change(function() { upd_bd_regions(); });
 // Select global regions
 function clickall_chrdef(i) {
     $("#vs_chrdef"+i).trigger('click'); 
+    $("#gatk_chrdef"+i).trigger('click');
     $("#bder_chrdef"+i).trigger('click'); 
     $("#pindel_chrdef"+i).trigger('click'); 
     $("#gs_chrdef"+i).trigger('click'); 
 }
 function copy_chr_str(s) {
     $("#vs_chrdef_str").val( s );
+    $("#gatk_chrdef_str").val( s );
     $("#bder_chrdef_str").val( s );
     $("#pindel_chrdef_str").val( s );
     $("#gs_chrdef_str").val( s );
@@ -3505,9 +3625,11 @@ $("#mode_select").change(function() {
 $("#global_do_fpfilter").click(function() {
     if ($("#global_do_fpfilter").is(':checked')) {
         $("#vs_do_fpfilter").prop('checked',true).trigger('change');
+        $("#gatk_do_fpfilter").prop('checked',true).trigger('change');
         $("#strlk_do_fpfilter").prop('checked',true).trigger('change');
     } else {
         $("#vs_do_fpfilter").prop('checked',false).trigger('change');
+        $("#gatk_do_fpfilter").prop('checked',false).trigger('change');
         $("#strlk_do_fpfilter").prop('checked',false).trigger('change');
 }
 
@@ -3515,17 +3637,19 @@ $("#global_do_fpfilter").click(function() {
 $("#global_do_dbsnp").click(function() {
     if ($("#global_do_dbsnp").is(':checked')) {
         $("#vs_do_dbsnp").prop('checked',true).trigger('change');
+        $("#gatk_do_dbsnp").prop('checked',true).trigger('change');
         $("#strlk_do_dbsnp").prop('checked',true).trigger('change');
     } else {
         $("#vs_do_dbsnp").prop('checked',false).trigger('change');
+        $("#gatk_do_dbsnp").prop('checked',false).trigger('change');
         $("#strlk_do_dbsnp").prop('checked',false).trigger('change');
     }
 });
 function upd_global_dbsnp() {
-    if( $("#vs_do_dbsnp").is(':checked') &&  $("#strlk_do_dbsnp").is(':checked')) {
+    if( $("#vs_do_dbsnp").is(':checked') && $("#gatk_do_dbsnp").is(':checked') &&  $("#strlk_do_dbsnp").is(':checked')) {
 	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
 	$("#global_do_dbsnp").prop('checked',true).trigger('change');
-    } else if ( ! $("#vs_do_dbsnp").is(':checked') &&  ! $("#strlk_do_dbsnp").is(':checked')) {
+    } else if ( ! $("#vs_do_dbsnp").is(':checked') && ! $("#gatk_do_dbsnp").is(':checked') &&  ! $("#strlk_do_dbsnp").is(':checked')) {
 	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
 	$("#global_do_dbsnp").prop('checked',false).trigger('change');
     } else {
@@ -3534,10 +3658,10 @@ function upd_global_dbsnp() {
     }
 }
 function upd_global_fpfilter() {
-    if( $("#vs_do_fpfilter").is(':checked') &&  $("#strlk_do_fpfilter").is(':checked')) {
+    if( $("#vs_do_fpfilter").is(':checked') && $("#gatk_do_fpfilter").is(':checked') &&  $("#strlk_do_fpfilter").is(':checked')) {
 	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
 	$("#global_do_fpfilter").prop('checked',true).trigger('change');
-    } else if ( ! $("#vs_do_fpfilter").is(':checked') &&  ! $("#strlk_do_fpfilter").is(':checked')) {
+    } else if ( ! $("#vs_do_fpfilter").is(':checked') && ! $("#gatk_do_fpfilter").is(':checked') &&  ! $("#strlk_do_fpfilter").is(':checked')) {
 	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
 	$("#global_do_fpfilter").prop('checked',false).trigger('change');
     } else {
@@ -3545,8 +3669,8 @@ function upd_global_fpfilter() {
 	$("#global_do_fpfilter").prop('checked',false).trigger('change');
     }
 }
-$("#vs_do_dbsnp,#strlk_do_dbsnp").click(function() {  upd_global_dbsnp(); });
-$("#vs_do_fpfilter,#strlk_do_fpfilter").click(function() {  upd_global_fpfilter(); });
+$("#vs_do_dbsnp,#gatk_do_dbsnp,#strlk_do_dbsnp").click(function() {  upd_global_dbsnp(); });
+$("#vs_do_fpfilter,#gatk_do_fpfilter,strlk_do_fpfilter").click(function() {  upd_global_fpfilter(); });
 
 
 
