@@ -33,6 +33,10 @@ exe=bam2cfg.pl
 path=/usr/local/bin/breakdancer/1.4.5
 exe=breakdancer-max
 
+[pindel025b5]
+path=/usr/local/bin/pindel/0.2.5b5
+exe=pindel
+
 [pindel025b8]	
 path=/usr/local/bin/pindel/0.2.5b8
 exe=pindel
