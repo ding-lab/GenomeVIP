@@ -34,7 +34,7 @@ $cmd="/bin/grep -v ^# $paras{'vcf'} > $tmp_orig_calls";
 
 # run vep
 my (undef, $tmp_vep_out) = tempfile();
-$cmd = "perl $paras{'vep_cmd'} $opts --buffer_size 1000 --database --offline --cache --dir $paras{'cachedir'} --assembly $paras{'assembly'} --fork 4 --format vcf --vcf -i $tmp_orig_calls -o $tmp_vep_out --force_overwrite  --fasta $paras{'reffasta'}";
+$cmd = "perl $paras{'vep_cmd'} $opts --buffer_size 1000 --offline --cache --dir $paras{'cachedir'} --assembly $paras{'assembly'} --fork 4 --format vcf --vcf -i $tmp_orig_calls -o $tmp_vep_out --force_overwrite  --fasta $paras{'reffasta'}";
    system($cmd);
 
 # re-merge headers and move
