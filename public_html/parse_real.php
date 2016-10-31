@@ -629,16 +629,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
   if(isset($_POST['gatk_cmd'])) {
     if ($compute_target=="AWS") {
-      fwrite($fp, "GATK_REMOTE=".$_POST['gatk_aws_jarpath']."\n");
+      fwrite($fp, "GATK_REMOTE=".$_POST['gatk_jarpath']."\n");
       fwrite($fp, "export GATK_DIR=\$RUNDIR/gatk\n");
-      fwrite($fp, "export GATK_EXE=".basename($_POST['gatk_aws_jarpath'])."\n");
+      fwrite($fp, "export GATK_EXE=".basename($_POST['gatk_jarpath'])."\n");
       fwrite($fp, "mkdir -p \$GATK_DIR\n");
       fwrite($fp, "echo Retrieving GATK...\n");
       fwrite($fp, "msg=`$s3_action  \$GATK_REMOTE  \$GATK_DIR/\$GATK_EXE  2>&1`\n");
       fwrite($fp, "check_aws_file \$msg \n");
     } else {
+      if ($_POST['gatk_jarpath'] == "gatk_user") {
+	fwrite($fp, "export GATK_DIR=".dirname($_POST['gatk_jarpath'])."\n");
+	fwrite($fp, "export GATK_EXE=".basename($_POST['gatk_jarpath'])."\n");
+      } else {
       fwrite($fp, "export GATK_DIR=".$toolsinfo_h[$_POST['gatk_version']]['path']."\n");
       fwrite($fp, "export GATK_EXE=".$toolsinfo_h[$_POST['gatk_version']]['exe']."\n");
+      }
     }
   }
 
@@ -2951,6 +2956,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       case "gatk_min_call_qual":
 	$gatk_opts_cmd .= " ".$value." ".$_POST[$key].".0"." ";	// floats recommended
         break;
+      case "gatk_extra_arguments":
+	$gatk_opts_cmd .= " ".$_POST[$key];
+	break;
       default:
 	$gatk_opts_cmd .= " ".$value." ".$_POST[$key];
       }

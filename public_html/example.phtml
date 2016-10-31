@@ -277,7 +277,7 @@ function validateform( bSubmit ){
 	}
 
 	// TODO: Check jarfile path syntax and exists
-	$("#gatk_aws_jarpath").val($.trim($("#gatk_aws_jarpath").val()));
+	$("#gatk_jarpath").val($.trim($("#gatk_jarpath").val()));
     }
 
 
@@ -1847,7 +1847,6 @@ function download(filename, text) {
 
        <input type="checkbox" id="gatk_cmd" name="gatk_cmd"><label for="gatk_cmd">Run GATK</label>
        <select id="version_gatk" name="gatk_version">
-	 <option class="menu1" value="gatk35">version 3.5</option>
        </select>
        for germline variant calling
       <br><br><br>
@@ -1877,6 +1876,20 @@ function download(filename, text) {
 	 </tr>
 </table>
 	 <p><br></p>
+
+
+       <p id="toggle6a" class="tdindent"><img id="image6a" src="image/plus.gif" alt="toggle advanced options"><a name="n_g6a" href="#n_g6a" class="hdr">&nbsp;<i>ADVANCED OPTIONS</i></a></p>
+       <div class="tdindent"> <div id="panel6a" style="display:none;">
+	   <table class="tdindentd">
+	     <tr><th class="myheader">Other</th><th></th>
+	     </tr><tr>
+	       <td class="tdindents">Additional command line arguments:</td>
+	       <td><input type="text" class="tb2" id="gatk_extraArguments" name="gatk_extra_arguments" value=""></td>
+	     </tr>
+	   </table>
+	 </div>
+       </div>
+       <p><br></p>
 
 
 	 <div class="subhead tdindents"><b>STEP 2: Select genomics regions</b></div>
@@ -2813,8 +2826,8 @@ function download(filename, text) {
 
 
        <div id="gatk_jardiv" class="initiallyHidden fps">
-	 <div class="tdindents"><p class="fps">S3 path of GATK jarfile:&nbsp;<img class="inline" title="Format is s3://bucket/path/to/jarfile (e.g., s3://mybucket/Software/GenomeAnalysisTK.jar)" src="image/Help.png"</img>&nbsp;</p>
-	   <input type="text" class="tb2" id="gatk_aws_jarpath" name="gatk_aws_jarpath"/>
+	 <div class="tdindents"><p class="fps">Path of GATK jarfile:&nbsp;<img class="inline" title="Format is s3://bucket/path/to/jarfile (e.g., s3://mybucket/Software/GenomeAnalysisTK.jar) on AWS or /path/to/jarfile on local system" src="image/Help.png"</img>&nbsp;</p>
+	   <input type="text" class="tb2" id="gatk_jarpath" name="gatk_jarpath"/>
 	 </div>
 	 <p><br></p>
        </div>
@@ -3491,7 +3504,7 @@ function do_aws_setup() {
     $("#jobinst").show();
     $("#runinfo").hide();
     $("#titleinfo").show();
-    if( $("#gatk_cmd").is(":checked")) { $("#gatk_jardiv").show(); }
+    if( $("#gatk_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else {$("#gatk_jardiv").hide();}
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3530,7 +3543,7 @@ function do_local_setup () {
     $("#jobinst").show();						   
     $("#runinfo").show();
     $("#titleinfo").show();
-    $("#gatk_jardiv").hide();
+    if( $("#gatk_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else {$("#gatk_jardiv").hide();}
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3563,21 +3576,24 @@ $("#vs_isTRIO").change(function() {
     }
 });
 
-$("#gatk_cmd").change(function() {
-    if( $(this).is(':checked')) {
-	opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==10)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_emit_qual").html(opt);$("#gatk_min_base_qual").html(opt);
-	opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==30)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_call_qual").html(opt);
-	if( $("#login_aws").is(":checked") ) {
-	    $("#gatk_jardiv").show();
-	    if( ! $("#gatk_aws_jarpath").length ) {
-		alert("Note: you will need to provide the AWS S3 location of the GATK jarfile under the Submit tab before job submission.");
-	    }
-	}
-    } else {
-	$("#gatk_jardiv").hide();
+function manage_gatk_jardiv () {
+  if($("#gatk_cmd").is(":checked") && $("#version_gatk option:selected").val()=="gatk_user") {
+    $("#gatk_jardiv").show();
+    var mywhere=" ";
+    if( $("#login_aws").is(":checked") ) {mywhere=" AWS S3 ";}
+    if( $("#login_local").is(":checked") ) {mywhere=" local ";}
+    alert("Note: Under the current settings, you will need to provide a valid"+mywhere+"path to the GATK jarfile under the Submit tab before job submission.");
+  } else {
+      $("#gatk_jardiv").hide();
+  }
+}
+$("#gatk_cmd,#version_gatk").change(function() {
+    if( $("#gatk_cmd").is(':checked')) {
+      opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==10)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_emit_qual").html(opt);$("#gatk_min_base_qual").html(opt);
+      opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==30)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_call_qual").html(opt);
     }
+    manage_gatk_jardiv();
 });
-
 
 $("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
 $("#vs_do_hcfilter").change(function() { upd_vs_hcfilters(); check_vs_mode(); });
@@ -3821,6 +3837,23 @@ $("#chk_sid,#gvip_sid_rl").click(function() {
 	alert("Success: Session '"+id+"' was found and is ready to use. Click OK to continue.");
     }
 
+});
+
+$("#gatk_cmd,#login_aws,#login_local").change(function() {
+    var tgt=-1;
+    if($("#gatk_cmd").is(":checked")) {
+	if($("#login_aws").is(":checked")) {tgt=0;} else if($("#login_local").is(":checked")){tgt=1;}
+	var posting = $.ajax({
+	    url: "get_versions.php",
+	    type: "POST",
+	    async: false,
+	    data: { 'tgt': tgt, 'cl_str': "menu1",  'cmd': "gatk" },
+	    success: function(data) { $("#version_gatk").html(data); }
+	});
+    } else {
+      $("#version_gatk").empty();
+    }
+    manage_gatk_jardiv();
 });
 </script>
 </body></html>

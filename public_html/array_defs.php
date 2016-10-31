@@ -159,6 +159,7 @@ $gatk_opts = array(
  "remove_unmapped"    => " -rf UnmappedRead ",
  "min_emit_qual"      => " -stand_emit_conf ",
  "min_call_qual"      => " -stand_call_conf ",
+ "extra_arguments"    => "extraGATKArguments",
 );
 
 

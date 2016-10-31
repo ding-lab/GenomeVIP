@@ -252,11 +252,11 @@ if (isset($_POST['vs_cmd'])) {
 
     array_push($pp, "$prefix.version = ".$gatk_ver_map[$_POST['gatk_version']]."\n");
 
-    if( isset($_POST['compute_target']) || array_key_exists('compute_target', $_POST) ){
-      if ($_POST['compute_target']=="AWS") {
-	array_push($pp, "$prefix.aws_jarpath = ".$_POST['gatk_aws_jarpath']."\n");
-      }
+
+    if ($_POST['gatk_version']=="gatk_user") {
+      array_push($pp, "$prefix.jarpath = ".$_POST['gatk_jarpath']."\n");
     }
+
 
     foreach ($gatk_opts as $tmpkey => $novalue) {
       $key = "gatk_$tmpkey";

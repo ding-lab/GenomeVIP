@@ -18,6 +18,7 @@ path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/varscan/2.3.9
 exe=VarScan.jar
 
 [gatk35]
+desc="version 3.5"
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/gatk/3.5
 exe=GenomeAnalysisTK.jar
 

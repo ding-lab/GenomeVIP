@@ -19,6 +19,7 @@ $vs_ver_map = array(
 		    );
 $gatk_ver_map = array(
 		       "gatk35" => "3.5",
+		       "gatk_user" => "user",
 		       );
 $strlk_ver_map = array(
 		       "strlk1014" => "1.0.14",
