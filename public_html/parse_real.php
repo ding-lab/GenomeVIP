@@ -637,7 +637,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "msg=`$s3_action  \$GATK_REMOTE  \$GATK_DIR/\$GATK_EXE  2>&1`\n");
       fwrite($fp, "check_aws_file \$msg \n");
     } else {
-      if ($_POST['gatk_jarpath'] == "gatk_user") {
+      if ($_POST['gatk_version'] == "gatk_user") {
 	fwrite($fp, "export GATK_DIR=".dirname($_POST['gatk_jarpath'])."\n");
 	fwrite($fp, "export GATK_EXE=".basename($_POST['gatk_jarpath'])."\n");
       } else {
@@ -986,10 +986,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "if [[ ! -e  \$GATK_REF_fai ]]; then\n");
 	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$GATK_REF_fai  .\n");
 	  fwrite($fp, "fi\n");
-	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fa.gz)\n");
-	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fasta.gz)\n");
-	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fa)\n");
-	  fwrite($fp, "mystem=\$(basename \$GATK_REF .fasta)\n");
+	  fwrite($fp, "mystem=\$(basename \$GATK_REF .gz)\n");
+	  fwrite($fp, "mystem=\$(basename \$mystem .fasta)\n");
+	  fwrite($fp, "mystem=\$(basename \$mystem .fa)\n");
 	  fwrite($fp, "if [[ ! -e  \$mystem.dict  ]]; then\n");
 	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$mystem.dict .\n");
 	  fwrite($fp, "fi\n");
@@ -3007,7 +3006,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
     fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
     fwrite($fp, "GATK_REF=\\\$RUNDIR/reference/$GATK_REF\n");
-    fwrite($fp, "GATK_DIR=\\\$RUNDIR/gatk\n");
+    fwrite($fp, "GATK_DIR=\$GATK_DIR\n");
     fwrite($fp, "GATK_EXE=\$GATK_EXE\n");
     fwrite($fp, "put_cmd=$put_cmd\n");
     fwrite($fp, "del_cmd=$del_cmd\n");
