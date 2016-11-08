@@ -5091,7 +5091,7 @@ case 'AWS':
   $s3cfg  = "/tmp/".$_POST['gvip_sid_conf'].".s3cfg";
   $real_cluster = $_POST['real_cluster'];
 
-  echo "Transmitting files to cluster '".$real_cluster."'...<br>";
+  echo "Transmitting job files to cluster '".$real_cluster."'...<br>";
 
   $cmd = "$sc_cmd -c $scconf put $real_cluster $s3cfg ~/.s3cfg";
   $output = shell_exec($cmd);
@@ -5104,6 +5104,12 @@ case 'AWS':
   $cmd = "$sc_cmd -c $scconf put  $real_cluster $tmpjob   $RUNDIR/$myjob.sh"; 
   $output = shell_exec($cmd);
   $cmd = "$sc_cmd -c $scconf sshmaster $real_cluster \"chmod 0755 $RUNDIR/$myjob.sh\""; 
+  $output = shell_exec($cmd);
+  echo "...transmitted.<br>";
+  echo "Transmitting genomevip scripts to cluster '".$real_cluster."'...<br>";
+  $cmd = "$sc_cmd -c $scconf sshmaster $real_cluster \"mkdir -p ".$toolsinfo_h['genomevip_scripts']['path']."\"";
+  $output = shell_exec($cmd);
+  $cmd = "$sc_cmd -c $scconf put $real_cluster genomevip_scripts/* ".$toolsinfo_h['genomevip_scripts']['path']."/";
   $output = shell_exec($cmd);
   echo "...transmitted.<br>";
 
