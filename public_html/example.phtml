@@ -866,23 +866,18 @@ function apply_profile(results) {
 		} else if ($("[name="+ k +"]").is("input:radio")) {
  		    $("[name="+k+"][value="+v+"]").prop('checked',true).trigger('change');
 		} else if ($("[name="+ k +"]").is("input:text") || $("[name="+ k +"]").is("input:hidden") || $("[name="+ k +"]").is("select") ) {
-		    // remove certain floats
-		    if( k.match(/gatk_min_(.+)_qual/) ) {
+		    if( k.match(/(gatk|mutect)_min_(.+)_qual/) ) {        // remove certain floats
 			$("[name="+k+"]").val(parseInt(results[i]['v']));
+		    } else if ( k=="gatk_version" ) {
+			$("#version_gatk").val(v);
+		    } else if ( k=="mutect_version" ) {
+			$("#version_mutect").val(v);
 		    } else {
-			$("[name="+k+"]").val(results[i]['v']);
+			$("[name="+k+"]").val(v);
 		    }
-		    if( k.match(/mutect_min_(.+)_qual/) ) {
-			$("[name="+k+"]").val(parseInt(results[i]['v']));
-		    } else {
-			$("[name="+k+"]").val(results[i]['v']);
-		    }
-		    if( k == "gatk_version" ) { $("#version_gatk").val(v); }
-		    if( k == "mutect_version" ) { $("#version_mutect").val(v); }
-		    
 		} else {
 		    alert("Error: Profile key "+k_orig+" is not recognized. Please check the configuration.");
-		} 
+		}
 	    }
 	    
 	}  // for
