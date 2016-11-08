@@ -689,7 +689,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // --------------------------------------------------------------------------------
   // Set up genomes
   // --------------------------------------------------------------------------------
-  fwrite($fp, "mkdir -p \$RUNDIR/{genomes,reference,status} \$RESULTSDIR\n");
+  fwrite($fp, "mkdir -p \$RUNDIR/{genomes,reference,status}\n");
+  if ($compute_target != "AWS") { fwrite($fp, "mkdir -p \$RESULTSDIR\n"); }
   fwrite($fp, "touch \$RUNDIR/status/Tasks_left\n");
   if ($compute_target=="AWS") {
     fwrite($fp, "\$put_cmd  \$RUNDIR/status/Tasks_left  \$STATUSDIR/\n");
