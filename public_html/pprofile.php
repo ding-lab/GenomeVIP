@@ -693,6 +693,20 @@ if (isset($_POST['vs_cmd'])) {
 
   // ------------------------------------------------------------
 
+  if ($_POST['compute_target']=="AWS") {
+    array_push($pp, "[ aws ]\n");
+    if (trim($_POST['gvip_img'])!="") {
+      array_push($pp, "; requested alternative image\n");
+      array_push($pp, "genomevip.runtime_imageID = ".trim($_POST['gvip_img']));
+    } else {
+      array_push($pp, "; default image\n");
+      array_push($pp, "genomevip.runtime_imageID = $genomevip_imageID\n");
+    }
+  }
+
+
+  // ------------------------------------------------------------
+
 echo json_encode($pp);
 
 ?>

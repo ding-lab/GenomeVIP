@@ -848,6 +848,7 @@ function apply_profile(results) {
 		replace(/^dbsnp\.dbsnp_version/,"dbsnp_version").
 		replace(/^variant_effect_predictor/,"vep").
 		replace(/^vep\.vep_version/,"vep_version").
+		replace(/^aws\.runtime_imageID/,"gvip_img").
 		replace(/\./g,"_");
 	    v=results[i]['v'];
 	    if(k == "gatk_version" && v == "user") { v="gatk_user"; }
