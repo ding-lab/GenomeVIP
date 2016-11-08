@@ -17,6 +17,7 @@ $cmd_names = array(
  "genomestrip"              =>"",
  "variant_effect_predictor" =>"",
  "gatk"                     =>"",
+ "mutect"                   =>"",
 );
 
 
@@ -162,6 +163,17 @@ $gatk_opts = array(
  "extra_arguments"    => "extraGATKArguments",
 );
 
+// ----------------------------------------
+
+$mutect_opts = array(
+ "min_base_qual"      => " -mbq ",
+ "remove_duplicates"  => " -rf DuplicateRead ",
+ "remove_unmapped"    => " -rf UnmappedRead ",
+ "min_emit_qual"      => " -stand_emit_conf ",
+ "min_call_qual"      => " -stand_call_conf ",
+ "extra_arguments"    => "extraMuTectArguments",
+ "use_pon"            => " --normal_panel ",
+);
 
 // ----------------------------------------
 

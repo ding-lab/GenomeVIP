@@ -1,6 +1,7 @@
 [config]
 varscan.cmd="false"
 gatk.cmd="false"
+mutect.cmd="false"
 strelka.cmd="false"
 breakdancer.cmd="false"
 pindel.cmd="false"

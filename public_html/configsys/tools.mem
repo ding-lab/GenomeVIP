@@ -63,3 +63,8 @@ mem_default=3072
 mem_default=5000
 mem_min=5000
 mem_max=5000
+
+[mutect]
+mem_default=5000
+mem_min=5000
+mem_max=5000

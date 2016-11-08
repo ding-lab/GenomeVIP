@@ -26,7 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$resp .= "<option class=\"".$cl_str."\" value=\"".$k."\">".$v['desc']."</option>";
       }
     }
-    $resp .= "<option class=\"".$cl_str."\" value=\""."gatk_user"."\">"."version user"."</option>";
+    $user_str = $_POST['cmd']."_user";
+    $resp .= "<option class=\"".$cl_str."\" value=\"".$user_str."\">"."version user"."</option>";
   }
   echo $resp;
 }

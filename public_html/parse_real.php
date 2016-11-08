@@ -31,6 +31,7 @@ include realpath(dirname(__FILE__)."/"."array_defs.php");
 include realpath(dirname(__FILE__)."/"."pprofile_wrapper.php");
 include realpath(dirname(__FILE__)."/"."bam_util.php");
 include realpath(dirname(__FILE__)."/"."versions.php");
+include realpath(dirname(__FILE__)."/"."file_util.php");
 
 
 function write_bamlist($fp,$list,$thefile)   {
@@ -433,6 +434,21 @@ function write_gatk_merge($fp, $gatk_dbsnp_filter_prefix, $gatk_fpfilter_prefix)
   fwrite($fp, "fi\n");
 }
 
+function write_mutect_merge($fp, $mutect_dbsnp_filter_prefix, $mutect_fpfilter_prefix) {
+  $vartype="snv";
+  $suffix = "gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass'].$mutect_fpfilter_prefix[$vartype]['pass']."vcf";
+  $find_cmd  = "find . -size +0c -iname  mutect.out.*.$vartype.$suffix  >  ./\\\$outlist";
+  fwrite($fp, "$find_cmd\n");
+  $vartype="indel";
+  $suffix = "gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass'].$mutect_fpfilter_prefix[$vartype]['pass']."vcf";
+  $find_cmd  = "find . -size +0c -iname  mutect.out.*.$vartype.$suffix  >>  ./\\\$outlist";
+  fwrite($fp, "$find_cmd\n");
+  fwrite($fp, "if [ -s ./\\\$outlist ] ; then\n");
+  fwrite($fp, "   \\\$VCFTOOLSDIR/bin/vcf-concat -f ./\\\$outlist | \\\$VCFTOOLSDIR/bin/vcf-sort -c  > ./mutect.out.group\$gp.all.current_final.gvip.vcf\n");
+  fwrite($fp, "else\n");
+  fwrite($fp, "   touch ./mutect.out.group\$gp.all.current_final.gvip.vcf\n");
+  fwrite($fp, "fi\n");
+}
 
 function write_strlk_merge($fp, $callset, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix) {
   $vartype="snv";
@@ -527,9 +543,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if ($workdir=="") {
       $workdir="~/mydir";  // default
     } 
-    if (!preg_match('#^[/~]#', $workdir)) {
-      $workdir = "~/$workdir"; // assume homedir
-    }
+    verify_rel_homedir( $workdir ); // assume homedir
+
+
     
     // Generated jobname
     $myjob = generateRandomString($randlen);
@@ -638,11 +654,34 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "check_aws_file \$msg \n");
     } else {
       if ($_POST['gatk_version'] == "gatk_user") {
-	fwrite($fp, "export GATK_DIR=".dirname($_POST['gatk_jarpath'])."\n");
-	fwrite($fp, "export GATK_EXE=".basename($_POST['gatk_jarpath'])."\n");
+	$my_gatk_jarpath = $_POST['gatk_jarpath'];
+	verify_rel_homedir( $my_gatk_jarpath );
+	fwrite($fp, "export GATK_DIR=".dirname($my_gatk_jarpath)."\n");
+	fwrite($fp, "export GATK_EXE=".basename($my_gatk_jarpath)."\n");
       } else {
       fwrite($fp, "export GATK_DIR=".$toolsinfo_h[$_POST['gatk_version']]['path']."\n");
       fwrite($fp, "export GATK_EXE=".$toolsinfo_h[$_POST['gatk_version']]['exe']."\n");
+      }
+    }
+  }
+  if(isset($_POST['mutect_cmd'])) {
+    if ($compute_target=="AWS") {
+      fwrite($fp, "MUTECT_REMOTE=".$_POST['gatk_jarpath']."\n");
+      fwrite($fp, "export MUTECT_DIR=\$RUNDIR/mutect\n");
+      fwrite($fp, "export MUTECT_EXE=".basename($_POST['gatk_jarpath'])."\n");
+      fwrite($fp, "mkdir -p \$MUTECT_DIR\n");
+      fwrite($fp, "echo Retrieving MUTECT...\n");
+      fwrite($fp, "msg=`$s3_action  \$MUTECT_REMOTE  \$MUTECT_DIR/\$MUTECT_EXE  2>&1`\n");
+      fwrite($fp, "check_aws_file \$msg \n");
+    } else {
+      if ($_POST['mutect_version'] == "mutect_user") {
+	$my_gatk_jarpath = $_POST['gatk_jarpath'];
+	verify_rel_homedir( $my_gatk_jarpath );
+	fwrite($fp, "export MUTECT_DIR=".dirname($my_gatk_jarpath)."\n");
+	fwrite($fp, "export MUTECT_EXE=".basename($my_gatk_jarpath)."\n");
+      } else {
+      fwrite($fp, "export MUTECT_DIR=".$toolsinfo_h[$_POST['mutect_version']]['path']."\n");
+      fwrite($fp, "export MUTECT_EXE=".$toolsinfo_h[$_POST['mutect_version']]['exe']."\n");
       }
     }
   }
@@ -1009,6 +1048,81 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
   } // end gatk ref
 
+  // for mutect
+  if(isset($_POST['mutect_cmd'])) {
+    fwrite($fp, "# Check avail refs for mutect ref\n");
+    $bFound=0;
+    foreach ($typematch as $key => $value) {
+      switch ($key) {
+      case $IS_FA_GZ:    // "$stemref.fa.gz":
+      case $IS_FASTA_GZ: //"$stemref.fasta.gz":
+	$bFound=1;
+	list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+
+	// normal
+	fwrite($fp, "MUTECT_REF=$availref\n");
+	fwrite($fp, "if [[ ! -e  \$MUTECT_REF ]]; then\n");
+        if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+	  fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$MUTECT_REF 2>&1`\n");
+	  fwrite($fp, "   check_aws_file \$msg \$MUTECT_REF\n");
+	} else {
+	  fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$MUTECT_REF  .\n");
+        }
+	fwrite($fp, "fi\n");
+
+	$DNAM_use[$pathid] = 1;
+	$retrieved[$availref] = $availref_type_h[$availref];
+	$retrieved_pathid[$availref] = $pathid;
+	fwrite($fp, "MUTECT_REF_fai=\${MUTECT_REF}.fai\n");
+	$MUTECT_REF = $availref;
+	$MUTECT_REF_fai = "$MUTECT_REF.fai";
+	handle_fai($fp, $hasfai, $MUTECT_REF_fai, "MUTECT_REF", $pathid, $action, $compute_target, $s3_action);
+	$retrieved[$MUTECT_REF_fai] = get_ref_type($MUTECT_REF_fai);
+	break 2;
+      }
+    }
+
+    if(!$bFound) {
+      foreach ($typematch as $key => $value) {
+	switch ($key) {
+	case $IS_FA:    //"$stemref.fa"
+	case $IS_FASTA: //"$stemref.fasta"
+	  $bFound=1;
+	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
+	  fwrite($fp, "MUTECT_REF=$availref\n");
+	  fwrite($fp, "if [[ ! -e  \$MUTECT_REF ]]; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$MUTECT_REF  .\n");
+	  fwrite($fp, "fi\n");
+	    $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = $availref_type_h[$availref];
+	  $retrieved_pathid[$availref] = $pathid;
+	  fwrite($fp, "MUTECT_REF_fai=\${MUTECT_REF}.fai\n");
+	  // TODO: tie into functions
+	  fwrite($fp, "if [[ ! -e  \$MUTECT_REF_fai ]]; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$MUTECT_REF_fai  .\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "mystem=\$(basename \$MUTECT_REF .gz)\n");
+	  fwrite($fp, "mystem=\$(basename \$mystem .fasta)\n");
+	  fwrite($fp, "mystem=\$(basename \$mystem .fa)\n");
+	  fwrite($fp, "if [[ ! -e  \$mystem.dict  ]]; then\n");
+	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$mystem.dict .\n");
+	  fwrite($fp, "fi\n");
+	  //
+	  $MUTECT_REF = $availref;
+	  $MUTECT_REF_fai = "$MUTECT_REF.fai";
+	  handle_fai($fp, $hasfai, $MUTECT_REF_fai, "MUTECT_REF", $pathid, $action, $compute_target, $s3_action);
+	  $retrieved[$MUTECT_REF_fai] = get_ref_type($MUTECT_REF_fai);
+	  break 2;
+	}
+      }
+    }
+
+    if(!$bFound) {
+      fwrite($fp, "\nexit\n");
+      fwrite($fp, "# ERROR:  No compatible reference for mutect found.\n");
+      echo "ERROR:  No compatible reference for mutect found.<br>\n";
+    }
+  } // end mutect ref
 
   // for strelka
   if(isset($_POST['strlk_cmd'])) {
@@ -1772,6 +1886,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		     "pin_cmd"    => "pindel",
 		     "gs_cmd"     => "genomestrip",
 		     "gatk_cmd"   => "gatk",
+		     "mutect_cmd" => "mutect",
 		     );
   foreach ($prog_cmds as $key => $value) {
     if(isset($_POST[$key])) {
@@ -3232,6 +3347,315 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "\n");
 
   } // if gatk_cmd
+
+  // --------------------------------------------------------------------------------
+  // RUN MUTECT
+  // --------------------------------------------------------------------------------
+  if (isset($_POST['mutect_cmd'])) {
+    fwrite($fp, "#------------------------------\n");
+
+    $mutect_opts_cmd = "";
+
+    // Set user options
+    foreach ($mutect_opts as $tmpkey => $value) {
+      $key = "mutect_$tmpkey";
+      switch($key) {
+      case "mutect_remove_duplicates":
+      case "mutect_remove_unmapped":
+	if($_POST[$key] == "true" ) { $mutect_opts_cmd .= " ".$value." "; }
+        break;
+      case "mutect_min_emit_qual":
+      case "mutect_min_call_qual":
+	$mutect_opts_cmd .= " ".$value." ".$_POST[$key].".0"." ";	// floats recommended
+        break;
+      case "mutect_use_pon":
+	if($_POST[$key] == "true" ) { $mutect_opts_cmd .= " ".$value." "."\\\$NORMAL_PANEL"; }
+	break;
+      case "mutect_extra_arguments":
+	$mutect_opts_cmd .= " ".$_POST[$key];
+	break;
+      default:
+	$mutect_opts_cmd .= " ".$value." ".$_POST[$key];
+      }
+    }
+
+    // options (both on by default with this mutect module)
+    $mutect_bMap = array("snv" => 1, "indel" => 1);
+
+    // set up dirs and samples
+    write_sample_tuples($fp, $list_of_sorted_bams, "mutect", 2);
+
+    // Chromosome
+    write_chromosomes($fp,$_POST['mutect_chrdef'], "MUTECT_REF_fai", $_POST['mutect_chrdef_str'] );
+
+    fwrite($fp,"# mutect somatic\n");
+    fwrite($fp,"echo Preparing MUTECT...\n");
+    fwrite($fp,"cd \$RUNDIR/mutect\n");
+    fwrite($fp, "for gp in `seq 0 \$((numgps - 1))`; do\n");
+    fwrite($fp,"echo    Preparing group \$gp of \$((numgps - 1))...\n");
+
+    if ($compute_target != "AWS") {  fwrite($fp, "   mkdir -p \$RESULTSDIR/group\$gp\n"); } // deld tool
+
+    fwrite($fp, "   statfile_g=incomplete.mutect_postrun.group\$gp\n");
+    fwrite($fp, "   localstatus_g=\$RUNDIR/status/\$statfile_g\n");
+    fwrite($fp, "   touch \$localstatus_g\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "   remotestatus_g=\$STATUSDIR/\$statfile_g\n");
+      fwrite($fp, "   ".str_replace("\"","",$put_cmd)." "."\$localstatus_g  \$remotestatus_g\n");
+    }
+
+    fwrite($fp, "   tag_mutect=\$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 6 | head -n 1)\n");
+    fwrite($fp, "   for chr in \$SEQS; do\n");
+    fwrite($fp, "      chralt=\${chr/:/_}\n");
+    fwrite($fp, "      dir=group\$gp/\$chralt\n");
+    fwrite($fp, "      mkdir -p \$RUNDIR/mutect/\$dir\n");
+    fwrite($fp, "      cat > \$RUNDIR/mutect/\$dir/mutect.sh <<EOF\n");
+    write_vs_preamble($fp, $toolsinfo_h);
+    write_wait_func($fp);
+    fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
+    fwrite($fp, "export VARSCAN_DIR=".$toolsinfo_h['varscan238']['path']."\n"); // fpfilter uses varscan
+    fwrite($fp, "RUNDIR=\$RUNDIR\n");
+    fwrite($fp, "myRUNDIR=\$RUNDIR/mutect/group\$gp\n");
+    fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+    fwrite($fp, "myRWORKDIR=\$RWORKDIR/mutect/group\$gp\n");
+    fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
+    fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
+    fwrite($fp, "MUTECT_REF=\\\$RUNDIR/reference/$MUTECT_REF\n");
+    fwrite($fp, "MUTECT_DIR=\$MUTECT_DIR\n");
+    fwrite($fp, "MUTECT_EXE=\$MUTECT_EXE\n");
+    fwrite($fp, "put_cmd=$put_cmd\n");
+    fwrite($fp, "del_cmd=$del_cmd\n");
+    fwrite($fp, "del_local=$del_local\n");
+    fwrite($fp, "statfile=incomplete.mutect.group\$gp.chr\$chralt\n");
+    fwrite($fp, "localstatus=\\\$RUNDIR/status/\\\$statfile\n");
+    fwrite($fp, "touch \\\$localstatus\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "remotestatus=\\\$STATUSDIR/\\\$statfile\n");
+      fwrite($fp, "\\\$put_cmd \\\$localstatus  \\\$remotestatus\n");
+    }
+    fwrite($fp, "cd \\\$RUNDIR/mutect/\$dir\n");
+
+    // Set up calcs
+    fwrite($fp, "outstem=mutect.out.group\$gp.chr\$chralt\n");
+
+
+    fwrite($fp, "log=mutect.log.group\$gp.chr\$chralt\n");
+    fwrite($fp, "BAMFILE=\\\$RUNDIR/mutect/group\$gp/bamfilelist.inp\n");
+    fwrite($fp, "TBAM=\\\$(awk 'NR==1' \\\$BAMFILE)\n"); // (tumor,normal) order
+    fwrite($fp, "NBAM=\\\$(awk 'NR==2' \\\$BAMFILE)\n");
+    if ($_POST['mutect_use_pon'] == "true") {
+      $my_pon_path = $_POST['mutect_pon_vcfpath'];
+      if ($compute_target == "local") {
+	verify_rel_homedir( $my_pon_path );
+      }
+      fwrite($fp, "NORMAL_PANEL=".$my_pon_path."\n");
+    }
+    fwrite($fp, "java  \\\$JAVA_OPTS -jar \\\$MUTECT_DIR/\\\$MUTECT_EXE  -R \\\$MUTECT_REF  -T MuTect2 -I:tumor \\\$TBAM -I:normal \\\$NBAM  -L \$chr  $mutect_opts_cmd  -o  \\\$outstem.raw.vcf   &> \\\$log\n");
+    fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/genomevip_label.pl MuTect ./\\\$outstem.raw.vcf  ./\\\$outstem.gvip.vcf\n");
+    fwrite($fp, "wait_file ./\\\$outstem.raw.vcf.idx\n"); // frequently needed here
+    fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$MUTECT_DIR/\\\$MUTECT_EXE  -R \\\$MUTECT_REF  -T SelectVariants  -V  \\\$outstem.gvip.vcf   -o  \\\$outstem.snv.gvip.vcf    -selectType SNP -selectType MNP  &>>  \\\$log\n");
+    fwrite($fp, "java \\\$JAVA_OPTS -jar \\\$MUTECT_DIR/\\\$MUTECT_EXE  -R \\\$MUTECT_REF  -T SelectVariants  -V  \\\$outstem.gvip.vcf   -o  \\\$outstem.indel.gvip.vcf  -selectType INDEL                &>>  \\\$log\n");
+    fwrite($fp, "\\\$del_local ./\\\$outstem.gvip.vcf ./*.idx\n");
+
+    // store raw results
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  ./\\\$log  ./\\\$outstem.*.vcf    \\\$myRWORKDIR/\n");
+    }
+
+    if($do_timing) {
+      fwrite($fp, "scr_tf=\`date +%s\`\n");
+      fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
+      fwrite($fp, "echo GVIP_TIMING_MUTECT_DISCOVERY=\\\$scr_t0,\\\$scr_dt\n");
+      //
+      fwrite($fp, "scr_t0=\\\$scr_tf\n");
+    }
+
+    // Run dbSNP filter
+    $mutect_dbsnp_filter_prefix['snv']['pass']   = "";
+    $mutect_dbsnp_filter_prefix['snv']['fail']   = "";
+    $mutect_dbsnp_filter_prefix['indel']['pass'] = "";
+    $mutect_dbsnp_filter_prefix['indel']['fail'] = "";
+    if (isset($_POST['mutect_apply_dbsnp_filter'])) {
+      foreach( array('snv','indel') as $vartype) {
+	$mutect_dbsnp_filter_prefix[$vartype]['pass'] = "dbsnp_pass.";
+	$mutect_dbsnp_filter_prefix[$vartype]['fail'] = "dbsnp_present.";
+	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/dbsnp_filter.pl  ./mutect_dbsnp_filter.$vartype.input\n");
+      }
+    }
+
+    // Run false-positives filter (only for snvs at this time)
+    $mutect_fpfilter_prefix['snv']['pass']   = "";
+    $mutect_fpfilter_prefix['snv']['fail']   = "";
+    $mutect_fpfilter_prefix['indel']['pass'] = "";
+    $mutect_fpfilter_prefix['indel']['fail'] = "";
+    if (isset($_POST['mutect_apply_false_positives_filter'])) {
+      $vartype="snv";
+      $mutect_fpfilter_prefix[$vartype]['pass'] = "fp_pass.";
+      $mutect_fpfilter_prefix[$vartype]['fail'] = "fp_fail.";
+      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/snv_filter.pl  ./mutect_fpfilter.$vartype.input\n");
+      if( isset($_POST['mutect_apply_dbsnp_filter'])) {
+	fwrite($fp, "\\\$del_local  ./mutect.out.group\$gp.chr\$chralt.gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+      }
+    }
+
+
+    if ($compute_target!="AWS") {	fwrite($fp, "mkdir -p \\\$myRESULTSDIR\n"); }
+    // store results
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  ./mutect.log.* ./mutect.*.vcf  ./*.input \\\$myRWORKDIR/\n");
+    }
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus\n");
+    }
+    fwrite($fp, "\\\$del_local \\\$localstatus\n");
+
+
+    if($do_timing) {
+      fwrite($fp, "scr_tf=\`date +%s\`\n");
+      fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
+      fwrite($fp, "echo GVIP_TIMING_MUTECT_FILTERING=\\\$scr_t0,\\\$scr_dt\n");
+    }
+    if($compute_target=="AWS") { fwrite($fp, "$sgemem_cmd\n"); }
+    fwrite($fp,"EOF\n");
+
+    // Generate input files
+    foreach (array('snv','indel') as $vartype) {
+
+      if (isset($_POST['mutect_apply_dbsnp_filter'])) {
+	$prefix="mutect.dbsnp.$vartype";
+	fwrite($fp, "cat > \$RUNDIR/mutect/group\$gp/\$chralt/mutect_dbsnp_filter.$vartype.input <<EOF\n");
+	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");
+	fwrite($fp, "$prefix.rawvcf = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.vcf\n");
+	fwrite($fp, "$prefix.mode = filter\n");
+	fwrite($fp, "$prefix.passfile = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	fwrite($fp, "$prefix.dbsnpfile = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.".$mutect_dbsnp_filter_prefix[$vartype]['fail']."vcf\n");
+	fwrite($fp, "EOF\n");
+      }
+
+      if (isset($_POST['mutect_apply_false_positives_filter'])) {
+	if ( $vartype=="snv" ) {  //  only for snvs at this time
+	  $prefix="mutect.fpfilter.$vartype";
+	  fwrite($fp, "FP_BAM=`awk '{if(NR==1){print \$1}}' \$RUNDIR/mutect/group\$gp/bamfilelist.inp`\n");
+	  fwrite($fp, "cat > \$RUNDIR/mutect/group\$gp/\$chralt/mutect_fpfilter.$vartype.input <<EOF\n");
+	  fwrite($fp, "$prefix.bam_readcount = ".$toolsinfo_h['readcount']['path']."/".$toolsinfo_h['readcount']['exe']."\n");
+	  fwrite($fp, "$prefix.bam_file = \$FP_BAM\n");
+	  fwrite($fp, "$prefix.REF = \$RUNDIR/reference/\$MUTECT_REF\n");
+	  fwrite($fp, "$prefix.variants_file = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "$prefix.passfile = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass'].$mutect_fpfilter_prefix[$vartype]['pass']."vcf\n");
+	  fwrite($fp, "$prefix.failfile = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass'].$mutect_fpfilter_prefix[$vartype]['fail']."vcf\n");
+	  foreach ($vs_opts_fpfilter as $value) { $key = "vs_fp_".$value; fwrite($fp, "$prefix.$value = ".$_POST[$key]."\n"); }
+	  fwrite($fp, "EOF\n");
+	}
+      }
+    }
+
+
+    fwrite($fp, "cd \$RUNDIR/mutect/\$dir ; chmod +x ./mutect.sh\n");
+    // configure memory
+    $mem_opt = gen_mem_str($compute_target, $toolmem_h['mutect']['mem_default']);
+    $job_name = $batch['name_opt']." "."\$tag_mutect.group\$gp.chr";
+    $ERRARG = "-e ./stderr.mutect.group\$gp.chr\$chralt";
+    $OUTARG = "-o ./stdout.mutect.group\$gp.chr\$chralt";
+    $EXEARG = "./mutect.sh";
+    fwrite($fp,"$nobsub"." ".$batch['cmd']." ".$batch['limitgr']." ".$job_name." ".$batch['q_opt']." "."$ERRARG $OUTARG $mem_opt $EXEARG\n");
+    fwrite($fp,"sleep $dlay\n");
+    fwrite($fp,"# done chr\n");
+    fwrite($fp,"   done\n");  //chr
+
+    // Gather group results and annotate
+    fwrite($fp, " cat > \$RUNDIR/mutect/group\$gp/mutect_postrun.sh <<EOF\n");
+    fwrite($fp, "#!/bin/bash\n");
+    check_aws_shell($fp);
+    if($do_timing) {fwrite($fp, "scr_t0=\`date +%s\`\n"); }
+    fwrite($fp, "RUNDIR=\$RUNDIR\n");
+    fwrite($fp, "RWORKDIR=\$RWORKDIR\n");
+    fwrite($fp, "myRWORKDIR=\$RWORKDIR/mutect/group\$gp\n");
+    fwrite($fp, "STATUSDIR=\$STATUSDIR\n");
+    fwrite($fp, "RESULTSDIR=\$RESULTSDIR\n");
+    fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
+    fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
+    fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
+    fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+    fwrite($fp, "put_cmd=$put_cmd\n");
+    fwrite($fp, "del_cmd=$del_cmd\n");
+    fwrite($fp, "del_local=$del_local\n");
+    fwrite($fp, "statfile_g=\$statfile_g\n");
+    fwrite($fp, "localstatus_g=\\\$RUNDIR/status/\\\$statfile_g\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "remotestatus_g=\\\$STATUSDIR/\\\$statfile_g\n");
+    }
+    fwrite($fp, "cd \\\$RUNDIR/mutect/group\$gp\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  ./bamfilelist.inp \\\$myRWORKDIR/mutect.bamfilelist.group\$gp.inp\n");
+    }
+    fwrite($fp, "\\\$put_cmd  \`pwd\`/bamfilelist.inp \\\$myRESULTSDIR/mutect.bamfilelist.group\$gp.inp\n");
+    fwrite($fp, "outlist=mutect.out.group\$gp.all.filelist\n");
+    write_mutect_merge( $fp, $mutect_dbsnp_filter_prefix, $mutect_fpfilter_prefix );
+
+    // Results, possibly with annotation
+    if (isset($_POST['vep_cmd'])) {
+      fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./mutect_vep.input >& ./mutect_vep.log\n");
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/mutect.out.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
+      if ($compute_target=="AWS") {
+	fwrite($fp, "\\\$put_cmd  ./mutect_vep.* \\\$myRWORKDIR/\n");
+      }
+      fwrite($fp, "\\\$del_local ./mutect.out.group\$gp.all.current_final.gvip.vcf\n");
+    } else {
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/mutect.out.group\$gp.all.current_final.gvip.vcf  \\\$myRESULTSDIR/\n");
+    }
+    fwrite($fp, "\\\$put_cmd  \`pwd\`/\\\$outlist \\\$myRESULTSDIR/\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/\\\$outlist \\\$myRWORKDIR/\n");
+      fwrite($fp, "\\\$put_cmd  \`pwd\`/stdout.*.postrun \`pwd\`/stderr.*.postrun \\\$myRWORKDIR/\n");
+    }
+
+    fwrite($fp, "\\\$del_local \\\$localstatus_g\n");
+    if ($compute_target=="AWS") {
+      fwrite($fp, "\\\$del_cmd  \\\$remotestatus_g\n");
+    }
+
+    if($do_timing) {
+      fwrite($fp, "scr_tf=\`date +%s\`\n");
+      fwrite($fp, "scr_dt=\\\$((scr_tf - scr_t0))\n");
+      fwrite($fp, "echo GVIP_TIMING_MUTECT_GATHER=\\\$scr_t0,\\\$scr_dt\n");
+    }
+    if($compute_target=="AWS") { fwrite($fp, "$sgemem_cmd\n"); }
+    fwrite($fp, "EOF\n");
+
+    // Generate VEP input
+    if (isset($_POST['vep_cmd'])) {
+      $prefix="mutect.vep";
+      fwrite($fp, "cat > \$RUNDIR/mutect/group\$gp/mutect_vep.input <<EOF\n");
+      fwrite($fp, "$prefix.vcf = ./mutect.out.group\$gp.all.current_final.gvip.vcf\n");
+      fwrite($fp, "$prefix.output = ./mutect.out.group\$gp.all.current_final.gvip.VEP.vcf\n");
+      write_vep_input_common($fp, $prefix);
+      fwrite($fp, "EOF\n");
+    }
+
+    fwrite($fp, "cd \$RUNDIR/mutect/group\$gp ;  chmod +x ./mutect_postrun.sh\n");
+    // configure memory
+    if (isset($_POST['vep_cmd'])) {
+      $mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
+    }	else {
+      $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
+    }
+    $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_mutect.group\$gp.$wc".$batch['dep_opt_post'];
+    $job_name = $batch['name_opt']." "."mutect_postrun.group\$gp";
+    $ERRARG = "-e ./stderr.mutect.group\$gp.postrun";
+    $OUTARG = "-o ./stdout.mutect.group\$gp.postrun";
+    $EXEARG = "./mutect_postrun.sh";
+    fwrite($fp, "$nobsub"." ".$batch['cmd']." ".$batch['limitgr']." "."$job_name $jobdeps"." ".$batch['q_opt']." "."$ERRARG $OUTARG $mem_opt $EXEARG\n");
+    fwrite($fp,"sleep $dlay\n");
+    fwrite($fp, "\n");
+
+
+    fwrite($fp,"# done group\n");
+    fwrite($fp, "done\n");  // group
+    fwrite($fp, "\n");
+
+  } // if mutect_cmd
 
   // ---------------------------------------------------------------------------
   // RUN STRELKA

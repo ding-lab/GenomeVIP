@@ -10,6 +10,13 @@ error_reporting(E_ALL);
 include realpath(dirname(__FILE__)."/"."array_defs.php");
 include realpath(dirname(__FILE__)."/"."versions.php");
 
+// importing file_util.php here avoids previous declaration
+function pprofile_verify_rel_homedir( &$p ) {
+  if ( ! preg_match('#^[/~]#', $p) ) {
+    $p = "~/" . $p;
+  }
+}
+
 $pp = array();
 
 array_push($pp, "; GenomeVIP execution profile\n");
@@ -253,8 +260,12 @@ if (isset($_POST['vs_cmd'])) {
     array_push($pp, "$prefix.version = ".$gatk_ver_map[$_POST['gatk_version']]."\n");
 
 
-    if ($_POST['gatk_version']=="gatk_user") {
-      array_push($pp, "$prefix.jarpath = ".$_POST['gatk_jarpath']."\n");
+    if ($_POST['gatk_version'] == "gatk_user") {
+      $my_gatk_jarpath = trim($_POST['gatk_jarpath']);
+      if ( strlen($my_gatk_jarpath)  &&  $_POST['compute_target'] == "local") {
+	pprofile_verify_rel_homedir( $my_gatk_jarpath );
+      }
+      array_push($pp, "$prefix.jarpath = ".$my_gatk_jarpath."\n");
     }
 
 
@@ -296,6 +307,76 @@ if (isset($_POST['vs_cmd'])) {
     array_push($pp, "\n");
 
   }  // end gatk
+
+  // ------------------------------------------------------------
+
+  if( isset($_POST['mutect_cmd'])) {
+    array_push($pp, "\n");
+
+    $prefix = "mutect";
+    array_push($pp, "[ $prefix ]\n");
+
+    array_push($pp, "$prefix.version = ".$mutect_ver_map[$_POST['mutect_version']]."\n");
+
+
+    if ($_POST['mutect_version'] == "mutect_user") {
+      $my_gatk_jarpath = trim($_POST['gatk_jarpath']);
+      if ( strlen($my_gatk_jarpath) && $_POST['compute_target'] == "local") {
+	pprofile_verify_rel_homedir( $my_gatk_jarpath );
+      }
+      array_push($pp, "$prefix.jarpath = ".$my_gatk_jarpath."\n");
+    }
+
+
+    foreach ($mutect_opts as $tmpkey => $novalue) {
+      $key = "mutect_$tmpkey";
+
+      switch($tmpkey) {
+      case "remove_duplicates":
+      case "remove_unmapped":
+	if( ! isset($_POST[$key]) ) {
+	  array_push($pp, "$prefix.$tmpkey = \"false\"\n");
+	} else {
+	  array_push($pp, "$prefix.$tmpkey = \"true\"\n");
+	}
+        break;
+      case "use_pon":
+	array_push($pp, "$prefix.$tmpkey = \"".$_POST[$key]."\"\n");
+	$my_pon_path = "";
+	if ($_POST[$key] == "true") {
+	  $my_pon_path = $_POST['mutect_pon_vcfpath'];
+	  if ( strlen($my_pon_path)  &&  $_POST['compute_target'] == "local") {
+	    pprofile_verify_rel_homedir( $my_pon_path );
+	  }
+	}
+	array_push($pp, "$prefix.pon_vcfpath = ".$my_pon_path."\n");
+	break;
+      default:
+	array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
+      }
+
+    }
+
+    array_push($pp, "\n");
+
+    // dbSNP filter
+    if( ! isset($_POST['mutect_apply_dbsnp_filter'])) {
+      array_push($pp, "$prefix.apply_dbsnp_filter = \"false\"\n");
+    } else {
+      array_push($pp, "$prefix.apply_dbsnp_filter = \"true\"\n");
+    }
+    array_push($pp, "\n");
+
+
+    // mutect false positives filter
+    if( ! isset($_POST['mutect_apply_false_positives_filter']) ) {
+      array_push($pp, "$prefix.apply_false_positives_filter = \"false\"\n");
+    } else {
+      array_push($pp, "$prefix.apply_false_positives_filter = \"true\"\n");
+    }
+    array_push($pp, "\n");
+
+  }  // end mutect
 
   // ------------------------------------------------------------
 

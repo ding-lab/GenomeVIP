@@ -86,6 +86,14 @@ gatk.remove_duplicates = "true"
 gatk.remove_unmapped = "true"
 
 ; ----------------------------------------
+; mutect
+; ----------------------------------------
+; values for base quality and emit/call thresholds are set within the interface
+mutect.remove_duplicates = "true"
+mutect.remove_unmapped = "true"
+mutect.use_pon = "false"
+
+; ----------------------------------------
 ; strelka 
 ; ----------------------------------------
 strelka.skip_depth_filters = "false"

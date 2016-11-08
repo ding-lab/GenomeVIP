@@ -276,9 +276,9 @@ function validateform( bSubmit ){
 	    return false;
 	}
 
-	// TODO: Check jarfile path syntax and exists
-	$("#gatk_jarpath").val($.trim($("#gatk_jarpath").val()));
-    }
+
+
+    } // aws
 
 
     if (document.forms.myform.bamfilesms2side__dx.length < 1) {
@@ -290,7 +290,7 @@ function validateform( bSubmit ){
 	numerr++; return false;
     }
 
-    if ( ! ( $("#vs_cmd").is(':checked') || $("#strlk_cmd").is(':checked') ||  $("#bd_cmd").is(':checked') || $("#pindel_cmd").is(':checked') || $("#gs_cmd").is(':checked') || $("#gatk_cmd").is(':checked')) ) {
+    if ( ! ( $("#vs_cmd").is(':checked') || $("#strlk_cmd").is(':checked') ||  $("#bd_cmd").is(':checked') || $("#pindel_cmd").is(':checked') || $("#gs_cmd").is(':checked') || $("#gatk_cmd").is(':checked') || $("#mutect_cmd").is(':checked')) ) {
 	alert("No tools selected. Please select at least one tool before submitting.");
 	numerr++; return false;
     }
@@ -306,6 +306,21 @@ function validateform( bSubmit ){
         alert("Please specify calling mode for Pindel !"); numerr++; return false;
     }
 
+    $("#gatk_jarpath").val($("#gatk_jarpath").val().trim());
+    if ( $("#gatk_cmd").is(":checked")) {
+      if ( $("#version_gatk").val()=="gatk_user") { if ($("#gatk_jarpath").val().length==0) {
+	  alert("Current configuration requires a GATK jarfile location. Please provide a valid path in the Submit tab."); numerr++; return false;
+	}}
+    }
+    if ( $("#mutect_cmd").is(":checked")) {
+      if ( $("#version_mutect").val()=="mutect_user") { if ($("#gatk_jarpath").val().length==0) {
+	  alert("Current configuration requires a GATK jarfile location. Please provide a valid path in the Submit tab."); numerr++; return false;
+	}}
+      $("#mutect_pon_vcfpath").val($("#mutect_pon_vcfpath").val().trim());
+      if ( $("#mutect_use_ponT").is(":checked")) { if ($("#mutect_pon_vcfpath").val().length==0) {
+	  alert("Current configuration requires a panel of normals VCF file. Please provide a valid path in the Submit tab."); numerr++; return false;
+	}}
+    }
 
     if (  ($("#vs_cmd").is(':checked') && $("#vs_isTRIO").is(':checked')) ||	($("#bd_cmd").is(':checked') && $("#bd_call_modeT").is(':checked')) ||	($("#pindel_cmd").is(':checked') && $("#pindel_modeT").is(':checked')) )   { 
 	if (document.forms.myform.bamfilesms2side__dx.length % 3 != 0) {
@@ -318,6 +333,7 @@ function validateform( bSubmit ){
 	if( ($("#vs_cmd").is(':checked')     && $("#vs_isSOM").is(':checked')     ) ||
 	    ($("#bd_cmd").is(':checked')   && $("#bd_call_modeP").is(':checked') ) || 
 	    ($("#pindel_cmd").is(':checked') && $("#pindel_modeP").is(':checked') ) ||
+	    ($("#mutect_cmd").is(':checked') )                                      ||
 	    ($("#strlk_cmd").is(':checked')) ) {
 	    alert ("A tumor-normal computation is selected but a bam file is unpaired. Please fix before submitting.");
 	    numerr++;
@@ -334,6 +350,11 @@ function validateform( bSubmit ){
     if ( $("#gatk_cmd").is(':checked')) {
 	if( $("#gatk_chrdef2").is(':checked')) { // user
 	    if(chr_str_fail("gatk_chrdef_str","GATK")==true) { alert("The user-input genomic region for GATK is invalid."); numerr++; return false; }
+	}
+    }
+    if ( $("#mutect_cmd").is(':checked')) {
+	if( $("#mutect_chrdef2").is(':checked')) { // user
+	    if(chr_str_fail("mutect_chrdef_str","MuTect")==true) { alert("The user-input genomic region for MuTect is invalid."); numerr++; return false; }
 	}
     }
     if ( $("#bd_cmd").is(':checked')) {
@@ -619,6 +640,16 @@ function reset_form(i) {
     $("#resultsbox").empty();
     if (i==1) {
 	document.getElementById("myform").reset(); 
+	do_none_setup();
+	$("#bamfilesms2side__dx").empty();
+	$("#bamfilesms2side__sx").empty();
+	clear_chr(5);
+	manage_gatk_jardiv();
+	manage_pon();
+	$("#version_gatk").empty();
+	$("#gatk_jarpath").val("");
+	$("#version_mutect").empty();
+	$("#mutect_pon_vcfpath").val("");
 	upd_global_dbsnp();
 	upd_global_fpfilter(); 
 	alert("All options have been reset successfully !");
@@ -700,8 +731,8 @@ function setup_s3() {
 
 
 function gotomytab(i) {
-    var myarray=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
-    var tabnum =[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
+    var myarray=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+    var tabnum =[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
     var buttonarr=[0,1,2,3,9,10,11];
     
     for (var j=0; j< buttonarr.length; j++) {
@@ -715,7 +746,7 @@ function gotomytab(i) {
     $("#litab-"+i).show();
     if (i==3) {
 	for (var j=4;  j<=8;  j++) { $("#litab-"+j).show(); }
-	for (var j=12; j<=13; j++) { $("#litab-"+j).show(); }
+	for (var j=12; j<=14; j++) { $("#litab-"+j).show(); }
     }
     $("#litab-"+i).trigger('click');  // sufficient
 }
@@ -740,6 +771,10 @@ function upd_vs_fpfilter() {
 function upd_gatk_fpfilter() {
     if( $("#gatk_do_dbsnp").is(':checked') ) { $("#gatk_filter_dbsnp").show(); } else { $("#gatk_filter_dbsnp").hide(); }
     if( $("#gatk_do_fpfilter").is(':checked') ){ $("#gatk_filter_fps").show(); } else { $("#gatk_filter_fps").hide(); }
+}
+function upd_mutect_fpfilter() {
+    if( $("#mutect_do_dbsnp").is(':checked') ) { $("#mutect_filter_dbsnp").show(); } else { $("#mutect_filter_dbsnp").hide(); }
+    if( $("#mutect_do_fpfilter").is(':checked') ){ $("#mutect_filter_fps").show(); } else { $("#mutect_filter_fps").hide(); }
 }
 function upd_strlk_fpfilter() {
     if( $("#strlk_do_dbsnp").is(':checked') ){ $("#strlk_filter_dbsnp").show(); } else { $("#strlk_filter_dbsnp").hide(); }
@@ -779,6 +814,7 @@ function clear_chr(i) {
     case 3: $("#pindel_chrdef_str").val(''); break;
     case 4: $("#gs_chrdef_str").val('');     break;
     case 5: $("#upload_ep_div").empty();  $("#ep_frame").contents().find('#myfile').val('');  break;	
+    case 6: $("#mutect_chrdef_str").val(''); break;
     }
     return true;
 }
@@ -813,8 +849,9 @@ function apply_profile(results) {
 		replace(/^variant_effect_predictor/,"vep").
 		replace(/^vep\.vep_version/,"vep_version").
 		replace(/\./g,"_");
-
 	    v=results[i]['v'];
+	    if(k == "gatk_version" && v == "user") { v="gatk_user"; }
+	    if(k == "mutect_version" && v == "user") { v="mutect_user"; }
 	    if($("[name="+ k +"]").length) {  // TODO: is working?
 		// Explict types
 		if($("[name="+ k +"]").is("input:checkbox")) {
@@ -834,6 +871,13 @@ function apply_profile(results) {
 		    } else {
 			$("[name="+k+"]").val(results[i]['v']);
 		    }
+		    if( k.match(/mutect_min_(.+)_qual/) ) {
+			$("[name="+k+"]").val(parseInt(results[i]['v']));
+		    } else {
+			$("[name="+k+"]").val(results[i]['v']);
+		    }
+		    if( k == "gatk_version" ) { $("#version_gatk").val(v); }
+		    if( k == "mutect_version" ) { $("#version_mutect").val(v); }
 		    
 		} else {
 		    alert("Error: Profile key "+k_orig+" is not recognized. Please check the configuration.");
@@ -845,6 +889,10 @@ function apply_profile(results) {
 	upd_vs_hcfilters();
 	upd_vs_fpfilter();
 	upd_gatk_fpfilter();
+	upd_mutect_fpfilter();
+	manage_gatk_jardiv();
+	manage_pon();
+	check_pon();
 	upd_bd_regions();
 	upd_pin_filters();
 
@@ -890,6 +938,10 @@ function mkbucket  () {
 
 function quick_setup() {
     // Error check
+    if( $("#login_none").is(":checked")) {
+	alert("Please select a computational resource under Accounts before applying the execution profile !");
+	return false;
+    }
     var bFile=$("#filepath_ep").length;
     var bSysProf=(($("#mode_select").val()!="nada"||$("#ep_select").val()!="nada")?(1):(0));
     if( ! bSysProf &&  $("#glob_chrdefn").is(":checked") && ! bFile) { 
@@ -1065,6 +1117,7 @@ function download(filename, text) {
 	  <li><a class="tooltip" href="#tabs-3" id="litab-3" title="Configure computations by selecting and applying a pre-made execution profile">Quick Setup</a>
 	  <li><a class="tooltip" href="#tabs-4" id="litab-4" title="Configure VarScan to call nucleotide variants, insertions & deletions for germline, somatic, or single trio analysis">VarScan</a>
 	  <li><a class="tooltip" href="#tabs-13" id="litab-13" title="Configure GATK to call nucleotide variants, insertions & deletions for germline analysis. Uses GATK's HaplotypeCaller module.">GATK</a>
+	  <li><a class="tooltip" href="#tabs-14" id="litab-14" title="Configure MuTect to call nucleotide variants, insertions & deletions for somatic analysis. Uses GATK's builtin caller.">MuTect</a>
 	  <li><a class="tooltip" href="#tabs-5" id="litab-5" title="Configure Strelka to call nucleotide variants, insertions & deletions for somatic analysis">Strelka</a>
 	  <li><a class="tooltip" href="#tabs-6" id="litab-6" title="Configure BreakDancer to call various structural variants in single or multiple samples">BreakDancer</a>
 	  <li><a class="tooltip" href="#tabs-7" id="litab-7" title="Configure Pindel to call insertions, deletions & tandem duplications in single or multiple samples">Pindel</a>
@@ -1076,39 +1129,20 @@ function download(filename, text) {
 	</ul>
 	
 	<div id="tabs-0" class="ui-tabs-panel"> 
-	  <div class="headspc subhead tdindentd"><p>Use the Navigation menu at the left to set up your computation.</p></div> 
-	  <div> 
-	    <h3>Feature list (current)</h3>
-	    <ul>
-	      <li>Computing: Amazon cloud and local cluster</li>
-	      <li>Tools: VarScan, Strelka, BreakDancer, Pindel</li>
-	      <li>Filtering: quality and false positives filters</li>
-	      <li>Annotation: dbSNP, Variant Effect Predictor (VEP)</li>
-	      <li>Execution profiles: systemwide defaults or uploadable by user</li>
-	      <li>Genomic regions: provided selections or uploadable by user</li>
-	    </ul>
-	    <h3>Under development / testing</h3>
-	    <ul>
-	      <li>Documentation</li> 
-	      <li>All-VCF formatted output</li>
-	      <li>GenomeSTRiP, for general cases</li>
-	      <li>Multi-instance AWS clusters</li>
-	      <li>...</li>
-	    </ul>
-	    <h3>Help / Questions</h3>
-	    <ul>
-	      <li>For tool-specific concerns unrelated to GenomeVIP, we suggest contacting the author(s) of the corresponding tool.</li>
-	      <li>For GenomeVIP-related issues, please contact us at one of the following:</li>
-	      <ul>
-		<li> E-mail:  genomevip@genome.wustl.edu</li>
-		<li> GitHub: Go to our site <a href="http://github.com/ding-lab">here</a>; locate GenomeVIP &#8594; Issues</li>
-	      </ul>
-	    </ul>
-	  </div>
-
+	  <div class="headspc subhead tdindentd"><p><b>GenomeVIP</b></p></div>
+	  <p>GenomeVIP is a platform for performing variant discovery and annotation on Amazon's Web Service (AWS) cloud or on local high-performance computing clusters. This web portal aims to make configuring analyses more convenient.</p><br>
+	  <p>Use the Navigation menu at the left to set up your computation.</p>
+	  <br><br>
+	  <div class="headspc subhead tdindentd"><p><b>Further Information</b></p></div>
+	  <ul>
+	    <li>For GenomeVIP-related issues, including list of features, implementation, documentation, and help, please refer to our <a href="http://github.com/ding-lab/GenomeVIP">GitHub site</a>.</li>
+	    <li>For documentation on the utilized Amazon Web Services features, please see also:
+	      <a href="https://aws.amazon.com/documentation/ec2/">Elastic Compute Cloud (EC2)</a>, <a href="https://aws.amazon.com/documentation/s3/">Simple Storage Service (S3)</a>, <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html">Elastic Block Storage (EBS)</a>.
+	    <li>For tool-specific concerns unrelated to GenomeVIP, we suggest contacting the author(s) of the corresponding tool. A list of software links is available through our <a href="http://github.com/ding-lab/GenomeVIP">GitHub site</a>.</li>
+	  </ul>
 
 	</div>
-	
+
 	<!-- Login --> 
 	<div id="tabs-1" class="ui-tabs-panel"> 
 	  <div class="spinner" style="display:none;">
@@ -1116,7 +1150,7 @@ function download(filename, text) {
 	  </div>  
 	  <div class="headspc subhead tdindentd"><p>Select a computational resource:</p></div>
 
-	  <div class="tdindent"> <p><input type="radio" id="login_none" name="compute_target" value="none" hidden="true"/></p></div>
+	  <div class="tdindent"> <p><input type="radio" id="login_none" name="compute_target" value="none" hidden="true" checked/></p></div>
 
     <div class="tdindent"> <p><input type="radio" id="login_aws" name="compute_target" value="AWS" /><label for="login_aws">Amazon EC2 / Cloud</label></p></div>
 	  <div id="awsinfo_c" class="tdindent initiallyHidden">
@@ -1420,7 +1454,7 @@ function download(filename, text) {
 	    <tr>
 	      <td width="200px"><input type="button" onclick="quick_setup();" value="Apply Profile"></td><td>Click to apply the selections above.</td>
 	    </tr><tr>
-	      <td><input type="button" onclick="reset_form(1);" value="Reset"></td><td>Initialize all tool tabs to their default settings</td>
+	      <td><input type="button" onclick="reset_form(1);" value="Reset"></td><td>Reset all tabs (sets default parameters and empties strings, including account info)</td>
 	  </tr></table>
 	  
 
@@ -1880,7 +1914,7 @@ function download(filename, text) {
 
        <p id="toggle6a" class="tdindent"><img id="image6a" src="image/plus.gif" alt="toggle advanced options"><a name="n_g6a" href="#n_g6a" class="hdr">&nbsp;<i>ADVANCED OPTIONS</i></a></p>
        <div class="tdindent"> <div id="panel6a" style="display:none;">
-	   <table class="tdindentd">
+	   <table class="tdindentd fps">
 	     <tr><th class="myheader">Other</th><th></th>
 	     </tr><tr>
 	       <td class="tdindents">Additional command line arguments:</td>
@@ -1930,6 +1964,104 @@ function download(filename, text) {
 
 
      </div>
+
+<!-- MuTect -->
+     <div id="tabs-14" class="ui-tabs-panel">
+
+       <input type="checkbox" id="mutect_cmd" name="mutect_cmd"><label for="mutect_cmd">Run MuTect</label>
+       <select id="version_mutect" name="mutect_version">
+       </select>
+       for somatic variant calling
+       <br><br><br>
+
+       <div class="subhead tdindents"><b>STEP 1: Configure discovery</b></div>
+       <table class="tdindents">
+	 <tr>
+	   <td>Minimum base quality to consider a base for calling</td>
+           <td><select id="mutect_min_base_qual" name="mutect_min_base_qual"></select>&nbsp;(default: 10)</td>
+	 </tr><tr>
+	   <td>Filter duplicate reads ?</td>
+	   <td><input type="radio" id="mutect_remove_duplicates_y" name="mutect_remove_duplicates" value="true" checked><label for="mutect_remove_duplicates_y">True (default)</label>&nbsp;&nbsp;
+	   <input type="radio" id="mutect_remove_duplicates_n" name="mutect_remove_duplicates" value="false"><label for="mutect_remove_duplicates_n">False</label></td>
+	 </tr><tr>
+
+	   <td>Filter unmapped reads ?</td>
+	   <td><input type="radio" id="mutect_remove_unmapped_y" name="mutect_remove_unmapped" value="true" checked><label for="mutect_remove_unmapped_y">True (default)</label>&nbsp;&nbsp;
+	   <input type="radio" id="mutect_remove_unmapped_n" name="mutect_remove_unmapped" value="false"><label for="mutect_remove_unmapped_n">False</label></td>
+	 </tr><tr>
+
+	   <td>Minimum phred-scaled confidence threshold to emit variants</td>
+	   <td><select id="mutect_min_emit_qual" name="mutect_min_emit_qual"></select>&nbsp;(default: 10)</td>
+	 </tr><tr>
+
+	   <td>Minimum phred-scaled confidence threshold to call variants</td>
+	   <td><select id="mutect_min_call_qual" name="mutect_min_call_qual"> </select>&nbsp;(default: 30)</td>
+	 </tr>
+       </table>
+       <p><br></p>
+
+       <p id="toggle6am" class="tdindent"><img id="image6am" src="image/plus.gif" alt="toggle advanced options"><a name="n_g6am" href="#n_g6am" class="hdr">&nbsp;<i>ADVANCED OPTIONS</i></a></p>
+       <div class="tdindent"> <div id="panel6am" style="display:none;">
+	   <table class="tdindentd fps">
+	     <tr><th class="myheader">Panel of normals (PoN) filtering</th><th></th>
+	     </tr><tr>
+               <td class="tdindents">Use panel of normals:</td>
+                 <td><input type="radio" id="mutect_use_ponT" name="mutect_use_pon" value="true"><label for="mutect_use_ponT">True</label>
+                   <input type="radio" id="mutect_use_ponF" name="mutect_use_pon" value="false" checked><label for="mutect_use_ponF">False (default)</label></td>
+	     </tr>
+	   </table>
+	   <br>
+	   <table class="tdindentd">
+	     <tr><th class="myheader">Other</th><th></th>
+	     </tr><tr>
+	       <td class="tdindents">Additional command line arguments:</td>
+	       <td><input type="text" class="tb2" id="mutect_extraArguments" name="mutect_extra_arguments" value=""></td>
+	     </tr>
+	   </table>
+
+	 </div>
+       </div>
+       <p><br></p>
+
+
+       <div class="subhead tdindents"><b>STEP 2: Select genomics regions</b></div>
+
+       <table class="tdindents">
+	 <tr><td class="tdw3">Select one:</td>
+
+	   <td><input type="radio" id="mutect_chrdef0" name="mutect_chrdef" value="standard" checked><label for="mutect_chrdef0">Standard chromosomes 1-22,X,Y</label><br>
+	     <input type="radio" id="mutect_chrdef1" name="mutect_chrdef" value="standard_plus_contigs"><label for="mutect_chrdef1">Standard chromosomes 1-22,X,Y plus contigs MT,GI,GL,NC</label><br>
+             <input type="radio" id="mutect_chrdef2" name="mutect_chrdef" value="user"><label for="mutect_chrdef2">User-defined:</label>&nbsp;
+             <textarea id="mutect_chrdef_str"  name="mutect_chrdef_str" value=""></textarea>
+             <img src="image/Help.png" class="inline" title="Enter a list of regions (in BED or interval format), delimited by commmas or line return. (Example: 1-4, X, 6:1000, 5:1000-2000, 22)"> <button onclick="clear_chr(6);" type="button">Clear list</button></td>
+	 </tr>
+       </table>
+
+       <p><br></p>
+       <div class="subhead tdindents"><b>STEP 3: Select filtering (optional)</b></div>
+       <br>
+
+       <!-- div for dbSNP -->
+       <p  class="tdindent">1.<input type="checkbox" id="mutect_do_dbsnp" name="mutect_apply_dbsnp_filter"><label for="mutect_do_dbsnp">Apply dbSNP filter</label></p>
+       <div class="tdindent1"><div id="mutect_filter_dbsnp" class="vspanel" style="display:none;">
+	   <p><br></p>
+	   <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	   <p><br></p>
+       </div> </div>
+       <p><br></p>
+
+       <!-- div for fpfilter -->
+       <p  class="tdindent">2.<input type="checkbox" id="mutect_do_fpfilter" name="mutect_apply_false_positives_filter"><label for="mutect_do_fpfilter">Apply false-positives filter (currently SNV-only)</label></p>
+       <div class="tdindent1"><div id="mutect_filter_fps" class="vspanel" style="display:none;">
+	   <p><br></p>
+	   <p class="tdindent">To configure options, please review the items under the tab "Post-discovery Analysis."</p>
+	   <p><br></p>
+       </div> </div>
+       <p><br></p>
+
+
+     </div>
+
 
 <!-- Strelka -->
 
@@ -2831,6 +2963,13 @@ function download(filename, text) {
 	 </div>
 	 <p><br></p>
        </div>
+
+       <div id="mutect_pondiv" class="initiallyHidden fps">
+	 <div class="tdindents"><p class="fps">Path of panel of normals VCF:&nbsp;<img class="inline" title="Format is s3://bucket/path/to/file.vcf on AWS or /path/to/file.vcf on local system" src="image/Help.png"</img>&nbsp;</p>
+	   <input type="text" class="tb2" id="mutect_pon_vcfpath" name="mutect_pon_vcfpath"/>
+	 </div>
+	 <p><br></p>
+       </div>
        
        <div id="titleinfo" class="initiallyHidden fps">
 	 <div class="tdindents"><p class="fps">Comment to place into execution profile (OPTIONAL):</p>
@@ -2876,7 +3015,7 @@ function download(filename, text) {
 	   <td></td>
  	 </tr><tr>
 	   <td align="center"><input type="button" onclick="reset_form(1);" value="Reset"></td>
-	   <td>Reset parameters in all tabs to their default values</td>
+	   <td>Reset all tabs (sets default parameters and empties strings, including account info)</td>
 	 </tr>
        </table>
        <p><br></p>
@@ -2946,7 +3085,7 @@ function download(filename, text) {
        <div class="subhead tdindents">   <b>Filtering</b></div>
 
 
-       <p><input type="checkbox" id="global_do_dbsnp" name="global_apply_dbsnp_filter"><label for="global_do_dbsnp">Identify and remove dbSNP variants</label>&nbsp;<img class="inline" title="Checking this box activates or deactivates this filtering for VarScan and Strelka. Filtering may be deselected under individual tool tabs." src="image/Help.png"</img></p>
+       <p><input type="checkbox" id="global_do_dbsnp" name="global_apply_dbsnp_filter"><label for="global_do_dbsnp">Identify and remove dbSNP variants</label>&nbsp;<img class="inline" title="Checking this box activates or deactivates this filtering for VarScan, GATK/MuTect, and Strelka. Filtering may be deselected under individual tool tabs." src="image/Help.png"</img></p>
 	<div class="tdindent2">
 	  <select class="tb2menu" id="dbsnp_version" name="dbsnp_version">
 	    <option class="menu1" value="ncbi_grch37p13_snp142">NCBI, v.142, GRCh37p13</option>
@@ -2959,7 +3098,7 @@ function download(filename, text) {
 
 
 
-    <p><input type="checkbox" id="global_do_fpfilter" name="global_apply_false_positives_filter"><label for="global_do_fpfilter">Identify and remove false positives (snvs only)</label>&nbsp;<img class="inline" title="Checking this box activates or deactivates this filtering for VarScan and Strelka. Filtering may be deselected under individual tool tabs." src="image/Help.png"</img></p>
+    <p><input type="checkbox" id="global_do_fpfilter" name="global_apply_false_positives_filter"><label for="global_do_fpfilter">Identify and remove false positives (snvs only)</label>&nbsp;<img class="inline" title="Checking this box activates or deactivates this filtering for VarScan, GATK/MuTect, and Strelka. Filtering may be deselected under individual tool tabs." src="image/Help.png"</img></p>
        <p id="toggle5a" class="tdindent2"><img id="image5a" src="image/plus.gif" alt="toggle options">&nbsp;<i>OPTIONS</i></p>
        <div class="tdindent2"><div id="panel5a" style="display:none;">
 	     <table class="rindent">
@@ -3077,6 +3216,7 @@ $(document).ready(function() {
     upd_vs_hcfilters();
     upd_vs_fpfilter();
     upd_gatk_fpfilter();
+    upd_mutect_fpfilter();
     upd_strlk_fpfilter();
     upd_bd_regions();
     upd_pin_filters();
@@ -3504,7 +3644,7 @@ function do_aws_setup() {
     $("#jobinst").show();
     $("#runinfo").hide();
     $("#titleinfo").show();
-    if( $("#gatk_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else {$("#gatk_jardiv").hide();}
+    if( $("#gatk_cmd").is(":checked") || $("#mutect_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else { $("#gatk_jardiv").hide(); }
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3543,7 +3683,7 @@ function do_local_setup () {
     $("#jobinst").show();						   
     $("#runinfo").show();
     $("#titleinfo").show();
-    if( $("#gatk_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else {$("#gatk_jardiv").hide();}
+    if( $("#gatk_cmd").is(":checked") || $("#mutect_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else { $("#gatk_jardiv").hide(); }
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3552,12 +3692,15 @@ function do_local_setup () {
     $("#sc_running").hide();
 }
 
-
 $("#login_local").click(function () {
     get_clust(1); // content
     do_local_setup(); // panels
 });
 
+function do_none_setup() {
+    // Accounts
+    if($("#login_none").is(":checked")) { $("#awsinfo_c").hide(); $("#localinfo_c").hide(); }
+}
 
 // (rjm) For applying profile to work
 $("#vs_isGL").change(function() {
@@ -3576,29 +3719,73 @@ $("#vs_isTRIO").change(function() {
     }
 });
 
-function manage_gatk_jardiv () {
-  if($("#gatk_cmd").is(":checked") && $("#version_gatk option:selected").val()=="gatk_user") {
-    $("#gatk_jardiv").show();
-    var mywhere=" ";
-    if( $("#login_aws").is(":checked") ) {mywhere=" AWS S3 ";}
-    if( $("#login_local").is(":checked") ) {mywhere=" local ";}
-    alert("Note: Under the current settings, you will need to provide a valid"+mywhere+"path to the GATK jarfile under the Submit tab before job submission.");
-  } else {
-      $("#gatk_jardiv").hide();
-  }
+function write_qual_opts (t) { // t is gatk or mutect
+    var opt;
+    opt=""; for(i=0; i<=60; i++){opt+= "<option"+((i==10)?" selected='selected'":"")+">"+i+"</option>";}; $("#"+t+"_min_emit_qual").html(opt);$("#"+t+"_min_base_qual").html(opt);
+    opt=""; for(i=0; i<=60; i++){opt+= "<option"+((i==30)?" selected='selected'":"")+">"+i+"</option>";}; $("#"+t+"_min_call_qual").html(opt);
 }
-$("#gatk_cmd,#version_gatk").change(function() {
-    if( $("#gatk_cmd").is(':checked')) {
-      opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==10)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_emit_qual").html(opt);$("#gatk_min_base_qual").html(opt);
-      opt="";for(i=0; i<=60; i++){opt+= "<option"+((i==30)?" selected='selected'":"")+">"+i+"</option>";}; $("#gatk_min_call_qual").html(opt);
+function manage_gatk_version (tgt, t) { // tgt=0(aws),1(local);t=gatk or mutect
+    var posting = $.ajax({
+	url: "get_versions.php",
+	type: "POST",
+	async: false,
+	data: { 'tgt': tgt, 'cl_str': "menu1",  'cmd': t },
+	success: function(data) { $("#version_"+t).html(data); }
+    });
+}
+function manage_gatk_jardiv () {
+    if( ($("#gatk_cmd").is(":checked") && $("#version_gatk option:selected").val()=="gatk_user") ||
+	($("#mutect_cmd").is(":checked") && $("#version_mutect option:selected").val()=="mutect_user") ) {
+	$("#gatk_jardiv").show();
+	var mywhere=" ";
+	if( $("#login_aws").is(":checked") ) {mywhere=" AWS S3 ";}
+	if( $("#login_local").is(":checked") ) {mywhere=" local ";}
+	if( ! $("#gatk_jarpath").val().trim().length ) {alert("Note: The current settings require a valid"+mywhere+"path to the GATK jarfile to be specified in the Submit tab before job submission.");}
+    } else {
+	$("#gatk_jardiv").hide();
+    }
+}
+
+$("#gatk_cmd,#mutect_cmd,#version_gatk,#version_mutect,#login_aws,#login_local").change(function() {
+    var tgt;
+    var a = ["gatk","mutect"];
+    for (j=0, l=a.length; j<l; j++) { // check both
+	prog = a[j];
+	if( this.id == prog+"_cmd" || this.id.match(/^login/) ) {
+	    if( $("#"+prog+"_cmd").is(':checked')) {
+		write_qual_opts( prog );
+		tgt = -1;
+		if($("#login_aws").is(":checked")) {tgt=0;} else if($("#login_local").is(":checked")){tgt=1;}
+		manage_gatk_version( tgt, prog );
+		if(prog=="mutect") { manage_pon(); }
+	    } else {
+		$("#version_"+prog).empty();
+	    }
+	}
     }
     manage_gatk_jardiv();
 });
+
+function check_pon () {
+    if( ! $("#mutect_pon_vcfpath").val().trim().length ) {
+	alert("Note: The current settings require a panel-of-normals VCF to be specified in the Submit tab before job submission.");
+    }
+}
+function manage_pon () {
+    if( $("#mutect_cmd").is(":checked") && $("#mutect_use_ponT").is(":checked") && ! $("#login_none").is(":checked") ) {
+	$("#mutect_pondiv").show();
+	alert("Note: The current settings require a panel-of-normals VCF file to be specified in the Submit tab before job submission.");
+    } else {
+	$("#mutect_pondiv").hide();
+    }
+}
+$("input[type=radio][name=mutect_use_pon]").on('change', function() { manage_pon(); });
 
 $("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
 $("#vs_do_hcfilter").change(function() { upd_vs_hcfilters(); check_vs_mode(); });
 $("#vs_do_fpfilter, #vs_do_dbsnp").change(function() { upd_vs_fpfilter(); check_vs_mode(); });
 $("#gatk_do_fpfilter, #gatk_do_dbsnp").change(function() { upd_gatk_fpfilter(); });
+$("#mutect_do_fpfilter, #mutect_do_dbsnp").change(function() { upd_mutect_fpfilter(); });
 $("#strlk_do_fpfilter, #strlk_do_dbsnp").change(function() { upd_strlk_fpfilter(); });
 
 
@@ -3612,6 +3799,7 @@ $("[id^=bd_trans_type]").change(function() { upd_bd_regions(); });
 function clickall_chrdef(i) {
     $("#vs_chrdef"+i).trigger('click'); 
     $("#gatk_chrdef"+i).trigger('click');
+    $("#mutect_chrdef"+i).trigger('click');
     $("#bder_chrdef"+i).trigger('click'); 
     $("#pindel_chrdef"+i).trigger('click'); 
     $("#gs_chrdef"+i).trigger('click'); 
@@ -3619,6 +3807,7 @@ function clickall_chrdef(i) {
 function copy_chr_str(s) {
     $("#vs_chrdef_str").val( s );
     $("#gatk_chrdef_str").val( s );
+    $("#mutect_chrdef_str").val( s );
     $("#bder_chrdef_str").val( s );
     $("#pindel_chrdef_str").val( s );
     $("#gs_chrdef_str").val( s );
@@ -3640,33 +3829,22 @@ $("#mode_select").change(function() {
 });
 
 $("#global_do_fpfilter").click(function() {
-    if ($("#global_do_fpfilter").is(':checked')) {
-        $("#vs_do_fpfilter").prop('checked',true).trigger('change');
-        $("#gatk_do_fpfilter").prop('checked',true).trigger('change');
-        $("#strlk_do_fpfilter").prop('checked',true).trigger('change');
-    } else {
-        $("#vs_do_fpfilter").prop('checked',false).trigger('change');
-        $("#gatk_do_fpfilter").prop('checked',false).trigger('change');
-        $("#strlk_do_fpfilter").prop('checked',false).trigger('change');
-}
-
+    var a = ["vs","gatk","mutect","strlk"];
+    var stat=false;
+    if ($("#global_do_fpfilter").is(':checked')) {stat=true;}
+    for (j=0, l=a.length; j<l; j++) {$("#"+a[j]+"_do_fpfilter").prop('checked',stat).trigger('change');}
 });
 $("#global_do_dbsnp").click(function() {
-    if ($("#global_do_dbsnp").is(':checked')) {
-        $("#vs_do_dbsnp").prop('checked',true).trigger('change');
-        $("#gatk_do_dbsnp").prop('checked',true).trigger('change');
-        $("#strlk_do_dbsnp").prop('checked',true).trigger('change');
-    } else {
-        $("#vs_do_dbsnp").prop('checked',false).trigger('change');
-        $("#gatk_do_dbsnp").prop('checked',false).trigger('change');
-        $("#strlk_do_dbsnp").prop('checked',false).trigger('change');
-    }
+    var a = ["vs","gatk","mutect","strlk"];
+    var stat=false;
+    if ($("#global_do_dbsnp").is(':checked')) {stat=true;}
+    for (j=0, l=a.length; j<l; j++) {$("#"+a[j]+"_do_dbsnp").prop('checked',stat).trigger('change');}
 });
 function upd_global_dbsnp() {
-    if( $("#vs_do_dbsnp").is(':checked') && $("#gatk_do_dbsnp").is(':checked') &&  $("#strlk_do_dbsnp").is(':checked')) {
+    if( $("#vs_do_dbsnp").is(':checked') && $("#gatk_do_dbsnp").is(':checked') && $("#mutect_do_dnsnp").is(':checked') &&  $("#strlk_do_dbsnp").is(':checked')) {
 	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
 	$("#global_do_dbsnp").prop('checked',true).trigger('change');
-    } else if ( ! $("#vs_do_dbsnp").is(':checked') && ! $("#gatk_do_dbsnp").is(':checked') &&  ! $("#strlk_do_dbsnp").is(':checked')) {
+    } else if ( ! $("#vs_do_dbsnp").is(':checked') && ! $("#gatk_do_dbsnp").is(':checked') && ! $("#mutect_do_dbsnp").is(':checked') &&  ! $("#strlk_do_dbsnp").is(':checked')) {
 	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
 	$("#global_do_dbsnp").prop('checked',false).trigger('change');
     } else {
@@ -3675,10 +3853,10 @@ function upd_global_dbsnp() {
     }
 }
 function upd_global_fpfilter() {
-    if( $("#vs_do_fpfilter").is(':checked') && $("#gatk_do_fpfilter").is(':checked') &&  $("#strlk_do_fpfilter").is(':checked')) {
+    if( $("#vs_do_fpfilter").is(':checked') && $("#gatk_do_fpfilter").is(':checked') && $("#mutect_do_fpfilter").is(':checked') &&  $("#strlk_do_fpfilter").is(':checked')) {
 	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
 	$("#global_do_fpfilter").prop('checked',true).trigger('change');
-    } else if ( ! $("#vs_do_fpfilter").is(':checked') && ! $("#gatk_do_fpfilter").is(':checked') &&  ! $("#strlk_do_fpfilter").is(':checked')) {
+    } else if ( ! $("#vs_do_fpfilter").is(':checked') && ! $("#gatk_do_fpfilter").is(':checked') && ! $("#mutect_do_fpfilter").is(':checked') &&  ! $("#strlk_do_fpfilter").is(':checked')) {
 	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
 	$("#global_do_fpfilter").prop('checked',false).trigger('change');
     } else {
@@ -3686,8 +3864,8 @@ function upd_global_fpfilter() {
 	$("#global_do_fpfilter").prop('checked',false).trigger('change');
     }
 }
-$("#vs_do_dbsnp,#gatk_do_dbsnp,#strlk_do_dbsnp").click(function() {  upd_global_dbsnp(); });
-$("#vs_do_fpfilter,#gatk_do_fpfilter,strlk_do_fpfilter").click(function() {  upd_global_fpfilter(); });
+$("#vs_do_dbsnp,#gatk_do_dbsnp,#mutect_do_dbsnp,#strlk_do_dbsnp").click(function() {  upd_global_dbsnp(); });
+$("#vs_do_fpfilter,#gatk_do_fpfilter,#mutect_do_fpfilter,#strlk_do_fpfilter").click(function() {  upd_global_fpfilter(); });
 
 
 
@@ -3837,23 +4015,6 @@ $("#chk_sid,#gvip_sid_rl").click(function() {
 	alert("Success: Session '"+id+"' was found and is ready to use. Click OK to continue.");
     }
 
-});
-
-$("#gatk_cmd,#login_aws,#login_local").change(function() {
-    var tgt=-1;
-    if($("#gatk_cmd").is(":checked")) {
-	if($("#login_aws").is(":checked")) {tgt=0;} else if($("#login_local").is(":checked")){tgt=1;}
-	var posting = $.ajax({
-	    url: "get_versions.php",
-	    type: "POST",
-	    async: false,
-	    data: { 'tgt': tgt, 'cl_str': "menu1",  'cmd': "gatk" },
-	    success: function(data) { $("#version_gatk").html(data); }
-	});
-    } else {
-      $("#version_gatk").empty();
-    }
-    manage_gatk_jardiv();
 });
 </script>
 </body></html>
