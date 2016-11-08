@@ -67,7 +67,7 @@ exe=SnpSift.jar
 
 [vcftools]
 path=/usr/local/bin/vcftools/0.1.14/bin
-perllibpath=/usr/local/bin/vcftools/0.1.14/lib/perl5
+perllibpath=/usr/local/bin/vcftools/0.1.14/share/perl5
 
 [ncbi_grch37p13_snp142]
 path=/usr/local/bin/dbSNP/ncbi_grch37p13_snp142/qc

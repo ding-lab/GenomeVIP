@@ -2233,7 +2233,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
-      fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+      fwrite($fp, "export PERL5LIB=".$toolsinfo_h['vcftools']['perllibpath'].":\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
@@ -2658,7 +2658,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
-      fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+      fwrite($fp, "export PERL5LIB=".$toolsinfo_h['vcftools']['perllibpath'].":\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
@@ -3000,7 +3000,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool 
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
-      fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+      fwrite($fp, "export PERL5LIB=".$toolsinfo_h['vcftools']['perllibpath'].":\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");
@@ -3309,7 +3309,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
     fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
     fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
-    fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+    fwrite($fp, "export PERL5LIB=".$toolsinfo_h['vcftools']['perllibpath'].":\\\$PERL5LIB\n");
     fwrite($fp, "put_cmd=$put_cmd\n");
     fwrite($fp, "del_cmd=$del_cmd\n");
     fwrite($fp, "del_local=$del_local\n");
@@ -3618,7 +3618,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n"); // deld tool
     fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
     fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
-    fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+    fwrite($fp, "export PERL5LIB=".$toolsinfo_h['vcftools']['perllibpath'].":\\\$PERL5LIB\n");
     fwrite($fp, "put_cmd=$put_cmd\n");
     fwrite($fp, "del_cmd=$del_cmd\n");
     fwrite($fp, "del_local=$del_local\n");
@@ -3910,7 +3910,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "myRESULTSDIR=\$RESULTSDIR/group\$gp\n");  // deld tool
       fwrite($fp, "GENOMEVIP_SCRIPTS=$GENOMEVIP_SCRIPTS\n");
       fwrite($fp, "VCFTOOLSDIR=".preg_replace('/\/bin$/', "", $toolsinfo_h['vcftools']['path'])."\n");
-      fwrite($fp, "export PERL5LIB=\\\$VCFTOOLSDIR/lib/perl5/site_perl:\\\$PERL5LIB\n");
+      fwrite($fp, "export PERL5LIB=".$toolsinfo_h['vcftools']['perllibpath'].":\\\$PERL5LIB\n");
       fwrite($fp, "put_cmd=$put_cmd\n");
       fwrite($fp, "del_cmd=$del_cmd\n");
       fwrite($fp, "del_local=$del_local\n");

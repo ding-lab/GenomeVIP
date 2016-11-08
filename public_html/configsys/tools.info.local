@@ -77,7 +77,7 @@ exe=SnpSift.jar
 
 [vcftools]
 path=/gscmnt/gc2525/dinglab/rmashl/Software/bin/vcftools/0.1.14/bin
-perllibpath=/gscmnt/gc2525/dinglab/rmashl/Software/bin/vcftools/0.1.14/lib/perl5
+perllibpath=/gscmnt/gc2525/dinglab/rmashl/Software/bin/vcftools/0.1.14/share/perl5
 
 [ncbi_grch37p13_snp142]
 path=/gscmnt/gc2525/dinglab/rmashl/Reference/dbSNP/ncbi_grch37p13_snp142/qc
