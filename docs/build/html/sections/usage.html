@@ -1,0 +1,297 @@
+
+
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>General usage &#8212; GenomeVIP  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="GenomeVIP  documentation" href="../index.html" />
+    <link rel="next" title="Customized Usage" href="custom.html" />
+    <link rel="prev" title="Quick Start" href="startup.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="custom.html" title="Customized Usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="startup.html" title="Quick Start"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">GenomeVIP  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/genomevip.1in.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="startup.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom.html">Customized Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Build GenomeVIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extend.html">Extend GenomeVIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cite.html">How to Cite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="info.html">Further Information</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="startup.html"
+                        title="previous chapter">Quick Start</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="custom.html"
+                        title="next chapter">Customized Usage</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="general-usage">
+<span id="generalusage"></span><h1>General usage<a class="headerlink" href="#general-usage" title="Permalink to this headline">¶</a></h1>
+<p>The flowchart along the lefthand side can be used as a guide for the typical order for configuring a computation. Although the pages can be visited in any order, the dynamic content updates depending on the developing configuration. The display text and alerts will provide assistance.</p>
+<ol class="arabic">
+<li><p class="first">Select <span class="btn">Accounts</span></p>
+<ul class="simple">
+<li>For Amazon EC2/Cloud (i.e., AWS), generate a new SessionID (Option 3) or enter a previous SessionID (Option 1).<ul>
+<li>Note: the SessionID provides user account type functionality, allowing multiple users to use the same server instance. SessionsIDs persists until the server is terminated or rebooted and enables you to submit additional computations to a running runtime instance.</li>
+</ul>
+</li>
+<li>For local clusters, provide your login credentials to your local cluster.</li>
+</ul>
+</li>
+<li><p class="first">Select Genomes</p>
+<ul class="simple">
+<li>Load names and locations of bam files, reference genomes, and index files (e.g. by uploading a file(s) from your computer, by pointing to a remote file, or by obtaining a remote directory listing):<ul>
+<li>For AWS:<ul>
+<li>EBS volumes: select the volumes you wish to use and the corresponding lists of files (and/or upload files). Files should be given as their full path on that particular volume. Click <span class="btn">Apply lists</span> when done.</li>
+<li>Path to file:  enter a valid S3 path to a list file (e.g. <code class="docutils literal"><span class="pre">s3://bucket/path/to/listfile.txt</span></code>) and click <span class="btn">Retrieve file</span></li>
+<li>File upload: <span class="btn">Browse...</span> to a file on your computer and then click <span class="btn">Upload File</span></li>
+<li>1000 Genomes files: select one of the pre-formed list based on AWS&#8217;s 1000 Genomes mirror and then click <span class="btn">Load list</span></li>
+</ul>
+</li>
+<li>For local clusters:</li>
+</ul>
+</li>
+<li>Select samples and a reference.<ul>
+<li>Double-click on the bam name to transfer it to the &#8220;Selected bams&#8221; box. A search box with live update is available.</li>
+<li>In the &#8220;Selected box&#8221; box, arrange the bams in order according to the desired study:<ul>
+<li>somatic: matched pairs (in the order of <em>tumor followed by normal</em>)</li>
+<li>trio: triples (in the order of <em>father, mother, child</em>)</li>
+</ul>
+</li>
+<li>Note: missing index files will be generated automatically at run time. If necessary, bam files will be sorted as well. You may opt to save a copy of such generated files to the storage location where the results of the computaions are sent.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">Execution Profile</p>
+<p>This series of tabs allows users to configure computations at a high level across multiple tools or at a low level across individual tools. The collection of selected tools and corresponding parameters comprise the <em>execution profile</em>. There are three classes of tabs: 1) Quick Setup, 2) Individual tools, and 3) Post-discovery tools.</p>
+<ul>
+<li><p class="first"><strong>Quick Setup</strong>:</p>
+<p>The four main tasks available here are optional and independent of one another. At any time you may also optionally visit the other tabs for further configuring such as de/activating any tools appropriately and fine-tuning parameters.</p>
+<ol class="arabic">
+<li><p class="first"><strong>Start configuring a new execution profile:</strong> Select a pre-defined <strong>Run mode</strong> (germline, somatic, <em>de novo</em>/family trio) and/or <strong>Parameter set</strong> (these can be tuned further in each tool tab). Then in Step 3, click <span class="btn">Apply Profile</span> to propagate settings to the other tabs.</p>
+</li>
+<li><p class="first"><strong>Upload execution profile</strong> from uploaded file: Click <span class="btn">Browse...</span>, selecting a file from your computer using the dialog box that appears, and then clicking <span class="btn">Upload File</span>. Then in Step 3, click <span class="btn">Apply Profile</span> to propagate settings to the other tabs.</p>
+<blockquote>
+<div><p><strong>TIP</strong>: Execution profiles may be re-used across different computational configurations to ensure consistency and reproducibility, an approach that may be helpful in analyzing batches of sample sets in piecewise fashion.</p>
+</div></blockquote>
+</li>
+<li><p class="first"><strong>Select genomic regions</strong>: Select one option. For the user-defined list option, you can type or copy-paste directly into the textbox or supply a local file (click <span class="btn">Browse...</span>, select local file from the dialog box that appears, click <span class="btn">Upload File</span>). The format of the list must be either (a) <code class="docutils literal"><span class="pre">&lt;chr&gt;</span> <span class="pre">&lt;start&gt;</span> <span class="pre">&lt;stop&gt;</span></code> triples (one per line),  or (b) a comma-separated list such as <code class="docutils literal"><span class="pre">1-4,X,6:1000,5:1000-2000,22</span></code>. Prepend the chromosome numbers with <code class="docutils literal"><span class="pre">chr</span></code> if indicated by the reference genome. Click <span class="btn">Apply Profile</span> to propagate settings to the other tabs.</p>
+</li>
+<li><p class="first"><span class="btn">Reset</span>: Reinitialize all computational options to their default (possibly empty) values. <strong>CAUTION</strong>: This operation also clears the visible account information (however, sessionIDs are preserved but must be re-entered).</p>
+</li>
+</ol>
+</li>
+<li><p class="first"><strong>Individual Tools</strong>:</p>
+<p>A selection of tools from among those most often relied upon. GenomeVIP associates these tools with three common study types in the following way:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Germline</td>
+<td>VarScan, GATK, BreakDancer, Pindel, Genome STRiP</td>
+</tr>
+<tr class="row-even"><td>Somatic</td>
+<td>VarScan, MuTect, Strelka, BreakDancer, Pindel</td>
+</tr>
+<tr class="row-odd"><td><em>De novo</em>/Trio</td>
+<td>VarScan, BreakDancer, Pindel</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Documentation on these tools can be obtained by following the links to the tools&#8217; home page in <a class="reference internal" href="info.html#info"><span class="std std-ref">Further Information</span></a>.</p>
+</li>
+<li><p class="first"><strong>Post-discovery Tools</strong>:</p>
+<p>Options to filter and annotate raw variants are provided and are applied in the order displayed.</p>
+<ul>
+<li><p class="first">Filtering</p>
+<ul>
+<li><p class="first">Identify/Remove dbSNP variants: Database options include the dbSNP database (provided on the GenomeVIP runtime image) or a user-supplied VCF file, accessible via public FTP/HTTP/HTTPS or user&#8217;s/public AWS S3 location.</p>
+</li>
+<li><p class="first">Identify/Remove false positives: This approach is based on the bam-readcount tool and a series of heuristics for identify variant calls of lower quality and is implemented via the VarScan tool. The parameter values shown are considered by some to be generally appropriate.</p>
+<p><strong>Note</strong>: This option is independent of the false-positives annotation provided by the panel-of-normals option available with MuTect somatic variant discovery.</p>
+</li>
+</ul>
+</li>
+<li><p class="first">Annotation</p>
+<ul class="simple">
+<li>The Variant Effect Predictor (VEP) software with human genome reference has been installed on the GenomeVIP runtime image. A user-provided VCF file, accessible via public FTP/HTTP/HTTPS or user&#8217;s/public AWS S3 location, may alternatively be supplied.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">Submit</p>
+<ul>
+<li><p class="first">Computing/storage resources and additional information</p>
+<ul>
+<li><p class="first">For AWS:</p>
+<ul>
+<li><p class="first"><strong>Select a compute resource</strong>: This can be a new cluster, or, if you have previously instantiated a cluster under the current GenomeVIP SessionID, a running cluster. Re-using an existing resource may have certain cost efficiencies.</p>
+</li>
+<li><p class="first"><strong>Select a &#8220;bucket&#8221; for storing results</strong>: Buckets are uniquely named directories or folders in AWS&#8217;s S3 resource. Select an existing bucket, or create a new one by clicking <span class="btn">Create a new bucket</span> (the list will update automatically).</p>
+<p>Note: buckets can also be viewed/crated in your S3 Console (see Shortcuts under <a class="reference internal" href="startup.html#qstart"><span class="std std-ref">Quick Start</span></a>).</p>
+</li>
+<li><p class="first"><strong>Additional information</strong>:</p>
+<ul class="simple">
+<li>Supply the full paths of any files required by the configuration.</li>
+<li>Optionally provide a comment that will appear in the generated execution profile.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">For local clusters:</p>
+<ul class="simple">
+<li><strong>Select a compute resource</strong>: No user selection is provided here; the resource is actually specified through the fields under <span class="btn">Accounts</span>.</li>
+<li><strong>Additional information</strong>:<ul>
+<li>Supply the full paths of any files required by the configuration.</li>
+<li>Optionally provide a comment that will appear in the generated execution profile.</li>
+<li>Provide the name of a working directory (it will be created, if necessary) into which GenomeVIP will copy the generated execution profile and master job script. This directory is assumed to be relative to your home directory unless overridden by specifying a full path.</li>
+<li>Select submit action: Choose whether to execute (default is &#8216;yes&#8217;) the job script in the working directory. (Here, &#8220;power users&#8221; may wish just to transmit the script for inspection or modification by hand, after which time it can be run as a standard shell script.)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">Pre-submission checks (available at any time during the configuration process):</p>
+<ul class="simple">
+<li>Click <span class="btn">Preview</span> to display the current execution profile, or retrieve it as a file by clicking <span class="btn">Download</span>.</li>
+<li>Click <span class="btn">Validate</span> to have GenomeVIP perform basic checks and flag certain misconfigurations.</li>
+<li>Click <span class="btn">Submit</span> to perform the submit action specified above.</li>
+<li>Finally, clicking <span class="btn">Reset</span> sets all options to their default (possibly empty) values. (This is the same behavior described above for Execution Profile &gt; Quick Setup &gt; Reset).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">Results</p>
+<ul class="simple">
+<li>For AWS:<ul>
+<li>Navigate your web browser to your Amazon S3 Console (see Shortcuts/Tips under <a class="reference internal" href="startup.html#qstart"><span class="std std-ref">Quick Start</span></a>)</li>
+<li>In the list of buckets on the lefthand side, click on the bucket you specified when submitting the job. After the page updates, click on the folder corresponding to the jobID assigned to the computation.</li>
+<li>The &#8220;results&#8221; folder contains downloadable files containing variant calls according to sample sets. Inter</li>
+<li>The &#8220;status&#8221; folder displays sentinel files indicating which tasks/computations did not go to completion as expected. These filenames can be used to create additional jobs to provide the missing results.</li>
+</ul>
+</li>
+<li>For local clusters:<ul>
+<li>Log in to your cluster account.</li>
+<li>Change to the working directory specified at the time of job submission.</li>
+<li>The &#8220;results&#8221; directory contains a summary of variant calls obtained.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">Options</p>
+<p>This tab provides access to some additional features for working with AWS:</p>
+<ul class="simple">
+<li>AMI specification: The GenomeVIP runtime images are expected to be revised to include updates to the underlying operating system as well as to include minor tool bugfixes and feature enhancements. Here, users may can enter an alternative AMI ID in the specified format for instantiations rather than the default ID as programmed into the GenomeVIP server files.</li>
+<li>Settings: By default, GenomeVIP employs secure transfers (HTTPS) to/from S3 as implemented by the S3 Tools package and requests S3 server-side encryption, both of which options may be disabled. The default settings are recommended even when working with public data.</li>
+<li>Cluster management: Running EC2 clusters associated with the current GenomeVIP SessionsID are listed, each having the option to be terminated from GenomeVIP interface instead of from the EC2 Dashboard.</li>
+</ul>
+</li>
+</ol>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="custom.html" title="Customized Usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="startup.html" title="Quick Start"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">GenomeVIP  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2016.
+      Last updated on November 09, 2016 (rjm).
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>

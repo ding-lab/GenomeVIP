@@ -1,0 +1,275 @@
+
+
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quick Start &#8212; GenomeVIP  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="GenomeVIP  documentation" href="../index.html" />
+    <link rel="next" title="General usage" href="usage.html" />
+    <link rel="prev" title="GenomeVIP" href="../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="General usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="GenomeVIP"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">GenomeVIP  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/genomevip.1in.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#using-amazon-hosted-genomevip-server">Using Amazon-hosted GenomeVIP server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-locally-hosted-genomevip-server">Using locally hosted GenomeVIP server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">General Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom.html">Customized Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Build GenomeVIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extend.html">Extend GenomeVIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cite.html">How to Cite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="info.html">Further Information</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">GenomeVIP</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="usage.html"
+                        title="next chapter">General usage</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="quick-start">
+<span id="qstart"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-amazon-hosted-genomevip-server">
+<h2>Using Amazon-hosted GenomeVIP server<a class="headerlink" href="#using-amazon-hosted-genomevip-server" title="Permalink to this headline">¶</a></h2>
+<p><strong>SHORTCUTS / TIPS</strong></p>
+<ul>
+<li><p class="first">The <strong>AWS Management Console</strong> lists Shortcuts and Recently Viewed Services, Quick Starts, and AWS Services. It can be reached in two ways:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>Once logged in to your AWS account, select the menu item Services &gt; Console Home, if that option appears; or</li>
+<li>click on the orange box icon in the upper left corner of the page.</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">The <strong>EC2 Dashboard</strong> can be reached in two ways:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>Once logged in to your AWS account, select the menu item Services &gt; EC2, if that option appears; or</li>
+<li>click on the orange box icon in the upper left corner of the page, and then in section AWS Services below, in section &#8220;Compute&#8221;, select EC2.</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">The <strong>list of running instances</strong> can be reached from your EC2 Dashboard in two ways:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>in the left-hand panel, select the menu item Instances &gt; Instances; or</li>
+<li>in the Resources section at the top of the page, click the link &#8220;Running Instances&#8221;.</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">The <strong>S3 Console</strong> can be reached in two ways:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>Once logged in to your AWS account, select the menu item Services &gt; S3, if that option appears; or</li>
+<li>click on the orange box icon in the upper left corner of the page, and then in section AWS Services below, in section &#8220;Storage &amp; Content Delivery&#8221;, select S3.</li>
+</ol>
+</div></blockquote>
+</li>
+</ul>
+<p><strong>PROCEDURE</strong></p>
+<ol class="upperalpha">
+<li><p class="first">Selecting server image</p>
+<ol class="arabic simple">
+<li>Log in to your AWS account and navigate to the EC2 Dashboard.</li>
+<li>In the left-hand panel, in the Images menu, click on &#8220;AMIs&#8221;.</li>
+<li>Locate the filter/search field and enter <code class="docutils literal"><span class="pre">genomevip</span></code>. Then in the adjacent menu to the left, select &#8220;Public images&#8221;. The table below will update automatically.</li>
+<li>Under &#8220;AMI Name&#8221;, locate the GenomeVIP server images, and select one (the most recent version is recommended) by checking the corresponding checkbox in the left column. <em>Security tip: verify that the image has Owner 785242596344.</em> When ready to proceed to the image configuration step, click on <span class="btnb">Launch</span> near the top of the page.</li>
+</ol>
+</li>
+<li><p class="first">Configuring the server</p>
+<ol class="arabic">
+<li><p class="first">Select an instance type (minimum recommendation: 1 or more vCPUs with 4 GiB memory, e.g. <code class="docutils literal"><span class="pre">m1.medium</span></code>).</p>
+</li>
+<li><p class="first">Click on item &#8220;3. Configure Instance&#8221; near the top of the page, and then set the following:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="17%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">OPTION</th>
+<th class="head">VALUE</th>
+<th class="head">COMMENT</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Number of instances:</td>
+<td>1</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Network:</td>
+<td>EC2 Classic</td>
+<td>Virtual private cloud (VPC) should also work</td>
+</tr>
+<tr class="row-even"><td>Availability Zone:</td>
+<td>No preference</td>
+<td><strong>IMPORTANT:</strong> This generally much match those of any/all EBS data volumes requested to use</td>
+</tr>
+<tr class="row-odd"><td>IAM role:</td>
+<td>None</td>
+<td>Choice may vary depending on how your AWS account has been configured for your use</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p class="first">Click on item &#8220;6. Configure Security Group&#8221; near the top of the page. (Items 4 and 5 are not necessary.) The suggested security group information is likely adequate. On the left-hand side farther down the page, click the button <span class="btn">Add Rule</span>, and then in the dropdown menu that appears, select <span class="btn">HTTPS</span> and leave the port range set at &#8220;443&#8221;, which GenomeVIP expects. Your server instance is currently usable by anyone; if more security is desired, modify the source IP address setting.</p>
+</li>
+<li><p class="first">Click on item &#8220;7. Review&#8221; at the top of the page, and if the displayed information is in order, click on <span class="btnb">Launch</span> in the bottom right corner of the page.</p>
+</li>
+<li><p class="first">Selecting key pair. The dialog pop-up box allows you to use an existing, or create a new, key pair. Selecting &#8220;Process without a key pair&#8221; is sufficient when instantiating a GenomeVIP server simply for running analyses. (Developers will want to use a key pair instead.) Check the acknowledgment box, and then click on <span class="btnb">Launch Instances</span>.</p>
+</li>
+<li><p class="first">Launch Status. Review the information displayed, and then to view instances on your EC2 Dashboard, click on <span class="btnb">View Instances</span> in the bottom right corner of the page.</p>
+</li>
+</ol>
+</li>
+<li><p class="first">Accessing the user interface</p>
+<ol class="arabic">
+<li><p class="first">Navigate your browser to the list of running instances, locate the running instance of interest, and check the corresponding checkbox in the left column. The panel at the bottom of the web page now displays information about the instance.</p>
+</li>
+<li><p class="first">In that lower panel, the &#8220;Description&#8221; tab should already be active (if not, click on it to make it active). Note the entry Public IP (hereafter referred to as &lt;publicIP&gt;), which you will need to access the GenomeVIP interface.</p>
+</li>
+<li><p class="first">Point your web browser to <code class="docutils literal"><span class="pre">https://&lt;publicIP&gt;/~genomevip</span></code> to reach the GenomeVIP home page.</p>
+<blockquote>
+<div><p>Note: you may receive a warning notification (Your connection is not secure, &lt;publicIP&gt; uses an invalid security certificate, Error code: SEC_ERROR_UNKNOWN_USER, Can&#8217;t verify the identity of the website, etc.) because we have used a self-signed certificate. You will need to add an exception in order to proceed further. More information can be obtained from, e.g. <a class="reference external" href="https://support.mozilla.org/en-US/kb/troubleshoot-SEC_ERROR_UNKNOWN_ISSUER">Mozilla support</a>.</p>
+</div></blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<ol class="upperalpha" start="4">
+<li><p class="first">Configuring computations: see <a class="reference internal" href="usage.html#generalusage"><span class="std std-ref">General usage</span></a></p>
+</li>
+<li><p class="first">Shutting down the server</p>
+<blockquote>
+<div><p>All EC2 instances in &#8220;running&#8221; mode contribute to the charges billed to your account. After you submit your analysis, you may wish to change this mode (accessible from the &#8220;list of instances&#8221; page, under menu item <span class="btn">Actions</span> &gt; Instances State):</p>
+<ol class="loweralpha simple">
+<li><strong>Stop</strong>:  put the instance into sleep/hibernate mode</li>
+<li><strong>Start</strong>:  put the instance into running mode at a new address (see Step C above)</li>
+<li><strong>Terminate</strong>:  end the instance entirely</li>
+</ol>
+</div></blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="using-locally-hosted-genomevip-server">
+<h2>Using locally hosted GenomeVIP server<a class="headerlink" href="#using-locally-hosted-genomevip-server" title="Permalink to this headline">¶</a></h2>
+<p>This section applies to installations on physical machines as well as on virtualization software products (e.g. VirtualBox).</p>
+<p><strong>PROCEDURE</strong></p>
+<ol class="upperalpha">
+<li><p class="first">Navigate your web browser to the appropriate site or address (e.g. <em>https://192.168.57.1/~genomevip</em>).</p>
+<blockquote>
+<div><p>The actual address may vary depending on how the underlying web server running GenomeVIP was configured and, accordingly, where GenomeVIP was installed. Check with your administrator, if needed.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Configuring computations: see <a class="reference internal" href="usage.html#generalusage"><span class="std std-ref">General usage</span></a>.</p>
+</li>
+<li><p class="first">Shutting down the server</p>
+<blockquote>
+<div><p>This step is likely needed only in virtual machine deployments; refer to your virtualization software documentation.</p>
+</div></blockquote>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="General usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="GenomeVIP"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">GenomeVIP  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2016.
+      Last updated on November 09, 2016 (rjm).
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>
