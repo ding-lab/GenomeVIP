@@ -1073,7 +1073,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "     echo Creating new dictionary file...done\n");
       fwrite($fp, "   fi\n");
     } else {
-      fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$mystem.dict .\n");
+      fwrite($fp, "   if [[ -e \$$DNAM_VAR[$pathid]/\$mystem.dict ]] ; then\n");
+      fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$mystem.dict .\n");
+      fwrite($fp, "   else\n");
+      fwrite($fp, "     echo Dictionary file not found...\n");
+      fwrite($fp, "     echo Creating new dictionary file...\n");
+      fwrite($fp, "     ( PICARD_DIR=".$toolsinfo_h['picard']['path']."\n");
+      fwrite($fp, "     java -jar \$PICARD_DIR/CreateSequenceDictionary.jar R= \$GATK_REF O= \$mystem.dict ) \n");
+      fwrite($fp, "     echo Creating new dictionary file...done\n");
+      fwrite($fp, "   fi\n");
     }
     fwrite($fp, "fi\n");
 
@@ -1085,12 +1093,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $bFound=0;
     foreach ($typematch as $key => $value) {
       switch ($key) {
-      case $IS_FA_GZ:    // "$stemref.fa.gz":
-      case $IS_FASTA_GZ: //"$stemref.fasta.gz":
+      case $IS_FA:    //"$stemref.fa"
+      case $IS_FASTA: //"$stemref.fasta"
 	$bFound=1;
 	list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
-
-	// normal
 	fwrite($fp, "MUTECT_REF=$availref\n");
 	fwrite($fp, "if [[ ! -e  \$MUTECT_REF ]]; then\n");
         if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
@@ -1100,6 +1106,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$MUTECT_REF  .\n");
         }
 	fwrite($fp, "fi\n");
+
 	$DNAM_use[$pathid] = 1;
 	$retrieved[$availref] = $availref_type_h[$availref];
 	$retrieved_pathid[$availref] = $pathid;
@@ -1115,38 +1122,46 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if(!$bFound) {
       foreach ($typematch as $key => $value) {
 	switch ($key) {
-	case $IS_FA:    //"$stemref.fa"
-	case $IS_FASTA: //"$stemref.fasta"
+	case $IS_FA_GZ:    // "$stemref.fa.gz":
+	case $IS_FASTA_GZ: //"$stemref.fasta.gz":
 	  $bFound=1;
 	  list($pathid, $availref, $hasfai) = preg_split('/\|/', $typematch[$key]);
-	  fwrite($fp, "MUTECT_REF=$availref\n");
-	  fwrite($fp, "if [[ ! -e  \$MUTECT_REF ]]; then\n");
+	  fwrite($fp, "if [[ ! -e  $availref ]]; then\n");
+
 	  if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
-	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$MUTECT_REF 2>&1`\n");
-	    fwrite($fp, "   check_aws_file \$msg \$MUTECT_REF\n");
+	    fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/$availref 2>&1`\n");
+	    fwrite($fp, "   check_aws_file \$msg $availref\n");
 	  } else {
-	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$MUTECT_REF  .\n");
+	    fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/$availref .\n");
 	  }
+
 	  fwrite($fp, "fi\n");
-	    $DNAM_use[$pathid] = 1;
-	  $retrieved[$availref] = $availref_type_h[$availref];
-	  $retrieved_pathid[$availref] = $pathid;
+	  $DNAM_use[$pathid] = 1;
+	  $retrieved[$availref] = get_ref_type($availref);
+	  fwrite($fp, "echo Converting reference format...\n");
+	  fwrite($fp, "if [[ ! -e ./$baseref ]] ; then\n");
+	  fwrite($fp, "   gunzip -c ./$availref > ./$baseref\n");
+	  fwrite($fp, "fi\n");
+	  fwrite($fp, "echo Converting reference format...done\n");
+
+	  $retrieved[$baseref] = get_ref_type($baseref);
+	  fwrite($fp, "MUTECT_REF=$baseref\n");
 	  fwrite($fp, "MUTECT_REF_fai=\${MUTECT_REF}.fai\n");
-	  // TODO: tie into functions
-	  fwrite($fp, "if [[ ! -e  \$MUTECT_REF_fai ]]; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$MUTECT_REF_fai  .\n");
-	  fwrite($fp, "fi\n");
-	  fwrite($fp, "mystem=\$(basename \$MUTECT_REF .gz)\n");
-	  fwrite($fp, "mystem=\$(basename \$mystem .fasta)\n");
-	  fwrite($fp, "mystem=\$(basename \$mystem .fa)\n");
-	  fwrite($fp, "if [[ ! -e  \$mystem.dict  ]]; then\n");
-	  fwrite($fp, "   $action \$$DNAM_VAR[$pathid]/\$mystem.dict .\n");
-	  fwrite($fp, "fi\n");
-	  //
-	  $MUTECT_REF = $availref;
+	  $MUTECT_REF = $baseref;
 	  $MUTECT_REF_fai = "$MUTECT_REF.fai";
-	  handle_fai($fp, $hasfai, $MUTECT_REF_fai, "MUTECT_REF", $pathid, $action, $compute_target, $s3_action);
-	  $retrieved[$MUTECT_REF_fai] = get_ref_type($MUTECT_REF_fai);
+
+	  if ( array_key_exists($IS_FA_FAI, $typematch)) {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$MUTECT_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } elseif ( array_key_exists($IS_FASTA_FAI, $typematch))  {
+	    list($pathid2, $availref2, $hasfai2) = preg_split('/\|/', $typematch[$IS_FASTA_FAI]);
+	    fwrite($fp, "$action \$$DNAM_VAR[$pathid2]/\$MUTECT_REF_fai .\n");
+	    $DNAM_use[$pathid2] = 1;
+	  } else { // create fai
+	    create_fai($fp, "MUTECT_REF");
+	  }
+	  $retrieved[$MUTECT_REF_fai] = $availref_type_h[$MUTECT_REF_fai] = get_ref_type($MUTECT_REF_fai);
 	  break 2;
 	}
       }
@@ -1157,6 +1172,33 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "# ERROR:  No compatible reference for mutect found.\n");
       echo "ERROR:  No compatible reference for mutect found.<br>\n";
     }
+
+    fwrite($fp, "mystem=\$(basename \$MUTECT_REF .gz)\n");
+    fwrite($fp, "mystem=\$(basename \$mystem .fasta)\n");
+    fwrite($fp, "mystem=\$(basename \$mystem .fa)\n");
+    fwrite($fp, "if [[ ! -e  ./\$mystem.dict  ]] ; then\n");
+    if ($compute_target=="AWS" && preg_match('#^s3://#', $paths_h[$pathid])) {
+      fwrite($fp, "   msg=`$s3_action \$$DNAM_VAR[$pathid]/\$mystem.dict 2>&1`\n");
+      fwrite($fp, "   if [[ \$(check_aws_file_int \$msg) -ne 0 ]] ; then\n");
+      fwrite($fp, "     echo Dictionary file not found...\n");
+      fwrite($fp, "     echo Creating new dictionary file...\n");
+      fwrite($fp, "     ( PICARD_DIR=".$toolsinfo_h['picard']['path']."\n");
+      fwrite($fp, "     java -jar \$PICARD_DIR/CreateSequenceDictionary.jar R= \$MUTECT_REF O= \$mystem.dict ) \n");
+      fwrite($fp, "     echo Creating new dictionary file...done\n");
+      fwrite($fp, "   fi\n");
+    } else {
+      fwrite($fp, "   if [[ -e \$$DNAM_VAR[$pathid]/\$mystem.dict ]] ; then\n");
+      fwrite($fp, "      $action \$$DNAM_VAR[$pathid]/\$mystem.dict .\n");
+      fwrite($fp, "   else\n");
+      fwrite($fp, "     echo Dictionary file not found...\n");
+      fwrite($fp, "     echo Creating new dictionary file...\n");
+      fwrite($fp, "     ( PICARD_DIR=".$toolsinfo_h['picard']['path']."\n");
+      fwrite($fp, "     java -jar \$PICARD_DIR/CreateSequenceDictionary.jar R= \$MUTECT_REF O= \$mystem.dict ) \n");
+      fwrite($fp, "     echo Creating new dictionary file...done\n");
+      fwrite($fp, "   fi\n");
+    }
+    fwrite($fp, "fi\n");
+
   } // end mutect ref
 
   // for strelka
