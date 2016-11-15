@@ -16,10 +16,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -29,7 +30,8 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinxcontrib.fulltoc']
+if not on_rtd:
+  extensions = ['sphinxcontrib.fulltoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -119,15 +121,18 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'default'
-# not currently supported by RTD (make_toctree not JSON serializable)
-#html_theme = 'bizstyle'
+if on_rtd:
+  html_theme = 'default'
+else:
+  # not currently supported by RTD (make_toctree not JSON serializable)
+  html_theme = 'bizstyle'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = { "rightsidebar": "false"}
+if not on_rtd:
+  html_theme_options = { "rightsidebar": "true"}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
