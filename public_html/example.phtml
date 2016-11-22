@@ -644,12 +644,12 @@ function reset_form(i) {
 	$("#bamfilesms2side__dx").empty();
 	$("#bamfilesms2side__sx").empty();
 	clear_chr(5);
-	manage_gatk_jardiv();
-	manage_pon();
+	$("#gatk_jardiv").hide();
 	$("#version_gatk").empty();
 	$("#gatk_jarpath").val("");
 	$("#version_mutect").empty();
 	$("#mutect_pon_vcfpath").val("");
+	manage_pon(0);
 	upd_global_dbsnp();
 	upd_global_fpfilter(); 
 	alert("All options have been reset successfully !");
@@ -886,8 +886,8 @@ function apply_profile(results) {
 	upd_vs_fpfilter();
 	upd_gatk_fpfilter();
 	upd_mutect_fpfilter();
-	manage_gatk_jardiv();
-	manage_pon();
+	manage_gatk_jardiv(1);
+	manage_pon(1);
 	check_pon();
 	upd_bd_regions();
 	upd_pin_filters();
@@ -3090,6 +3090,9 @@ function download(filename, text) {
 	    <option class="menu1" value="ncbi_grch38p2_snp146">NCBI, v.146, GRCh38p2</option>
 	  </select>
 	</div>
+	<div class="tdindent2">
+       <p><input type="checkbox" id="global_custom_dbsnp" name="global_custom_dbsnp"><label for="global_custom_dbsnp">Check to use VCF file for custom dbSNP filtering/annotation</label>&nbsp;</p>
+	</div>
        <p><br></p>
 
 
@@ -3641,6 +3644,7 @@ function do_aws_setup() {
     $("#runinfo").hide();
     $("#titleinfo").show();
     if( $("#gatk_cmd").is(":checked") || $("#mutect_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else { $("#gatk_jardiv").hide(); }
+    // no manage_pon here
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3680,6 +3684,7 @@ function do_local_setup () {
     $("#runinfo").show();
     $("#titleinfo").show();
     if( $("#gatk_cmd").is(":checked") || $("#mutect_cmd").is(":checked")) { $("#gatk_jardiv").show(); } else { $("#gatk_jardiv").hide(); }
+    // no manage_pon here
     // Results
     $("#results_divN").hide();
     $("#results_divY").show();
@@ -3729,53 +3734,66 @@ function manage_gatk_version (tgt, t) { // tgt=0(aws),1(local);t=gatk or mutect
 	success: function(data) { $("#version_"+t).html(data); }
     });
 }
-function manage_gatk_jardiv () {
-    if( ($("#gatk_cmd").is(":checked") && $("#version_gatk option:selected").val()=="gatk_user") ||
-	($("#mutect_cmd").is(":checked") && $("#version_mutect option:selected").val()=="mutect_user") ) {
-	$("#gatk_jardiv").show();
+function dialog_gatk_jardiv () {
 	var mywhere=" ";
 	if( $("#login_aws").is(":checked") ) {mywhere=" AWS S3 ";}
 	if( $("#login_local").is(":checked") ) {mywhere=" local ";}
 	if( ! $("#gatk_jarpath").val().trim().length ) {alert("Note: The current settings require a valid"+mywhere+"path to the GATK jarfile to be specified in the Submit tab before job submission.");}
+}
+function manage_gatk_jardiv ( t ) {
+    if( ($("#gatk_cmd").is(":checked") && $("#version_gatk option:selected").val()=="gatk_user") || ($("#mutect_cmd").is(":checked") && $("#version_mutect option:selected").val()=="mutect_user") ) {
+	$("#gatk_jardiv").show();
+	if( t==1 ) { dialog_gatk_jardiv(); }
     } else {
 	$("#gatk_jardiv").hide();
     }
 }
-
-$("#gatk_cmd,#mutect_cmd,#version_gatk,#version_mutect,#login_aws,#login_local").change(function() {
-    var tgt;
-    var a = ["gatk","mutect"];
-    for (j=0, l=a.length; j<l; j++) { // check both
-	prog = a[j];
-	if( this.id == prog+"_cmd" || this.id.match(/^login/) ) {
-	    if( $("#"+prog+"_cmd").is(':checked')) {
-		write_qual_opts( prog );
-		tgt = -1;
+function handle_gatk_checked ( prog ) {
+    var tgt = -1;
 		if($("#login_aws").is(":checked")) {tgt=0;} else if($("#login_local").is(":checked")){tgt=1;}
 		manage_gatk_version( tgt, prog );
-		if(prog=="mutect") { manage_pon(); }
-	    } else {
-		$("#version_"+prog).empty();
-	    }
-	}
+    if( $("#version_"+prog+" option:selected").val() == prog+"_user") {
+	$("#gatk_jardiv").show();
+	dialog_gatk_jardiv();
     }
-    manage_gatk_jardiv();
+}
+$("#gatk_cmd,#mutect_cmd,#version_gatk,#version_mutect").change(function() {
+    var prog = "gatk";
+    if(this.id == "mutect_cmd" || this.id == "version_mutect"){ prog="mutect"; }
+    if( this.id == prog+"_cmd" ) {
+	if( $("#"+prog+"_cmd").is(':checked')) {
+	    write_qual_opts( prog );
+            handle_gatk_checked( prog );
+	    if(prog=="mutect") { manage_pon(1); }
+	    } else {
+	    $("#version_"+prog).empty(); manage_gatk_jardiv(0);
+	    if(prog=="mutect") { manage_pon(0); }
+	    }
+    } else {
+	if( $("#version_"+prog+" option:selected").val() == prog+"_user") { manage_gatk_jardiv(1); }
+	}
 });
-
+$("[name=compute_target]").change(function() {
+    if( ! $("#login_none").is(':checked') ) {
+	if( $("#gatk_cmd").is(':checked')) { handle_gatk_checked( "gatk" ); }
+	if( $("#mutect_cmd").is(':checked')) { handle_gatk_checked( "mutect" ); manage_pon(1); }
+	manage_gatk_jardiv(0);
+    }
+});
 function check_pon () {
     if( ! $("#mutect_pon_vcfpath").val().trim().length ) {
 	alert("Note: The current settings require a panel-of-normals VCF to be specified in the Submit tab before job submission.");
     }
 }
-function manage_pon () {
+function manage_pon ( t ) {
     if( $("#mutect_cmd").is(":checked") && $("#mutect_use_ponT").is(":checked") && ! $("#login_none").is(":checked") ) {
 	$("#mutect_pondiv").show();
-	alert("Note: The current settings require a panel-of-normals VCF file to be specified in the Submit tab before job submission.");
+	if(t==1){ alert("Note: The current settings require a panel-of-normals VCF file to be specified in the Submit tab before job submission."); }
     } else {
 	$("#mutect_pondiv").hide();
     }
 }
-$("input[type=radio][name=mutect_use_pon]").on('change', function() { manage_pon(); });
+$("input[type=radio][name=mutect_use_pon]").on('change', function() { manage_pon(1); });
 
 $("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
 $("#vs_do_hcfilter").change(function() { upd_vs_hcfilters(); check_vs_mode(); });
