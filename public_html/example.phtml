@@ -221,18 +221,22 @@ function check_has_dup() {
 function validateform( bSubmit ){ 
     var numerr = 0;
 
+    // Trim inputs
+    var tr_a = ['#un','#pw','#clust_gw','#clust_qn','#gvip_img','#gatk_jarpath','#mutect_pon_vcfpath','#alt_dbsnp_vcfpath','#alt_anno_vcfpath'];
+    for (var i=0; i < tr_a.length ; i++) { $(tr_a[i]).val($(tr_a[i]).val().trim()); }
+
     // computing target
     if ( $("#login_none").is(':checked')) {
 	alert ("Please specify a computing resource under Accounts in the navigational menu.");
 	numerr++; return false;
     }
     if ( $("#login_local").is(':checked') ) {
-	if ( $("#un").val().trim().length < 1 || $("#pw").val().trim().length < 1  || $('#clust_gw').val().trim().length < 1) {
+      if ( $("#un").val().length < 1 || $("#pw").val().length < 1  || $('#clust_gw').val().length < 1) {
 	    alert ("Please make sure username, passphrase, and remote hostname are provided under Accounts!");
 	    numerr++; return false;
 	}
 	if( bSubmit &&  $("#subactionR").is(':checked')) {
-	    if ( $('#clust_qn').val().trim().length < 1 ) {
+	    if ( $('#clust_qn').val().length < 1 ) {
 		alert("Please provide a queue name under Accounts!");
 		numerr++; return false;
 	    }
@@ -306,19 +310,21 @@ function validateform( bSubmit ){
         alert("Please specify calling mode for Pindel !"); numerr++; return false;
     }
 
-    $("#gatk_jarpath").val($("#gatk_jarpath").val().trim());
+    var cCR_str = "Current configuration requires";
+    var pPP_str = "Please provide a valid path in the Submit tab.";
+    var tmp1;
+
     if ( $("#gatk_cmd").is(":checked")) {
       if ( $("#version_gatk").val()=="gatk_user") { if ($("#gatk_jarpath").val().length==0) {
-	  alert("Current configuration requires a GATK jarfile location. Please provide a valid path in the Submit tab."); numerr++; return false;
+	  alert(cCR_str + " a GATK jarfile location. " + pPP_str); numerr++; return false;
 	}}
     }
     if ( $("#mutect_cmd").is(":checked")) {
-      if ( $("#version_mutect").val()=="mutect_user") { if ($("#gatk_jarpath").val().length==0) {
-	  alert("Current configuration requires a GATK jarfile location. Please provide a valid path in the Submit tab."); numerr++; return false;
+	if ( $("#version_mutect").val()=="mutect_user") { if ($("#gatk_jarpath").val().length==0) {
+	    alert(cCR_str + " a GATK jarfile location. " + pPP_str); numerr++; return false;
 	}}
-      $("#mutect_pon_vcfpath").val($("#mutect_pon_vcfpath").val().trim());
-      if ( $("#mutect_use_ponT").is(":checked")) { if ($("#mutect_pon_vcfpath").val().length==0) {
-	  alert("Current configuration requires a panel of normals VCF file. Please provide a valid path in the Submit tab."); numerr++; return false;
+	if ( $("#mutect_use_ponT").is(":checked")) { if ($("#mutect_pon_vcfpath").val().length==0) {
+	    alert(cCR_str + " a panel of normals VCF file. " + pPP_str); numerr++; return false;
 	}}
     }
 
@@ -392,7 +398,7 @@ function validateform( bSubmit ){
     if (tmp == false ) { numerr++; }
 
     // validate alt image
-    var alt_img = $("#gvip_img").val().trim();
+    var alt_img = $("#gvip_img").val();
     if( alt_img.length>0  &&  (alt_img.length != 12  || ! alt_img.match(/^ami/)) ) {
         alert("The format of the alternative image identifier listed under the Options tab is invalid.");
         numerr++;
@@ -3141,7 +3147,7 @@ function download(filename, text) {
 
        <div class="subhead tdindents">   <b>Annotation</b></div> 
   
-       <p><input type="checkbox" id="vep_cmd" name="vep_cmd"><label for="vep_cmd">Run VEP (Variant Effect Predictor)</label></p>
+       <p><input type="checkbox" id="vep_cmd" name="vep_cmd"><label for="vep_cmd">VEP (Variant Effect Predictor)</label></p>
        <div class="tdindent2"><select class="tb2menu" id="vep_version" name="vep_version">
 	   <option class="menu1" value="vep81_grch37_hsapiens">v.81, homo sapiens, GRCh37</option>
 	 </select>
@@ -3856,26 +3862,20 @@ $("#global_do_dbsnp").click(function() {
 });
 function upd_global_dbsnp() {
     if( $("#vs_do_dbsnp").is(':checked') && $("#gatk_do_dbsnp").is(':checked') && $("#mutect_do_dnsnp").is(':checked') &&  $("#strlk_do_dbsnp").is(':checked')) {
-	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
-	$("#global_do_dbsnp").prop('checked',true).trigger('change');
+	$("#global_do_dbsnp").prop({indeterminate: false, checked: true}).trigger('change');
     } else if ( ! $("#vs_do_dbsnp").is(':checked') && ! $("#gatk_do_dbsnp").is(':checked') && ! $("#mutect_do_dbsnp").is(':checked') &&  ! $("#strlk_do_dbsnp").is(':checked')) {
-	$("#global_do_dbsnp").prop('indeterminate',false).trigger('change');
-	$("#global_do_dbsnp").prop('checked',false).trigger('change');
+	$("#global_do_dbsnp").prop({indeterminate: false, checked: false}).trigger('change');
     } else {
-	$("#global_do_dbsnp").prop('indeterminate',true).trigger('change');
-	$("#global_do_dbsnp").prop('checked',false).trigger('change');
+	$("#global_do_dbsnp").prop({indeterminate: true, checked: false}).trigger('change');
     }
 }
 function upd_global_fpfilter() {
     if( $("#vs_do_fpfilter").is(':checked') && $("#gatk_do_fpfilter").is(':checked') && $("#mutect_do_fpfilter").is(':checked') &&  $("#strlk_do_fpfilter").is(':checked')) {
-	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
-	$("#global_do_fpfilter").prop('checked',true).trigger('change');
+	$("#global_do_fpfilter").prop({indeterminate: false, checked: true}).trigger('change');
     } else if ( ! $("#vs_do_fpfilter").is(':checked') && ! $("#gatk_do_fpfilter").is(':checked') && ! $("#mutect_do_fpfilter").is(':checked') &&  ! $("#strlk_do_fpfilter").is(':checked')) {
-	$("#global_do_fpfilter").prop('indeterminate',false).trigger('change');
-	$("#global_do_fpfilter").prop('checked',false).trigger('change');
+	$("#global_do_fpfilter").prop({indeterminate: false, checked: false}).trigger('change');
     } else {
-	$("#global_do_fpfilter").prop('indeterminate',true).trigger('change');
-	$("#global_do_fpfilter").prop('checked',false).trigger('change');
+	$("#global_do_fpfilter").prop({indeterminate: true, checked: false}).trigger('change');
     }
 }
 $("#vs_do_dbsnp,#gatk_do_dbsnp,#mutect_do_dbsnp,#strlk_do_dbsnp").click(function() {  upd_global_dbsnp(); });

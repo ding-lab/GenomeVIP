@@ -281,6 +281,11 @@ if (isset($_POST['vs_cmd'])) {
 	  array_push($pp, "$prefix.$tmpkey = \"true\"\n");
 	}
       break;
+      case "extra_arguments":
+	if( strlen(trim($_POST[$key])) > 0 ) {
+	  array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
+	}
+      break;
       default:
 	array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
       }
@@ -348,9 +353,14 @@ if (isset($_POST['vs_cmd'])) {
 	  if ( strlen($my_pon_path)  &&  $_POST['compute_target'] == "local") {
 	    pprofile_verify_rel_homedir( $my_pon_path );
 	  }
+	  array_push($pp, "$prefix.pon_vcfpath = ".$my_pon_path."\n");
 	}
-	array_push($pp, "$prefix.pon_vcfpath = ".$my_pon_path."\n");
 	break;
+      case "extra_arguments":
+	if( strlen(trim($_POST[$key])) > 0 ) {
+	  array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
+	}
+      break;
       default:
 	array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
       }
@@ -397,6 +407,11 @@ if (isset($_POST['vs_cmd'])) {
 	//case "extra_arguments": // no quotes here; bad for strelka
 	array_push($pp, "$prefix.$tmpkey = \"".$_POST[$key]."\"\n");
         break;
+      case "extra_arguments":
+	if( strlen(trim($_POST[$key])) > 0 ) {
+	  array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
+	}
+      break;
       default:
 	array_push($pp, "$prefix.$tmpkey = ".$_POST[$key]."\n");
       }
@@ -665,7 +680,7 @@ if (isset($_POST['vs_cmd'])) {
   // ------------------------------------------------------------
 
   // Need only if tools specify
-  if( isset($_POST['vs_apply_dbsnp_filter']) ||  isset($_POST['strlk_apply_dbsnp_filter']) ) {
+  if( isset($_POST['vs_apply_dbsnp_filter']) ||  isset($_POST['strlk_apply_dbsnp_filter']) ||  isset($_POST['gatk_apply_dbsnp_filter']) || isset($_POST['mutect_apply_dbsnp_filter']) ) {
     array_push($pp, "[ dbsnp ]\n"); 
     $prefix = "dbsnp";
     $value  = "dbsnp_version";
