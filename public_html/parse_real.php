@@ -2223,7 +2223,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    $prefix="varscan.dbsnp.$vartype";
 	    fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input <<EOF\n");  
 	    fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	    if ($_POST['dbsnp_user']=="dbsnp_user") {
+	    fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	    } else {
 	    fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
+	    }
 	    fwrite($fp, "$prefix.rawvcf = \$RUNDIR/varscan/group\$gp/\$chralt/varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	    fwrite($fp, "$prefix.mode = filter\n");
 	    fwrite($fp, "$prefix.passfile = \$RUNDIR/varscan/group\$gp/\$chralt/varscan.out.gl_$vartype.group\$gp.chr\$chralt.gvip.".$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
@@ -2637,7 +2641,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    $prefix="varscan.dbsnp.$vartype";
 	    fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input <<EOF\n");  
 	    fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	    if ($_POST['dbsnp_user']=="dbsnp_user") {
+	    fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	    } else {
 	    fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
+	    }
 	    fwrite($fp, "$prefix.rawvcf    = ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	    fwrite($fp, "$prefix.mode = filter\n");
 	    fwrite($fp, "$prefix.passfile  = ./varscan.out.som_$vartype.group\$gp.chr\$chralt.gvip.".$vs_som_prefix.$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
@@ -2985,7 +2993,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $prefix="varscan.dbsnp.$vartype";
 	  fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input <<EOF\n");  
 	  fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	  if ($_POST['dbsnp_user']=="dbsnp_user") {
+	  fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	  } else {
 	  fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
+	  }
 	  fwrite($fp, "$prefix.rawvcf = ./varscan.out.trio.group\$gp.chr\$chralt.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass']."vcf\n");
 	  fwrite($fp, "$prefix.mode = filter\n");
 	  fwrite($fp, "$prefix.passfile = ./varscan.out.trio.group\$gp.chr\$chralt.$vartype.gvip.denovo_pass.".$vs_hc_filter_prefix[$vartype]['pass'].$vs_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
@@ -3300,7 +3312,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$prefix="gatk.dbsnp.$vartype";
 	fwrite($fp, "cat > \$RUNDIR/gatk/group\$gp/\$chralt/gatk_dbsnp_filter.$vartype.input <<EOF\n");
 	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	if ($_POST['dbsnp_user']=="dbsnp_user") {
+	fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	} else {
 	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");
+	}
 	fwrite($fp, "$prefix.rawvcf = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.vcf\n");
 	fwrite($fp, "$prefix.mode = filter\n");
 	fwrite($fp, "$prefix.passfile = \$RUNDIR/gatk/group\$gp/\$chralt/gatk.out.group\$gp.chr\$chralt.$vartype.gvip.".$gatk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
@@ -3609,7 +3625,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$prefix="mutect.dbsnp.$vartype";
 	fwrite($fp, "cat > \$RUNDIR/mutect/group\$gp/\$chralt/mutect_dbsnp_filter.$vartype.input <<EOF\n");
 	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	if ($_POST['dbsnp_user']=="dbsnp_user") {
+	fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	} else {
 	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");
+	}
 	fwrite($fp, "$prefix.rawvcf = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.vcf\n");
 	fwrite($fp, "$prefix.mode = filter\n");
 	fwrite($fp, "$prefix.passfile = \$RUNDIR/mutect/group\$gp/\$chralt/mutect.out.group\$gp.chr\$chralt.$vartype.gvip.".$mutect_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");
@@ -3894,7 +3914,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$prefix="strelka.dbsnp.$vartype";
 	fwrite($fp, "cat > \$RUNDIR/strelka/group\$gp/strelka_dbsnp_filter.$vartype.input <<EOF\n");  
 	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
+	if ($_POST['dbsnp_user']=="dbsnp_user") {
+	fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	} else {
 	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
+	}
 	fwrite($fp, "$prefix.rawvcf = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.vcf\n");
 	fwrite($fp, "$prefix.mode = filter\n");
 	fwrite($fp, "$prefix.passfile = \$RUNDIR/strelka/group\$gp/strelka_out/results/strelka.somatic.$vartype.group\$gp.$strelka_callset.gvip.".$strlk_dbsnp_filter_prefix[$vartype]['pass']."vcf\n");

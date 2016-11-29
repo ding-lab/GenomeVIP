@@ -684,13 +684,16 @@ if (isset($_POST['vs_cmd'])) {
     array_push($pp, "[ dbsnp ]\n"); 
     $prefix = "dbsnp";
     $value  = "dbsnp_version";
-    $key    = "dbsnp_version";
+    $key    = $value;
     array_push($pp, "$prefix.$value = ".$_POST[$key]."\n");
 
-    array_push($pp, "\n");
+    if( $_POST[$key]=="dbsnp_user") {
+      $tmpkey = "alt_dbsnp_vcfpath";
+      array_push($pp, "$prefix.$tmpkey = ".trim($_POST[$tmpkey])."\n");
+    }
   }
-    
 
+  array_push($pp, "\n");
 
   // ------------------------------------------------------------
 

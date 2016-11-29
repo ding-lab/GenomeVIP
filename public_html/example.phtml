@@ -327,6 +327,9 @@ function validateform( bSubmit ){
 	    alert(cCR_str + " a panel of normals VCF file. " + pPP_str); numerr++; return false;
 	}}
     }
+    if( ($("#global_do_dbsnp").is(':checked') || $("#vs_do_dbsnp").is(':checked') || $("#gatk_do_dbsnp").is(':checked') || $("#mutect_do_dnsnp").is(':checked') ||  $("#strlk_do_dbsnp").is(':checked')) && $("#version_dbsnp").val()=="dbsnp_user" && $("#alt_dbsnp_vcfpath").val().length==0) {
+	alert(cCR_str + " a user-provided dbSNP VCF. " + pPP_str); numerr++; return false;
+    }
 
     if (  ($("#vs_cmd").is(':checked') && $("#vs_isTRIO").is(':checked')) ||	($("#bd_cmd").is(':checked') && $("#bd_call_modeT").is(':checked')) ||	($("#pindel_cmd").is(':checked') && $("#pindel_modeT").is(':checked')) )   { 
 	if (document.forms.myform.bamfilesms2side__dx.length % 3 != 0) {
@@ -2972,6 +2975,13 @@ function download(filename, text) {
 	 </div>
 	 <p><br></p>
        </div>
+
+       <div id="alt_dbsnpdiv" class="initiallyHidden fps">
+	 <div class="tdindents"><p class="fps">Path of alternative/custom dbSNP VCF:&nbsp;<img class="inline" title="Format is s3://bucket/path/to/file.vcf on AWS or /path/to/file.vcf on local system" src="image/Help.png"</img>&nbsp;</p>
+	   <input type="text" class="tb2" id="alt_dbsnp_vcfpath" name="alt_dbsnp_vcfpath"/>
+	 </div>
+	 <p><br></p>
+       </div>
        
        <div id="titleinfo" class="initiallyHidden fps">
 	 <div class="tdindents"><p class="fps">Comment to place into execution profile (OPTIONAL):</p>
@@ -3089,15 +3099,13 @@ function download(filename, text) {
 
        <p><input type="checkbox" id="global_do_dbsnp" name="global_apply_dbsnp_filter"><label for="global_do_dbsnp">Identify and remove dbSNP variants</label>&nbsp;<img class="inline" title="Checking this box activates or deactivates this filtering for VarScan, GATK/MuTect, and Strelka. Filtering may be deselected under individual tool tabs." src="image/Help.png"</img></p>
 	<div class="tdindent2">
-	  <select class="tb2menu" id="dbsnp_version" name="dbsnp_version">
+	  <select class="tb2menu" id="version_dbsnp" name="dbsnp_version">
 	    <option class="menu1" value="ncbi_grch37p13_snp142">NCBI, v.142, GRCh37p13</option>
 	    <option class="menu1" value="ncbi_grch37p13_snp146">NCBI, v.146, GRCh37p13</option>
 	    <option class="menu1" value="ncbi_grch38_snp142">NCBI, v.142, GRCh38</option>
 	    <option class="menu1" value="ncbi_grch38p2_snp146">NCBI, v.146, GRCh38p2</option>
+	    <option class="menu1" value="dbsnp_user">version user</option>
 	  </select>
-	</div>
-	<div class="tdindent2">
-       <p><input type="checkbox" id="global_custom_dbsnp" name="global_custom_dbsnp"><label for="global_custom_dbsnp">Check to use VCF file for custom dbSNP filtering/annotation</label>&nbsp;</p>
 	</div>
        <p><br></p>
 
@@ -3666,6 +3674,7 @@ function do_aws_setup() {
 
 $("#login_aws").click(function () {
     do_aws_setup();
+    manage_dbsnpdiv();
 });
 
 function do_local_setup () {
@@ -3702,6 +3711,7 @@ function do_local_setup () {
 $("#login_local").click(function () {
     get_clust(1); // content
     do_local_setup(); // panels
+    manage_dbsnpdiv();
 });
 
 function do_none_setup() {
@@ -3801,6 +3811,20 @@ function manage_pon ( t ) {
 }
 $("input[type=radio][name=mutect_use_pon]").on('change', function() { manage_pon(1); });
 
+function manage_dbsnpdiv () {
+    if( ($("#global_do_dbsnp").is(':checked') || $("#vs_do_dbsnp").is(':checked') || $("#gatk_do_dbsnp").is(':checked') || $("#mutect_do_dnsnp").is(':checked') ||  $("#strlk_do_dbsnp").is(':checked')) && $("#version_dbsnp").val()=="dbsnp_user") {
+	if( !$("#login_none").is(':checked')) {
+	    $("#jobinst").show();
+	    $("#alt_dbsnpdiv").show();
+	    alert("Note: The current settings require a dbSNP-labeled VCF file to be specified in the Submit tab before job submission.");
+	}
+    } else {
+	$("#alt_dbsnpdiv").hide();
+    }
+}
+$("#version_dbsnp").change(function() {
+    manage_dbsnpdiv();
+});
 $("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
 $("#vs_do_hcfilter").change(function() { upd_vs_hcfilters(); check_vs_mode(); });
 $("#vs_do_fpfilter, #vs_do_dbsnp").change(function() { upd_vs_fpfilter(); check_vs_mode(); });
@@ -3854,12 +3878,15 @@ $("#global_do_fpfilter").click(function() {
     if ($("#global_do_fpfilter").is(':checked')) {stat=true;}
     for (j=0, l=a.length; j<l; j++) {$("#"+a[j]+"_do_fpfilter").prop('checked',stat).trigger('change');}
 });
+
 $("#global_do_dbsnp").click(function() {
     var a = ["vs","gatk","mutect","strlk"];
     var stat=false;
     if ($("#global_do_dbsnp").is(':checked')) {stat=true;}
     for (j=0, l=a.length; j<l; j++) {$("#"+a[j]+"_do_dbsnp").prop('checked',stat).trigger('change');}
+    manage_dbsnpdiv();
 });
+
 function upd_global_dbsnp() {
     if( $("#vs_do_dbsnp").is(':checked') && $("#gatk_do_dbsnp").is(':checked') && $("#mutect_do_dnsnp").is(':checked') &&  $("#strlk_do_dbsnp").is(':checked')) {
 	$("#global_do_dbsnp").prop({indeterminate: false, checked: true}).trigger('change');
@@ -3868,6 +3895,7 @@ function upd_global_dbsnp() {
     } else {
 	$("#global_do_dbsnp").prop({indeterminate: true, checked: false}).trigger('change');
     }
+    manage_dbsnpdiv();
 }
 function upd_global_fpfilter() {
     if( $("#vs_do_fpfilter").is(':checked') && $("#gatk_do_fpfilter").is(':checked') && $("#mutect_do_fpfilter").is(':checked') &&  $("#strlk_do_fpfilter").is(':checked')) {
