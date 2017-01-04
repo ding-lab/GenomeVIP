@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'GenomeVIP'
-copyright = u'2015-2016'
+copyright = u'2015-2017'
 author = u'rmashl'
 
 # The version info for the project you're documenting, acts as replacement for
