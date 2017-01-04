@@ -179,6 +179,8 @@ function display(msg,cmd){
 
 
 function preview_ep(n) {
+    get_custom_anno_id();
+
     // Get current profile; update and display dialog
     var posting = $.ajax({
 	url: "pprofile.php",
@@ -217,13 +219,23 @@ function check_has_dup() {
     return false;
 }
 
+function get_custom_anno_id() {
+  if( $("#alt_anno_cmd").is(':checked') && $("#alt_anno_path").val().length ) {
+    var ss = $("#alt_anno_path").val().split("/");
+    var tmpA = ss[ss.length-1].split(".");
+    var guessA = tmpA[0].replace(/\ /g,"");
+    if( ! $("#alt_anno_id").val().length ) { $("#alt_anno_id").val( guessA ); }
+  }
+}
 
 function validateform( bSubmit ){ 
     var numerr = 0;
 
     // Trim inputs
-    var tr_a = ['#un','#pw','#clust_gw','#clust_qn','#gvip_img','#gatk_jarpath','#mutect_pon_vcfpath','#alt_dbsnp_vcfpath','#alt_anno_vcfpath'];
+    var tr_a = ['#un','#pw','#clust_gw','#clust_qn','#gvip_img','#gatk_jarpath','#mutect_pon_vcfpath','#alt_dbsnp_vcfpath','#alt_anno_path','#alt_anno_id'];
     for (var i=0; i < tr_a.length ; i++) { $(tr_a[i]).val($(tr_a[i]).val().trim()); }
+
+    get_custom_anno_id();
 
     // computing target
     if ( $("#login_none").is(':checked')) {
@@ -329,6 +341,14 @@ function validateform( bSubmit ){
     }
     if( ($("#global_do_dbsnp").is(':checked') || $("#vs_do_dbsnp").is(':checked') || $("#gatk_do_dbsnp").is(':checked') || $("#mutect_do_dnsnp").is(':checked') ||  $("#strlk_do_dbsnp").is(':checked')) && $("#version_dbsnp").val()=="dbsnp_user" && $("#alt_dbsnp_vcfpath").val().length==0) {
 	alert(cCR_str + " a user-provided dbSNP VCF. " + pPP_str); numerr++; return false;
+    }
+    if($("#alt_anno_cmd").is(':checked')) {
+	if( ! $("#alt_anno_path").val().length) { alert(cCR_str + " a user-provided annotation file. " + pPP_str); numerr++; return false; }
+	if($("#alt_anno_filetype").val()=="none") { alert("Please specify the format of the custom annotation file on the Submit page !"); numerr++; return false;}
+	if($("#alt_anno_overlap").val()=="none") { alert("Please specify overlap type for the custom annotation file in the Annotation section !"); numerr++; return false;}
+	// Allowed combinations are web or s3 for AWS; web or filesytem for local
+	if($("#login_aws").is(":checked") && ! $("#alt_anno_path").val().match(/^(http(s)?|ftp|s3):\//i)) { alert("Please use annotation files accessible by HTTP, HTTPS, FTP, or S3 on AWS !"); numerr++; return false;}
+	if($("#login_local").is(":checked") &&  $("#alt_anno_path").val().match(/^s3:\//i)) { alert("Please use annotation files accessible by HTTP, HTTPS, FTP, or path on local compute system !"); numerr++; return false;}
     }
 
     if (  ($("#vs_cmd").is(':checked') && $("#vs_isTRIO").is(':checked')) ||	($("#bd_cmd").is(':checked') && $("#bd_call_modeT").is(':checked')) ||	($("#pindel_cmd").is(':checked') && $("#pindel_modeT").is(':checked')) )   { 
@@ -855,8 +875,7 @@ function apply_profile(results) {
 		replace(/^genomestrip/,"gs").
 		replace(/^fpfilter/,"vs_fp").
 		replace(/^dbsnp\.dbsnp_version/,"dbsnp_version").
-		replace(/^variant_effect_predictor/,"vep").
-		replace(/^vep\.vep_version/,"vep_version").
+		replace(/^annotation\./,"").
 		replace(/^aws\.runtime_imageID/,"gvip_img").
 		replace(/\./g,"_");
 	    v=results[i]['v'];
@@ -2983,6 +3002,18 @@ function download(filename, text) {
 	 <p><br></p>
        </div>
        
+       <div id="alt_annodiv" class="initiallyHidden fps">
+	 <div class="tdindents"><p class="fps">Path of alternative/custom annotation file and format:&nbsp;<img class="inline" title="Please provide an annotation file, e.g., s3://bucket/path/to/file.bed.gz (on AWS), /path/to/file.bed.gz (on local system), or equivalent HTTP(S) or FTP location. See the documentation for further details." src="image/Help.png"</img>&nbsp;</p>
+            <input type="text" class="tb2" id="alt_anno_path" name="alt_anno_path"/>&nbsp;
+	    <select class="tb2menu" id="alt_anno_filetype" name="alt_anno_filetype">
+	      <option value="none" selected="selected">-- Select format --</option>
+	      <option value="bed">BED</option>
+	      <option value="vcf">VCF</option>
+	    </select>
+	 </div>
+	 <p><br></p>
+       </div>
+
        <div id="titleinfo" class="initiallyHidden fps">
 	 <div class="tdindents"><p class="fps">Comment to place into execution profile (OPTIONAL):</p>
 	   <input type="text" class="tb2" id="jobtitle" name="jobtitle" value=""/>
@@ -3156,12 +3187,26 @@ function download(filename, text) {
        <div class="subhead tdindents">   <b>Annotation</b></div> 
   
        <p><input type="checkbox" id="vep_cmd" name="vep_cmd"><label for="vep_cmd">VEP (Variant Effect Predictor)</label></p>
-       <div class="tdindent2"><select class="tb2menu" id="vep_version" name="vep_version">
+        <div class="tdindent2"><select class="tb2menu" id="vep_version" name="vep_version">
 	   <option class="menu1" value="vep81_grch37_hsapiens">v.81, homo sapiens, GRCh37</option>
+	   <option class="menu1" value="vep81_grch38_hsapiens">v.81, homo sapiens, GRCh38</option>
+	   <option class="menu1" value="vep85_grch37_hsapiens">v.85, homo sapiens, GRCh37 (includes ClinVar)</option>
+	   <option class="menu1" value="vep85_grch38_hsapiens">v.85, homo sapiens, GRCh38 (includes ClinVar)</option>
 	 </select>
        </div>
        <p><br></p>
-
+       <p><input type="checkbox" id="alt_anno_cmd" name="alt_anno_cmd"><label for="alt_anno_cmd">Alternative/custom annotation file</label>&nbsp;</p>
+       <table class="rindent">
+	 <tr><td>Overlap type:</td>
+	   <td><select class="tb2menu" id="alt_anno_overlap" name="alt_anno_overlap">
+	       <option value="none" selected="selected">-- Select one --</option>
+	       <option value="exact">Exact</option>
+	       <option value="overlap">Overlap (1 bp or more)</option>
+	   </select></td>
+	 </tr><tr><td>INFO field ID string:</td>
+	   <td><input type="text" class="tb2" id="alt_anno_id" name="alt_anno_id" placeholder="(Default: base name of input file)"/></td>
+	 </tr>
+       </table>
 
 
 
@@ -3825,6 +3870,16 @@ function manage_dbsnpdiv () {
 $("#version_dbsnp").change(function() {
     manage_dbsnpdiv();
 });
+$("#alt_anno_cmd").change(function() {
+    if( $("#alt_anno_cmd").is(':checked') ) {
+	$("#jobinst").show();
+	$("#alt_annodiv").show();
+	alert("Note: The current settings require an annotation file and format to be specified in the Submit tab before job submission.");
+    } else {
+	$("#alt_annodiv").hide();
+    }
+});
+
 $("input[name='vs_gl_samples']").click(function() { upd_vs_hcfilters(); upd_vs_fpfilter(); check_vs_mode(); });
 $("#vs_do_hcfilter").change(function() { upd_vs_hcfilters(); check_vs_mode(); });
 $("#vs_do_fpfilter, #vs_do_dbsnp").change(function() { upd_vs_fpfilter(); check_vs_mode(); });

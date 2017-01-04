@@ -689,7 +689,9 @@ if (isset($_POST['vs_cmd'])) {
 
     if( $_POST[$key]=="dbsnp_user") {
       $tmpkey = "alt_dbsnp_vcfpath";
-      array_push($pp, "$prefix.$tmpkey = ".trim($_POST[$tmpkey])."\n");
+      $my_path = trim($_POST[$tmpkey]);
+      pprofile_verify_rel_homedir( $my_path );
+      array_push($pp, "$prefix.$tmpkey = ".$my_path."\n");
     }
   }
 
@@ -697,17 +699,34 @@ if (isset($_POST['vs_cmd'])) {
 
   // ------------------------------------------------------------
 
-  if( isset($_POST['vep_cmd']) ) {
-    array_push($pp, "[ variant_effect_predictor ]\n"); 
+  if( isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd']) ) {
+    $prefix = "annotation";
+    array_push($pp, "[ $prefix ]\n");
+    if( isset($_POST['vep_cmd']) ) {
+      array_push($pp, "$prefix.vep_cmd = \"true\"\n");
+      $value  = "vep_version";
+      $key    = $value;
+      array_push($pp, "$prefix.$value = ".$_POST[$key]."\n");
+    } else {
+      array_push($pp, "$prefix.vep_cmd = \"false\"\n");
+    }
+    if( isset($_POST['alt_anno_cmd']) ) {
+      array_push($pp, "$prefix.alt_anno_cmd = \"true\"\n");
+      foreach ($alt_anno_opts as $tmpkey ) {
+	if($tmpkey=="alt_anno_path") {
+	  $my_path = trim($_POST[$tmpkey]);
+	  pprofile_verify_rel_homedir( $my_path );
+	  array_push($pp, "$prefix.$tmpkey = ".$my_path."\n");
+	} else {
+	  array_push($pp, "$prefix.$tmpkey = ".trim($_POST[$tmpkey])."\n");
+	}
+      }
+    } else {
+      array_push($pp, "$prefix.alt_anno_cmd = \"false\"\n");
+    }
 
-    $prefix = "vep";
-    $value = "vep_version";
-    $key    = $value;
-    array_push($pp, "$prefix.$value = ".$_POST[$key]."\n");
+    array_push($pp, "\n");
   }
-
-  array_push($pp, "\n");
-
 
   // ------------------------------------------------------------
 

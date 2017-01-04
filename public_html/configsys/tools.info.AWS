@@ -70,26 +70,20 @@ path=/usr/local/bin/vcftools/0.1.14/bin
 perllibpath=/usr/local/bin/vcftools/0.1.14/share/perl5
 
 [ncbi_grch37p13_snp142]
-path=/usr/local/bin/dbSNP/ncbi_grch37p13_snp142/qc
+path=/usr/local/bin/dbSNP/ncbi_grch37p13_snp142
 file=00-All.vcf.gz
 
 [ncbi_grch37p13_snp146]
-path=/usr/local/bin/dbSNP/ncbi_grch37p13_snp146/qc
+path=/usr/local/bin/dbSNP/ncbi_grch37p13_snp146
 file=00-All.vcf.gz
 
 [ncbi_grch38_snp142]
-path=/usr/local/bin/dbSNP/ncbi_grch38_snp142/qc
+path=/usr/local/bin/dbSNP/ncbi_grch38_snp142
 file=00-All.vcf.gz
 
 [ncbi_grch38p2_snp146]
-path=/usr/local/bin/dbSNP/ncbi_grch38p2_snp146/qc
+path=/usr/local/bin/dbSNP/ncbi_grch38p2_snp146
 file=00-All.vcf.gz
-
-[clinvar_37]
-path=/usr/local/bin/ClinVar/GRCh37/20160302
-
-[clinvar_38]
-path=/usr/local/bin/ClinVar/GRCh38/20160302
 
 [vep81_grch37_hsapiens]
 installdir=/usr/local/bin/VEP/v81
@@ -108,3 +102,24 @@ cache_relpath=cache
 fasta_relpath=cache/homo_sapiens/81_GRCh38
 reffasta=Homo_sapiens.GRCh38.dna.primary_assembly.fa
 assembly=GRCh38
+
+[vep85_grch37_hsapiens]
+installdir=/usr/local/bin/VEP/v85
+relpath=ensembl-tools-release-85/scripts/variant_effect_predictor
+vep_exe=variant_effect_predictor.pl
+cache_relpath=cache
+fasta_relpath=cache/homo_sapiens/85_GRCh37
+reffasta=Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
+assembly=GRCh37
+
+[vep85_grch38_hsapiens]
+installdir=/usr/local/bin/VEP/v85
+relpath=ensembl-tools-release-85/scripts/variant_effect_predictor
+vep_exe=variant_effect_predictor.pl
+cache_relpath=cache
+fasta_relpath=cache/homo_sapiens/85_GRCh38
+reffasta=Homo_sapiens.GRCh38.dna.primary_assembly.fa
+assembly=GRCh38
+
+[custom_annotation]
+vep_alt_anno=vep81_grch37_hsapiens

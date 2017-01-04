@@ -469,11 +469,22 @@ function write_strlk_merge($fp, $callset, $strlk_dbsnp_filter_prefix, $strlk_fpf
 
 function write_vep_input_common($fp, $prefix) {
   global $toolsinfo_h;
-  fwrite($fp, "$prefix.vep_cmd = ".$toolsinfo_h[$_POST['vep_version']]['installdir']."/".$toolsinfo_h[$_POST['vep_version']]['relpath']."/".$toolsinfo_h[$_POST['vep_version']]['vep_exe']."\n");
-  fwrite($fp, "$prefix.vep_opts = --everything\n");
-  fwrite($fp, "$prefix.cachedir = ".$toolsinfo_h[$_POST['vep_version']]['installdir']."/".$toolsinfo_h[$_POST['vep_version']]['cache_relpath']."\n");
-  fwrite($fp, "$prefix.reffasta = ".$toolsinfo_h[$_POST['vep_version']]['installdir']."/".$toolsinfo_h[$_POST['vep_version']]['fasta_relpath']."/".$toolsinfo_h[$_POST['vep_version']]['reffasta']."\n");
-  fwrite($fp, "$prefix.assembly = ".$toolsinfo_h[$_POST['vep_version']]['assembly']."\n");
+  $my_opts = "--everything";           // Configure defaults
+  $vep_id  = $_POST['vep_version'];
+
+  if( ! isset($_POST['vep_cmd']) ) { $my_opts = "--no_consequences"; }
+  if( isset($_POST['alt_anno_cmd']) ) {
+    if( ! isset($_POST['vep_cmd']) ) {
+      $vep_id = $toolsinfo_h['custom_annotation']['vep_alt_anno'];
+    }
+    $my_opts .= " "."--custom \$ANNO_FILE".",".$_POST['alt_anno_id'].",".$_POST['alt_anno_filetype'].",".$_POST['alt_anno_overlap'].",0";
+  }
+
+  fwrite($fp, "$prefix.vep_cmd = ".$toolsinfo_h[$vep_id]['installdir']."/".$toolsinfo_h[$vep_id]['relpath']."/".$toolsinfo_h[$vep_id]['vep_exe']."\n");
+  fwrite($fp, "$prefix.vep_opts = $my_opts\n");
+  fwrite($fp, "$prefix.cachedir = ".$toolsinfo_h[$vep_id]['installdir']."/".$toolsinfo_h[$vep_id]['cache_relpath']."\n");
+  fwrite($fp, "$prefix.reffasta = ".$toolsinfo_h[$vep_id]['installdir']."/".$toolsinfo_h[$vep_id]['fasta_relpath']."/".$toolsinfo_h[$vep_id]['reffasta']."\n");
+  fwrite($fp, "$prefix.assembly = ".$toolsinfo_h[$vep_id]['assembly']."\n");
 }
 
 // Wait for file creation
@@ -682,6 +693,60 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       } else {
       fwrite($fp, "export MUTECT_DIR=".$toolsinfo_h[$_POST['mutect_version']]['path']."\n");
       fwrite($fp, "export MUTECT_EXE=".$toolsinfo_h[$_POST['mutect_version']]['exe']."\n");
+      }
+    }
+  }
+  $my_dbsnp_file = "";
+  if(isset($_POST['global_apply_dbsnp_filter']) && $_POST['dbsnp_version']=="dbsnp_user") {
+    $my_dbsnp_file = trim($_POST['alt_dbsnp_vcfpath']);
+    if ($compute_target=="AWS") {
+      if( preg_match('/^(http(s)?|ftp):\//i', $my_dbsnp_file) ) {
+	fwrite($fp, "export DBSNP_FILE=".$my_dbsnp_file."\n");
+      }
+      if( preg_match('/^s3:\//i', $my_dbsnp_file) ) {
+	fwrite($fp, "mkdir -p \$RUNDIR/reference\n");
+	fwrite($fp, "DBSNP_FILE_REMOTE=".$my_dbsnp_file."\n");
+	fwrite($fp, "DBSNP_BASEFILE=".basename($my_dbsnp_file)."\n");
+	fwrite($fp, "export DBSNP_FILE=\$RUNDIR/reference/\$DBSNP_BASEFILE\n");
+	fwrite($fp, "echo Retrieving DBSNP FILE...\n");
+	fwrite($fp, "msg=`$s3_action  \$DBSNP_FILE_REMOTE  \$DBSNP_FILE  2>&1`\n");
+	fwrite($fp, "check_aws_file \$msg \n");
+	fwrite($fp, "echo Retrieving DBSNP FILE INDEX...\n");
+	fwrite($fp, "msg=`$s3_action  \$DBSNP_FILE_REMOTE.tbi  \$DBSNP_FILE.tbi  2>&1`\n");
+	fwrite($fp, "check_aws_file \$msg \n");
+      }
+    }
+    if ($compute_target=="local") {
+      if( ! preg_match('/^s3:\//i', $my_dbsnp_file) ) {
+	verify_rel_homedir( $my_dbsnp_file );
+	fwrite($fp, "export DBSNP_FILE=".$my_dbsnp_file."\n");
+      }
+    }
+  }
+  $my_anno_file = "";
+  if(isset($_POST['alt_anno_cmd'])) {
+    $my_anno_file = trim($_POST['alt_anno_path']);
+    if ($compute_target=="AWS") {
+      if( preg_match('/^(http(s)?|ftp):\//i', $my_anno_file) ) {
+	fwrite($fp, "export ANNO_FILE=".$my_anno_file."\n");
+      }
+      if( preg_match('/^s3:\//i', $my_anno_file) ) {
+	fwrite($fp, "mkdir -p \$RUNDIR/reference\n");
+	fwrite($fp, "ANNO_FILE_REMOTE=".$my_anno_file."\n");
+	fwrite($fp, "ANNO_BASEFILE=".basename($my_anno_file)."\n");
+	fwrite($fp, "export ANNO_FILE=\$RUNDIR/reference/\$ANNO_BASEFILE\n");
+	fwrite($fp, "echo Retrieving ANNOTATION FILE...\n");
+	fwrite($fp, "msg=`$s3_action  \$ANNO_FILE_REMOTE  \$ANNO_FILE  2>&1`\n");
+	fwrite($fp, "check_aws_file \$msg \n");
+	fwrite($fp, "echo Retrieving ANNOTATION FILE INDEX...\n");
+	fwrite($fp, "msg=`$s3_action  \$ANNO_FILE_REMOTE.tbi  \$ANNO_FILE.tbi  2>&1`\n");
+	fwrite($fp, "check_aws_file \$msg \n");
+      }
+    }
+    if ($compute_target=="local") {
+      if( ! preg_match('/^s3:\//i', $my_anno_file) ) {
+	verify_rel_homedir( $my_anno_file );
+	fwrite($fp, "export ANNO_FILE=".$my_anno_file."\n");
       }
     }
   }
@@ -2223,8 +2288,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    $prefix="varscan.dbsnp.$vartype";
 	    fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input <<EOF\n");  
 	    fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
-	    if ($_POST['dbsnp_user']=="dbsnp_user") {
-	    fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	    if ($_POST['dbsnp_version']=="dbsnp_user") {
+	      fwrite($fp, "$prefix.db = \$DBSNP_FILE\n");
 	    } else {
 	    fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
 	    }
@@ -2297,7 +2362,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       write_vs_gl_merge($fp, $vs_bMap, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
       // Results, possibly with annotation
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
 	fwrite($fp, "\\\$put_cmd  \`pwd\`/varscan.out.gl_all.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
 	if ($compute_target=="AWS") {
@@ -2327,7 +2392,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "EOF\n");
 
       // Generate VEP input
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$prefix="varscan.vep";
 	fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/vs_vep.input <<EOF\n");
 	fwrite($fp, "$prefix.vcf = ./varscan.out.gl_all.group\$gp.all.current_final.gvip.vcf\n");
@@ -2339,7 +2404,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
       // configure memory
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
       }	else {
 	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
@@ -2641,8 +2706,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	    $prefix="varscan.dbsnp.$vartype";
 	    fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input <<EOF\n");  
 	    fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
-	    if ($_POST['dbsnp_user']=="dbsnp_user") {
-	    fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	    if ($_POST['dbsnp_version']=="dbsnp_user") {
+	    fwrite($fp, "$prefix.db = \$DBSNP_FILE\n");
 	    } else {
 	    fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
 	    }
@@ -2726,7 +2791,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       write_vs_som_merge($fp,  $vs_som_prefix, $vs_hc_filter_prefix, $vs_dbsnp_filter_prefix, $vs_fpfilter_prefix);
 
       // Results, possibly with annotation
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
 	fwrite($fp, "\\\$put_cmd  \`pwd\`/varscan.out.som_all.group\$gp.all.current_final.gvip.*.VEP.vcf  \\\$myRESULTSDIR/\n");
 	if ($compute_target=="AWS") {
@@ -2756,7 +2821,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "EOF\n");
 
       // Generate VEP input
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$prefix="varscan.vep";
 	fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/vs_vep.input <<EOF\n");
 	fwrite($fp, "$prefix.vcf = ./varscan.out.som_all.group\$gp.all.current_final.gvip.Somatic.vcf\n");
@@ -2769,7 +2834,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
       // configure memory
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
       }	else {
 	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
@@ -2993,8 +3058,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  $prefix="varscan.dbsnp.$vartype";
 	  fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/\$chralt/vs_dbsnp_filter.$vartype.input <<EOF\n");  
 	  fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
-	  if ($_POST['dbsnp_user']=="dbsnp_user") {
-	  fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	  if ($_POST['dbsnp_version']=="dbsnp_user") {
+	  fwrite($fp, "$prefix.db = \$DBSNP_FILE\n");
 	  } else {
 	  fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
 	  }
@@ -3073,7 +3138,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       // Results, possibly with annotation
       // TODO: check 
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./vs_vep.input >& ./vs_vep.log\n");
 	fwrite($fp, "\\\$put_cmd  \`pwd\`/varscan.out.trio_all.group\$gp.all.current_final.gvip.*.VEP.vcf  \\\$myRESULTSDIR/\n");
 	if ($compute_target=="AWS") {
@@ -3103,7 +3168,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "EOF\n");
 
       // Generate VEP input
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$prefix="varscan.vep";
 	fwrite($fp, "cat > \$RUNDIR/varscan/group\$gp/vs_vep.input <<EOF\n");
 	fwrite($fp, "$prefix.vcf = ./varscan.out.trio_all.group\$gp.all.current_final.gvip.denovo.vcf\n");
@@ -3115,7 +3180,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       fwrite($fp, "cd \$RUNDIR/varscan/group\$gp ;  chmod +x ./varscan_postrun.sh\n");
       // configure memory
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
       }	else {
 	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
@@ -3312,8 +3377,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$prefix="gatk.dbsnp.$vartype";
 	fwrite($fp, "cat > \$RUNDIR/gatk/group\$gp/\$chralt/gatk_dbsnp_filter.$vartype.input <<EOF\n");
 	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
-	if ($_POST['dbsnp_user']=="dbsnp_user") {
-	fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	if ($_POST['dbsnp_version']=="dbsnp_user") {
+	fwrite($fp, "$prefix.db = \$DBSNP_FILE\n");
 	} else {
 	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");
 	}
@@ -3385,7 +3450,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     write_gatk_merge( $fp, $gatk_dbsnp_filter_prefix, $gatk_fpfilter_prefix );
 
     // Results, possibly with annotation
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./gatk_vep.input >& ./gatk_vep.log\n");
       fwrite($fp, "\\\$put_cmd  \`pwd\`/gatk.out.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
       if ($compute_target=="AWS") {
@@ -3415,7 +3480,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "EOF\n");
 
     // Generate VEP input
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       $prefix="gatk.vep";
       fwrite($fp, "cat > \$RUNDIR/gatk/group\$gp/gatk_vep.input <<EOF\n");
       fwrite($fp, "$prefix.vcf = ./gatk.out.group\$gp.all.current_final.gvip.vcf\n");
@@ -3426,7 +3491,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "cd \$RUNDIR/gatk/group\$gp ;  chmod +x ./gatk_postrun.sh\n");
     // configure memory
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       $mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
     }	else {
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
@@ -3625,8 +3690,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$prefix="mutect.dbsnp.$vartype";
 	fwrite($fp, "cat > \$RUNDIR/mutect/group\$gp/\$chralt/mutect_dbsnp_filter.$vartype.input <<EOF\n");
 	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
-	if ($_POST['dbsnp_user']=="dbsnp_user") {
-	fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	if ($_POST['dbsnp_version']=="dbsnp_user") {
+	fwrite($fp, "$prefix.db = \$DBSNP_FILE\n");
 	} else {
 	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");
 	}
@@ -3698,7 +3763,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     write_mutect_merge( $fp, $mutect_dbsnp_filter_prefix, $mutect_fpfilter_prefix );
 
     // Results, possibly with annotation
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./mutect_vep.input >& ./mutect_vep.log\n");
       fwrite($fp, "\\\$put_cmd  \`pwd\`/mutect.out.group\$gp.all.current_final.gvip.VEP.vcf  \\\$myRESULTSDIR/\n");
       if ($compute_target=="AWS") {
@@ -3728,7 +3793,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "EOF\n");
 
     // Generate VEP input
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       $prefix="mutect.vep";
       fwrite($fp, "cat > \$RUNDIR/mutect/group\$gp/mutect_vep.input <<EOF\n");
       fwrite($fp, "$prefix.vcf = ./mutect.out.group\$gp.all.current_final.gvip.vcf\n");
@@ -3739,7 +3804,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     fwrite($fp, "cd \$RUNDIR/mutect/group\$gp ;  chmod +x ./mutect_postrun.sh\n");
     // configure memory
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       $mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
     }	else {
       $mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
@@ -3914,8 +3979,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$prefix="strelka.dbsnp.$vartype";
 	fwrite($fp, "cat > \$RUNDIR/strelka/group\$gp/strelka_dbsnp_filter.$vartype.input <<EOF\n");  
 	fwrite($fp, "$prefix.annotator = ".$toolsinfo_h['snpsift']['path']."/".$toolsinfo_h['snpsift']['exe']."\n");
-	if ($_POST['dbsnp_user']=="dbsnp_user") {
-	fwrite($fp, "$prefix.db = ".$_POST['alt_dbsnp_vcfpath']."\n");
+	if ($_POST['dbsnp_version']=="dbsnp_user") {
+	fwrite($fp, "$prefix.db = \$DBSNP_FILE\n");
 	} else {
 	fwrite($fp, "$prefix.db = ".$toolsinfo_h[$_POST['dbsnp_version']]['path']."/".$toolsinfo_h[$_POST['dbsnp_version']]['file']."\n");     
 	}
@@ -3993,7 +4058,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       write_strlk_merge($fp, $strelka_callset, $strlk_dbsnp_filter_prefix, $strlk_fpfilter_prefix);
 
       // Results, possibly with annotation
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./strelka_vep.input >& ./strelka_vep.log\n");
 	fwrite($fp, "\\\$put_cmd  \`pwd\`/strelka.out.somatic_all.group\$gp.current_final.gvip.VEP.vcf \\\$myRESULTSDIR/\n");
 	if ($compute_target=="AWS") {
@@ -4024,7 +4089,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "EOF\n");
 
       // Generate VEP input
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$prefix="strelka.vep";
 	fwrite($fp, "cat > \$RUNDIR/strelka/group\$gp/strelka_vep.input <<EOF\n");
 	fwrite($fp, "$prefix.vcf = ./strelka.out.somatic_all.group\$gp.current_final.gvip.vcf\n");
@@ -4034,7 +4099,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       }
 
       fwrite($fp, "cd \$RUNDIR/strelka/group\$gp ;  chmod +x ./strelka_postrun.sh\n");
-      if (isset($_POST['vep_cmd'])) {
+      if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
 	$mem_opt = gen_mem_str($compute_target, max( $toolmem_h['gather']['mem_default'], $toolmem_h['vep']['mem_default'] ));
       }	else {
 	$mem_opt = gen_mem_str($compute_target, $toolmem_h['gather']['mem_default']);
@@ -4788,7 +4853,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "cat ./\\\${pre_current_final/%vcf/gvip.vcf} > ./\\\$current_final\n");
 
     // Results, possibly with annotations
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       fwrite($fp, "\\\$GENOMEVIP_SCRIPTS/vep_annotator.pl ./pindel_vep.input >& ./pindel_vep.log\n");
       fwrite($fp, "\\\$put_cmd  \`pwd\`/\\\${current_final/%vcf/VEP.vcf} \\\$myRESULTSDIR/\n");
       if ($compute_target=="AWS") {
@@ -4821,7 +4886,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
     // Generate VEP input
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       $prefix="pindel.vep";
       fwrite($fp, "cat > \$RUNDIR/pindel/group\$gp/pindel_vep.input <<EOF\n");
       fwrite($fp, "$prefix.vcf = ./pindel.out.group\$gp.current_final.gvip.".$mode_tag."vcf\n");
@@ -4834,7 +4899,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "cd \$RUNDIR/pindel/group\$gp ; chmod +x ./pindel_postrun.sh\n");
     $tmp_mem = $toolmem_h['pindel']['mem_p2v'];
 
-    if (isset($_POST['vep_cmd'])) {
+    if (isset($_POST['vep_cmd']) || isset($_POST['alt_anno_cmd'])) {
       $mem_opt = max( $mem_opt, $toolmem_h['vep']['mem_default'] );
     }
     $jobdeps = $batch['dep_opt']." ".$batch['dep_opt_pre']."\$tag_pin.pindel.group\$gp.$wc".$batch['dep_opt_post'];

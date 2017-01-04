@@ -15,7 +15,7 @@ $cmd_names = array(
  "breakdancer"              =>"",
  "pindel"                   =>"",
  "genomestrip"              =>"",
- "variant_effect_predictor" =>"",
+ "annotation"               =>"",
  "gatk"                     =>"",
  "mutect"                   =>"",
 );
@@ -374,6 +374,15 @@ $gs_opts_fixed = array(
   "depth_minimumUnobservedSampleSpanCoverage", // 1.0
   "depth_readReadCounts", // false
   "pairs_excludeJunctionReads", // false
+);
+
+// --------------------
+
+$alt_anno_opts = array(
+  "alt_anno_path",
+  "alt_anno_filetype",
+  "alt_anno_overlap",
+  "alt_anno_id",
 );
 
 // --------------------
