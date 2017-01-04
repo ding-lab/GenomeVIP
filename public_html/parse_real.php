@@ -684,6 +684,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       fwrite($fp, "echo Retrieving MUTECT...\n");
       fwrite($fp, "msg=`$s3_action  \$MUTECT_REMOTE  \$MUTECT_DIR/\$MUTECT_EXE  2>&1`\n");
       fwrite($fp, "check_aws_file \$msg \n");
+      if ($_POST['mutect_use_pon'] == "true") {
+	fwrite($fp, "NORMAL_PANEL_REMOTE=".$_POST['mutect_pon_vcfpath']."\n");
+	fwrite($fp, "export NORMAL_PANEL=".basename($_POST['mutect_pon_vcfpath'])."\n");
+	fwrite($fp, "echo Retrieving NORMAL PANEL...\n");
+	fwrite($fp, "msg=`$s3_action  \$NORMAL_PANEL_REMOTE  \$MUTECT_DIR/\$NORMAL_PANEL  2>&1`\n");
+	fwrite($fp, "check_aws_file \$msg \n");
+      }
     } else {
       if ($_POST['mutect_version'] == "mutect_user") {
 	$my_gatk_jarpath = $_POST['gatk_jarpath'];
@@ -693,6 +700,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       } else {
       fwrite($fp, "export MUTECT_DIR=".$toolsinfo_h[$_POST['mutect_version']]['path']."\n");
       fwrite($fp, "export MUTECT_EXE=".$toolsinfo_h[$_POST['mutect_version']]['exe']."\n");
+      }
+      if ($_POST['mutect_use_pon'] == "true") {
+	$my_pon_path = $_POST['mutect_pon_vcfpath'];
+	verify_rel_homedir( $my_pon_path );
       }
     }
   }
@@ -3609,10 +3620,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     fwrite($fp, "TBAM=\\\$(awk 'NR==1' \\\$BAMFILE)\n"); // (tumor,normal) order
     fwrite($fp, "NBAM=\\\$(awk 'NR==2' \\\$BAMFILE)\n");
     if ($_POST['mutect_use_pon'] == "true") {
-      $my_pon_path = $_POST['mutect_pon_vcfpath'];
-      if ($compute_target == "local") {
-	verify_rel_homedir( $my_pon_path );
-      }
       fwrite($fp, "NORMAL_PANEL=".$my_pon_path."\n");
     }
     fwrite($fp, "java  \\\$JAVA_OPTS -jar \\\$MUTECT_DIR/\\\$MUTECT_EXE  -R \\\$MUTECT_REF  -T MuTect2 -I:tumor \\\$TBAM -I:normal \\\$NBAM  -L \$chr  $mutect_opts_cmd  -o  \\\$outstem.raw.vcf   &> \\\$log\n");
