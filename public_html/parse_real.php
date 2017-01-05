@@ -5186,7 +5186,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   check_aws_shell($fp);
 
   fwrite($fp, "#\n");
-  fwrite($fp, "# GenomeVIP version $gvip_version\n");
+  fwrite($fp, "# GenomeVIP server version $genomevip_version_server\n");
   fwrite($fp, "# Script created ".date(DATE_ISO8601)."\n");
   fwrite($fp, "#\n");
 

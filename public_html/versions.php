@@ -9,8 +9,9 @@ ini_set('display_errors',1);
 error_reporting(E_ALL & ~E_DEPRECATED);
 
 // GenomeVIP versioning
-$gvip_version      = "1.2-dev";
-$genomevip_imageID = "ami-05f5b16f";
+$ini = parse_ini_file('versioning.ini',true);
+$genomevip_version_server = $ini['genomevip_version_server'];
+$genomevip_imageID        = $ini['genomevip_imageID'];
 
 // Tool versioning
 $vs_ver_map = array(

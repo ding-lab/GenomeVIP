@@ -27,7 +27,7 @@ array_push($pp, "\n");
 $prefix="genomevip";
 array_push($pp, "[ $prefix ]\n");
 array_push($pp, "$prefix.created = ".date(DATE_ISO8601)."\n");
-array_push($pp, "$prefix.version = $gvip_version\n");
+array_push($pp, "$prefix.version.server = $genomevip_version_server\n");
 array_push($pp, "\n");
 
 if( isset($_POST['compute_target']) || array_key_exists('compute_target', $_POST) ){
