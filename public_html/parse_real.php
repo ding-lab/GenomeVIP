@@ -1464,6 +1464,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	  } else {
 	    fwrite($fp, "$action \$$DNAM_VAR[$pathid]/\$PINDEL_REF  .\n");
 	  }
+      fwrite($fp, "fi\n");
+
 	    $DNAM_use[$pathid] = 1;
 	  $retrieved[$availref] = $availref_type_h[$availref];
 	  $retrieved_pathid[$availref] = $pathid;
