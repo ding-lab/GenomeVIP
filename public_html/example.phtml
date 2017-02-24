@@ -393,7 +393,7 @@ function validateform( bSubmit ){
     }
     if ( $("#pindel_cmd").is(':checked')) {
 	if( $("#pindel_chrdef2").is(':checked')) { // user
-	    if(chr_str_fail("pin_chrdef_str","Pindel")==true) { alert("The user-input genomic region for Pindel is invalid."); numerr++; return false; }
+	    if(chr_str_fail("pindel_chrdef_str","Pindel")==true) { alert("The user-input genomic region for Pindel is invalid."); numerr++; return false; }
 	}
     }
     if ( $("#gs_cmd").is(':checked')) {
